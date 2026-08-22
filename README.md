@@ -50,9 +50,16 @@ on one machine while clients render from anywhere on the network. Start a
 server that owns the hardware:
 
 ```
-python server-simulator.py    # renders into the simulator window
-python server-hardware.py     # drives the local USB device
-python server-lumax.py        # drives the lumax device
+python server-simulator.py              # renders into the simulator window
+python server-hardware.py               # drives the local USB device
+python server-lumax.py                  # drives the lumax device
+LASER=lumax python server-svglaser.py   # accepts SVG uploads and displays them on the device
+```
+
+For the latter command, you can post SVG files to the server via:
+
+```
+curl --data-urlencode "svg@examples/files/ccc.svg" http://localhost:8000/
 ```
 
 Each server listens on port `31337`. Then point clients at it:

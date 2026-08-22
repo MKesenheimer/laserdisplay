@@ -9,7 +9,6 @@ import time
 q = queue.Queue()
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
-
     def do_POST(self):
         if 'content-length' in self.headers:
             length= int( self.headers['content-length'] )
@@ -23,7 +22,7 @@ server_address = ('', 8000)
 httpd = http.server.HTTPServer(server_address, MyHandler)
 MyHandler.q = q
 
-print('listening at 8000 ...')
+print('listening on 8000 ...')
 
 def laser_loop(q):
     import LaserDisplay
@@ -31,19 +30,27 @@ def laser_loop(q):
 
     LD = LaserDisplay.create()
 
-    LD.set_scan_rate(30000)
+    LD.set_scan_rate(10000)
+    LD.set_zoom(0.1)
     LD.set_blanking_delay(0)
 
     sp = SvgProcessor(LD)
     svg = None
 
-    while True:
-        if not q.empty():
-            svg = q.get()
-        if not svg is None:
-            sp.parseString(svg, 255.0/595.0)
-            LD.show_frame()
-            time.sleep(1.0/25.0)
+    try:
+        while True:
+            if not q.empty():
+                svg = q.get()
+            if not svg is None:
+                sp.parseString(svg, 255.0/595.0)
+                LD.show_frame()
+                time.sleep(1.0/25.0)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        LD.close()
 
-threading.Thread(target=httpd.serve_forever).start()
-threading.Thread(target=laser_loop, args=[q]).start()
+# the laser output (pygame window) must live on the main thread; only the
+# plain-python HTTP server runs in a worker thread
+threading.Thread(target=httpd.serve_forever, daemon=True).start()
+laser_loop(q)

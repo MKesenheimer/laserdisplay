@@ -5,9 +5,7 @@ import math
 import time
 
 LD = LaserDisplay.create()
-
 LD.set_zoom(0.1)
-
 LD.set_scan_rate(5000)
 LD.set_blanking_delay(0)
 

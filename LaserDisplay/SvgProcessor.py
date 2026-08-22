@@ -1,7 +1,6 @@
 import xml.sax
 
 class SVGHandler(xml.sax.handler.ContentHandler):
-
     def __init__(self, LD, scale):
         xml.sax.handler.ContentHandler.__init__(self)
         self.LD = LD
@@ -136,7 +135,6 @@ class SVGHandler(xml.sax.handler.ContentHandler):
             self.LD.draw_line(x1,y1,x2,y2)
 
 class SvgProcessor():
-
     def __init__(self, LD):
         self.LD = LD
 
