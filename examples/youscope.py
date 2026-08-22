@@ -14,10 +14,10 @@ import LaserDisplay
 FPS = 25
 
 try:
-    wro = wave.open('youscope-wave.wav')
+    wro = wave.open('./examples/files/youscope-wave.wav')
 except:
     print('\nPlease download youscope-wave.wav:\n')
-    print('wget http://mirror.kapsi.fi/koodaa.mine.nu/tvt/youscope-wave.wav')
+    print('https://web.archive.org/web/20080906082603/http://mirror.kapsi.fi/koodaa.mine.nu/tvt/youscope-wave.wav')
     sys.exit(1)
 
 READ_LENGTH = wro.getframerate()//FPS
@@ -27,9 +27,8 @@ for _ in range(250):
 
 LD = LaserDisplay.create()
 
-LD.set_zoom(0.5)
-
-LD.set_scan_rate(45000)
+LD.set_zoom(0.1)
+LD.set_scan_rate(10000)
 LD.set_blanking_delay(0)
 LD.set_color(LD.WHITE)
 
