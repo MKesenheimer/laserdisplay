@@ -76,6 +76,7 @@ class LaserDisplayLocal(LaserDisplay):
 
     def draw_point(self, x, y, flags = 0x01):
         x,y = self.apply_context_transforms(x,y)
+        x,y = self._output_transform(x,y)
         x = self.noise_clamp(x)
         y = self.noise_clamp(y)
         self.__buffer += [x, 0x00, y, 0x00, self.color['R'], self.color['G'], self.color['B'], flags]

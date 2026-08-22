@@ -18,6 +18,16 @@ class LaserDisplayProxy(LaserDisplay):
         for i in self.devices:
           i.set_color(color)
 
+    def set_zoom(self, zoom):
+        LaserDisplay.set_zoom(self, zoom)
+        for i in self.devices:
+            i.set_zoom(zoom)
+
+    def set_mirror(self, mirror_x, mirror_y):
+        LaserDisplay.set_mirror(self, mirror_x, mirror_y)
+        for i in self.devices:
+            i.set_mirror(mirror_x, mirror_y)
+
     def show_frame(self):
         for i in self.devices:
           i.show_frame()

@@ -13,7 +13,6 @@ MAXSPEED = 8
 PROBAB_COLOR_CHANGE=0.05
 COLOR_CHANGE_MAXSTEP = 256
 
-
 def clamp(value, min, max):
   if value > max: return max
   if value < min: return min
@@ -55,6 +54,9 @@ class Particle:
 
 LD = LaserDisplay.create()
 
+LD.set_zoom(0.1)
+LD.set_scan_rate(10000)
+
 shapes = []
 for _ in range (NUM_SHAPES):
   particles = []
@@ -63,12 +65,17 @@ for _ in range (NUM_SHAPES):
     particles.append(p)
   shapes.append(particles)
 
-while True:
-  for particles in shapes:
-    points = []
-    for p in particles:
-      p.update_position()
-      points.append([p.x,p.y])
-      LD.set_color(p.color)
-    LD.draw_quadratic_bezier(points, 10)
-  LD.show_frame()
+try:
+  while True:
+    for particles in shapes:
+      points = []
+      for p in particles:
+        p.update_position()
+        points.append([p.x,p.y])
+        LD.set_color(p.color)
+      LD.draw_quadratic_bezier(points, 10)
+    LD.show_frame()
+except KeyboardInterrupt:
+  pass
+finally:
+  LD.close()

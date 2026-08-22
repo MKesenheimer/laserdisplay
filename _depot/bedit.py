@@ -16,7 +16,8 @@ def gen_circle(x, y, r):
     points.append([(int)(x + (CIRCLE[i][0]-0.5)*r*2), (int)(y + (CIRCLE[i][1]-0.5)*r*2-0.5)])
   return points
 
-size=WIDTH,HEIGHT;screen=pygame.display.set_mode(size, pygame.FULLSCREEN);
+size=WIDTH,HEIGHT
+screen=pygame.display.set_mode(size, pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 
 FPS = 30

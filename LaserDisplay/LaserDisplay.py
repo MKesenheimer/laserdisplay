@@ -32,9 +32,12 @@ class LaserDisplay():
 
     def __init__(self):
         # set variables and the initial state
-        self.blanking_delay = 202
-        self.scan_rate = 37000
+        self.blanking_delay = 0
+        self.scan_rate = 10000
         self.noise = 0
+        self.zoom = 1.0
+        self.mirror_x = 0
+        self.mirror_y = 0
         self.set_color(self.WHITE)
         self.ctm = None
 
@@ -59,6 +62,31 @@ class LaserDisplay():
 
     def set_noise(self, noise):
         self.noise = noise
+
+    def set_zoom(self, zoom):
+        # scales the output about the center of the frame (1.0 = full size)
+        self.zoom = zoom
+
+    def set_mirror(self, mirror_x, mirror_y):
+        # mirrors the output horizontally/vertically (1 = mirrored, 0 = normal)
+        self.mirror_x = 1 if mirror_x else 0
+        self.mirror_y = 1 if mirror_y else 0
+
+    def close(self):
+        # stops the output and releases the device, if applicable
+        pass
+
+    def _output_transform(self, x, y):
+        # applies zoom (about the center) and mirroring to a coordinate pair;
+        # used by the backends that transform coordinates on the client side
+        center = self.SIZE / 2.0
+        x = center + (x - center) * self.zoom
+        y = center + (y - center) * self.zoom
+        if self.mirror_x:
+            x = (self.SIZE - 1) - x
+        if self.mirror_y:
+            y = (self.SIZE - 1) - y
+        return x, y
 
     def set_color(self, c):
         if len(c) == 3:

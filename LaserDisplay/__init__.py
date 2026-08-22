@@ -5,6 +5,10 @@ def create(mode = os.getenv('LASER')):
         from .LaserDisplayLocal import LaserDisplayLocal
         return LaserDisplayLocal()
 
+    if mode == 'lumax':
+        from .LaserDisplayLumax import LaserDisplayLumax
+        return LaserDisplayLumax()
+
     if not mode is None and mode.startswith('remote'):
         from .LaserDisplayRemote import LaserDisplayRemote
         s = mode.split(':')

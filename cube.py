@@ -6,7 +6,8 @@ from random import random
 
 LD = LaserDisplay.create()
 
-LD.set_scan_rate(30000)
+LD.set_zoom(0.1)
+LD.set_scan_rate(5000)
 LD.set_blanking_delay(0)
 
 def draw_cube(LD, a, b, mode):
@@ -35,11 +36,16 @@ def draw_cube(LD, a, b, mode):
 a = b = 0
 da = db = 0.001
 mode = 0
-while True:
-    draw_cube(LD, a, b, mode)
-    a += da
-    b += db
-    if random() > 0.9999: da = -da
-    if random() > 0.9999: db = -db
-    if random() > 0.9999: mode = (mode+1)%2
-    LD.show_frame()
+try:
+    while True:
+        draw_cube(LD, a, b, mode)
+        a += da
+        b += db
+        if random() > 0.9999: da = -da
+        if random() > 0.9999: db = -db
+        if random() > 0.9999: mode = (mode+1)%2
+        LD.show_frame()
+except KeyboardInterrupt:
+    pass
+finally:
+    LD.close()

@@ -2,3 +2,5 @@ numpy
 pygame
 pysb
 twisted
+pycairo
+PyGObject

@@ -28,27 +28,35 @@ class LaserDisplaySimulator(LaserDisplay):
 
     def draw_point(self, x, y, flags = 0x01):
         x,y = self.apply_context_transforms(x,y)
+        x,y = self._output_transform(x,y)
         x,y = map(lambda a: a*self.SCALE, (x,y) )
         pygame.draw.rect(self.surface, self.__color(), pygame.Rect(x,y,self.SCALE,self.SCALE), 1)
 
     def draw_line(self, x1, y1, x2, y2):
         x1,y1 = self.apply_context_transforms(x1,y1)
         x2,y2 = self.apply_context_transforms(x2,y2)
+        x1,y1 = self._output_transform(x1,y1)
+        x2,y2 = self._output_transform(x2,y2)
         x1,y1,x2,y2 = map(lambda a: a*self.SCALE, (x1,y1,x2,y2) )
         pygame.draw.line(self.surface, self.__color(), (x1,y1), (x2,y2), self.SCALE)
 
     def draw_rect(self, x, y, w, h):
-        x,y,w,h = map(lambda a: a*self.SCALE, (x,y,w,h) )
-        pygame.draw.rect(self.surface, self.__color(), pygame.Rect(x,y,w,h), self.SCALE)
+        x1,y1 = self._output_transform(x, y)
+        x2,y2 = self._output_transform(x+w, y+h)
+        x1,y1,x2,y2 = map(lambda a: a*self.SCALE, (x1,y1,x2,y2) )
+        pygame.draw.rect(self.surface, self.__color(), pygame.Rect(x1,y1,x2-x1,y2-y1), self.SCALE)
 
     def draw_ellipse(self, cx, cy, rx, ry):
         if rx < 1 or ry < 1:
             return
+        cx,cy = self._output_transform(cx, cy)
+        rx *= self.zoom
+        ry *= self.zoom
         cx,cy,rx,ry = map(lambda a: a*self.SCALE, (cx,cy,rx,ry) )
         pygame.draw.ellipse(self.surface, self.__color(), pygame.Rect(cx-rx,cy-ry,2*rx,2*ry), self.SCALE)
 
     def draw_polyline(self, points):
-        points = [tuple(a*self.SCALE for a in p) for p in points]
+        points = [tuple(a*self.SCALE for a in self._output_transform(*p)) for p in points]
         pygame.draw.lines(self.surface, self.__color(), False, points, self.SCALE)
 
     def draw_quadratic_bezier(self, points, steps):
@@ -58,7 +66,7 @@ class LaserDisplaySimulator(LaserDisplay):
 
         step_inc = 1.0/(steps)
 
-        old_pos = ( points[0][0]*self.SCALE, points[0][1]*self.SCALE )
+        old_pos = tuple(a*self.SCALE for a in self._output_transform(points[0][0], points[0][1]))
 
         for i in range(0, len(points) - 2, 2):
             t = 0.0
@@ -66,10 +74,11 @@ class LaserDisplaySimulator(LaserDisplay):
             for s in range(steps):
                 t += step_inc
                 t_1 = 1.0 - t
-                pos = ((t_1 * (t_1 * points[i]  [0] + t * points[i+1][0]) + \
-                        t   * (t_1 * points[i+1][0] + t * points[i+2][0]))*self.SCALE,  \
-                       (t_1 * (t_1 * points[i]  [1] + t * points[i+1][1]) + \
-                        t   * (t_1 * points[i+1][1] + t * points[i+2][1]))*self.SCALE)
+                px = t_1 * (t_1 * points[i]  [0] + t * points[i+1][0]) + \
+                     t   * (t_1 * points[i+1][0] + t * points[i+2][0])
+                py = t_1 * (t_1 * points[i]  [1] + t * points[i+1][1]) + \
+                     t   * (t_1 * points[i+1][1] + t * points[i+2][1])
+                pos = tuple(a*self.SCALE for a in self._output_transform(px, py))
                 pygame.draw.line(self.surface, self.__color(), old_pos, pos, self.SCALE)
                 old_pos = pos
 
@@ -80,7 +89,7 @@ class LaserDisplaySimulator(LaserDisplay):
 
         step_inc = 1.0/(steps)
 
-        old_pos =  ( points[0][0]*self.SCALE, points[0][1]*self.SCALE )
+        old_pos = tuple(a*self.SCALE for a in self._output_transform(points[0][0], points[0][1]))
 
         for i in range(0, len(points) - 3, 2):
             t = 0.0
@@ -88,13 +97,14 @@ class LaserDisplaySimulator(LaserDisplay):
             for s in range(steps):
                 t += step_inc
                 t_1 = 1.0 - t
-                pos = ((t_1 * (t_1 * (t_1 * points[i][0] + t * points[i+1][0]) + \
-                        t   * (t_1 * points[i+1][0] + t * points[i+2][0])) +
-                        t   * (t_1 * (t_1 * points[i+1][0] + t * points[i+2][0]) + \
-                        t   * (t_1 * points[i+2][0] + t * points[i+3][0])))*self.SCALE,  \
-                       (t_1 * (t_1 * (t_1 * points[i][1] + t * points[i+1][1]) + \
-                        t   * (t_1 * points[i+1][1] + t * points[i+2][1])) +
-                        t   * (t_1 * (t_1 * points[i+1][1] + t * points[i+2][1]) + \
-                        t   * (t_1 * points[i+2][1] + t * points[i+3][1])))*self.SCALE)
+                px = (t_1 * (t_1 * (t_1 * points[i][0] + t * points[i+1][0]) +
+                             t   * (t_1 * points[i+1][0] + t * points[i+2][0])) +
+                      t   * (t_1 * (t_1 * points[i+1][0] + t * points[i+2][0]) +
+                             t   * (t_1 * points[i+2][0] + t * points[i+3][0])))
+                py = (t_1 * (t_1 * (t_1 * points[i][1] + t * points[i+1][1]) +
+                             t   * (t_1 * points[i+1][1] + t * points[i+2][1])) +
+                      t   * (t_1 * (t_1 * points[i+1][1] + t * points[i+2][1]) +
+                             t   * (t_1 * points[i+2][1] + t * points[i+3][1])))
+                pos = tuple(a*self.SCALE for a in self._output_transform(px, py))
                 pygame.draw.line(self.surface, self.__color(), old_pos, pos, self.SCALE)
                 old_pos = pos

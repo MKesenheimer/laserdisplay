@@ -1,0 +1,3 @@
+[submodule "LaserDisplay/lumax"]
+	path = LaserDisplay/lumax
+	url = https://github.com/MKesenheimer/lumax.git

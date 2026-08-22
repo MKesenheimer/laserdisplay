@@ -26,16 +26,24 @@ for _ in range(250):
    frames = wro.readframes(READ_LENGTH)
 
 LD = LaserDisplay.create()
+
+LD.set_zoom(0.5)
+
 LD.set_scan_rate(45000)
 LD.set_blanking_delay(0)
 LD.set_color(LD.WHITE)
 
-while True:
-    frames = wro.readframes(READ_LENGTH)
-    for i in range(0,READ_LENGTH,4):
-        r = struct.unpack('hh', frames[i:i+4])
-        x = int(r[1]*LD.SIZE/65536) + LD.SIZE/2
-        y = int(-r[0]*LD.SIZE/65536) + LD.SIZE/2
-        LD.draw_point(x,y)
-        i += 4
-    LD.show_frame()
+try:
+    while True:
+        frames = wro.readframes(READ_LENGTH)
+        for i in range(0,READ_LENGTH,4):
+            r = struct.unpack('hh', frames[i:i+4])
+            x = int(r[1]*LD.SIZE/65536) + LD.SIZE/2
+            y = int(-r[0]*LD.SIZE/65536) + LD.SIZE/2
+            LD.draw_point(x,y)
+            i += 4
+        LD.show_frame()
+except KeyboardInterrupt:
+    pass
+finally:
+    LD.close()

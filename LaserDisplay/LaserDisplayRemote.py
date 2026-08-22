@@ -24,31 +24,40 @@ class LaserDisplayRemote(LaserDisplay):
         self.__write('show\r\n')
 
     def draw_point(self, x, y, flags = 0x01):
+        x, y = self._output_transform(x, y)
         self.__write('point %f %f %d\r\n' % (x, y, flags))
 
     def draw_line(self, x1, y1, x2, y2):
+        x1, y1 = self._output_transform(x1, y1)
+        x2, y2 = self._output_transform(x2, y2)
         self.__write('line %f %f %f %f\r\n' % (x1, y1, x2, y2))
 
     def draw_rect(self, x, y, w, h):
-        self.__write('rect %f %f %f %f\r\n' % (x, y, w, h))
+        x1, y1 = self._output_transform(x, y)
+        x2, y2 = self._output_transform(x + w, y + h)
+        self.__write('rect %f %f %f %f\r\n' % (x1, y1, x2 - x1, y2 - y1))
 
     def draw_ellipse(self, cx, cy, rx, ry):
-        self.__write('ellipse %f %f %f %f\r\n' % (cx, cy, rx, ry))
+        cx, cy = self._output_transform(cx, cy)
+        self.__write('ellipse %f %f %f %f\r\n' % (cx, cy, rx * self.zoom, ry * self.zoom))
 
     def draw_polyline(self, points):
         msg = 'polyline'
         for p in points:
-            msg += ' %f %f' % (p[0], p[1])
+            px, py = self._output_transform(p[0], p[1])
+            msg += ' %f %f' % (px, py)
         self.__write(msg + '\r\n')
 
     def draw_quadratic_bezier(self, points, steps):
         msg = 'quadratic'
         for p in points:
-            msg += ' %f %f' % (p[0], p[1])
+            px, py = self._output_transform(p[0], p[1])
+            msg += ' %f %f' % (px, py)
         self.__write(msg + '\r\n')
 
     def draw_cubic_bezier(self, points, steps):
         msg = 'cubic'
         for p in points:
-            msg += ' %f %f' % (p[0], p[1])
+            px, py = self._output_transform(p[0], p[1])
+            msg += ' %f %f' % (px, py)
         self.__write(msg + '\r\n')
