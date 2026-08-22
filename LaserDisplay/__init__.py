@@ -1,5 +1,11 @@
 import os
 
+from .LaserDisplay import LaserDisplay
+from .Shape import Shape
+from .Geometry import Geometry
+from .Animate import Animate, Rotation, Translation, Scale, ColorShift, Blink
+from .Scheduler import Scheduler
+
 def create(mode = os.getenv('LASER')):
     if mode == 'local':
         from .LaserDisplayLocal import LaserDisplayLocal

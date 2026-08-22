@@ -40,6 +40,7 @@ class LaserDisplay():
         self.mirror_y = 0
         self.set_color(self.WHITE)
         self.ctm = None
+        self.frame_shapes = []
 
 # private functions
 
@@ -111,8 +112,66 @@ class LaserDisplay():
     def set_laser_configuration(self):
         raise NotImplementedError
 
+# routines that deal with frames consisting of shapes:
+#
+#   t1 = geometry.triangle(x0, y0, x1, y1, x2, y2, npoints, rd, gr, bl)
+#   l1 = geometry.line(x0, y0, x1, y1, npoints, rd, gr, bl)
+#
+#   animate.apply_translation(t1, dx, dy)
+#   animate.apply_rotation(l1, pivot_x, pivot_y, angle)
+#
+#   LD.new_frame()
+#   LD.add_shape_to_frame(t1)
+#   LD.add_shape_to_frame(l1)
+#   LD.show_frame()
+
+    def new_frame(self):
+        # starts a new frame consisting of shapes
+        self.frame_shapes = []
+
+    def add_shape_to_frame(self, shape):
+        # adds a finalized shape to the current frame
+        self.frame_shapes.append(shape)
+
     def show_frame(self):
+        # displays the current frame; by default the shapes are replayed
+        # through the classic drawing primitives, backends may override
+        # this with a more efficient direct path
+        for s in self.frame_shapes:
+            self._draw_shape(s)
+        self.frame_shapes = []
+        self.flush_frame()
+
+    def flush_frame(self):
+        # sends the buffered drawing primitives of this frame to the device
         raise NotImplementedError
+
+    def _draw_shape(self, shape):
+        # renders a shape using the classic drawing primitives; shapes use
+        # the 16 bit coordinate/color space (0 .. 255*255) with y pointing up,
+        # the display uses 0 .. SIZE-1 with y pointing down
+        pts = shape.get_points()
+        n = len(pts)
+        i = 0
+        while i < n:
+            r = int(pts[i, 2])
+            g = int(pts[i, 3])
+            b = int(pts[i, 4])
+            if r == 0 and g == 0 and b == 0:
+                # blanked point: splits the polyline (beam is moved off)
+                i += 1
+                continue
+            # collect the run of consecutive points with identical color
+            j = i + 1
+            while j < n and int(pts[j, 2]) == r and int(pts[j, 3]) == g and int(pts[j, 4]) == b:
+                j += 1
+            self.set_color((min(r >> 8, 255), min(g >> 8, 255), min(b >> 8, 255)))
+            run = [(float(p[0]) / 255.0, (self.SIZE - 1) - float(p[1]) / 255.0) for p in pts[i:j]]
+            if len(run) == 1:
+                self.draw_point(run[0][0], run[0][1])
+            else:
+                self.draw_polyline(run)
+            i = j
 
     def draw_point(self, x, y, flags = 0):
         raise NotImplementedError

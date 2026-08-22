@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import http.server
 import urllib.parse
 import threading
@@ -8,7 +9,17 @@ import time
 
 q = queue.Queue()
 
-class MyHandler(http.server.BaseHTTPRequestHandler):
+SVGLASER_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'svglaser')
+
+class MyHandler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=SVGLASER_DIR, **kwargs)
+
+    def end_headers(self):
+        # allow posting the drawing from file:// instances of the editor
+        self.send_header('Access-Control-Allow-Origin', '*')
+        super().end_headers()
+
     def do_POST(self):
         if 'content-length' in self.headers:
             length= int( self.headers['content-length'] )
@@ -19,7 +30,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
 
 server_address = ('', 8000)
-httpd = http.server.HTTPServer(server_address, MyHandler)
+httpd = http.server.ThreadingHTTPServer(server_address, MyHandler)
 MyHandler.q = q
 
 print('listening on 8000 ...')
@@ -30,7 +41,7 @@ def laser_loop(q):
 
     LD = LaserDisplay.create()
 
-    LD.set_scan_rate(10000)
+    LD.set_scan_rate(1000)
     LD.set_zoom(0.1)
     LD.set_blanking_delay(0)
 

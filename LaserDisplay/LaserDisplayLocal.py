@@ -70,7 +70,7 @@ class LaserDisplayLocal(LaserDisplay):
     def set_laser_configuration(self):
         self.ep.write([self.blanking_delay, (45000 - self.scan_rate)//200])
 
-    def show_frame(self):
+    def flush_frame(self):
         self.ep.write(self.__buffer, 0)
         self.__buffer = []
 

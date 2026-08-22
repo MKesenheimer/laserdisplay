@@ -20,7 +20,7 @@ class LaserDisplayRemote(LaserDisplay):
         LaserDisplay.set_color(self, color)
         self.__write('color %d %d %d\r\n' % (self.color['R'],self.color['G'],self.color['B']))
 
-    def show_frame(self):
+    def flush_frame(self):
         self.__write('show\r\n')
 
     def draw_point(self, x, y, flags = 0x01):

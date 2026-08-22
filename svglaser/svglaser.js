@@ -1,5 +1,9 @@
 var svgCanvas = null;
 
+// when the editor is opened directly from the file system, the drawing is
+// posted to the laser server running on localhost; otherwise stay same-origin
+var LASER_SERVER = (location.protocol === 'file:') ? 'http://localhost:8000/' : '/';
+
 var setColorIcon = function(id) {
     $('#color_white').removeClass('button_selected');
     $('#color_red').removeClass('button_selected');
@@ -39,6 +43,24 @@ $(function(){
 
     $('#clear').click(function(){ svgCanvas.clear(); });
     $('#delete').click(function(){ svgCanvas.deleteSelectedElements(); });
+
+    // display the current drawing on the laser
+    $('#laser').click(function(){
+        $.post(LASER_SERVER, {svg: svgCanvas.getSvgString()})
+            .fail(function(){ alert('Could not reach the laser server at ' + LASER_SERVER); });
+    });
+
+    // export the current drawing as an svg file
+    $('#export').click(function(){
+        var blob = new Blob([svgCanvas.getSvgString()], {type: 'image/svg+xml'});
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'drawing.svg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+    });
 
     $('#color_white').click(function(){ svgCanvas.setStrokeColor('#ffffff'); setColorIcon('#color_white'); });
     $('#color_red').click(function(){ svgCanvas.setStrokeColor('#ff0000'); setColorIcon('#color_red'); });

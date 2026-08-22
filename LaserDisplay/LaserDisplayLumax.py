@@ -6,15 +6,14 @@ from .LaserDisplay import LaserDisplay
 from .lumax import lumax_renderer
 
 class LaserDisplayLumax(LaserDisplay):
-
     # lumaxlib uses a 0..255 coordinate/color space scaled by 255 (16 bit)
     SCALE = 255
 
     # distance (in display units) between interpolated points of a segment
-    INTERP_STEP = 4
+    INTERP_STEP = 1
 
     # maximum number of interpolated points per segment
-    MAX_INTERP = 64
+    MAX_INTERP = 128
 
     # Mirror output
     MIRROR_X = 1
@@ -39,7 +38,6 @@ class LaserDisplayLumax(LaserDisplay):
             raise IOError('Could not find lumax device ...')
 
 # private functions
-
     def __clamp(self, value):
         if self.noise > 0:
             value += random() * self.noise - self.noise / 2
@@ -87,6 +85,22 @@ class LaserDisplayLumax(LaserDisplay):
 
         return numpy.array(points, dtype='uint16')
 
+    def __generate_shape_points(self, shape):
+        # translates the points of a shape into lumax points, applying the
+        # global zoom (about the center of the frame) and flipping the y axis;
+        # mirroring is done on the device side by the renderer
+        pts = shape.get_points()
+        x = pts[:, 0].astype('float64') / self.SCALE
+        y = pts[:, 1].astype('float64') / self.SCALE
+        center = self.SIZE / 2.0
+        x = numpy.clip(center + (x - center) * self.zoom, 0, self.SIZE - 1)
+        y = numpy.clip(center + (y - center) * self.zoom, 0, self.SIZE - 1)
+        points = numpy.empty((len(pts), 5), dtype='uint16')
+        points[:, 0] = numpy.rint(x * self.SCALE)
+        points[:, 1] = numpy.rint((self.SIZE - 1 - y) * self.SCALE)
+        points[:, 2:5] = pts[:, 2:5]
+        return points
+
 # public functions
 
     def set_mirror(self, mirror_x, mirror_y):
@@ -104,6 +118,21 @@ class LaserDisplayLumax(LaserDisplay):
         self.renderer.close_device()
 
     def show_frame(self):
+        # frames built from shapes are passed to the lumax renderer directly
+        if self.frame_shapes:
+            for s in self.frame_shapes:
+                if s.get_number_of_points() > 0:
+                    self.renderer.add_points_to_frame(self.__generate_shape_points(s))
+            self.frame_shapes = []
+            if self.renderer.totnpoints > 0:
+                # lumax accepts 250..70000 pps
+                speed = max(250, min(int(self.scan_rate), 70000))
+                self.renderer.send_frame(speed)
+                self.renderer.new_frame()
+        else:
+            self.flush_frame()
+
+    def flush_frame(self):
         if len(self.__buffer):
             self.renderer.add_points_to_frame(self.__generate_buffer())
             # lumax accepts 250..70000 pps

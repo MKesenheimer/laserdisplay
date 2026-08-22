@@ -53,7 +53,6 @@ class Particle:
 
 
 LD = LaserDisplay.create()
-
 LD.set_zoom(0.1)
 LD.set_scan_rate(10000)
 

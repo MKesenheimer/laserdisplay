@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Demo timeline for the Scheduler class (see examples/scheduler.py).
+
+    All coordinates and colors are in the familiar 0..255 range and are
+    scaled up to the internal 16 bit laser range automatically.
+    The y axis points up (y = 0 is the bottom of the frame).
+    Times are seconds, speeds are degrees/second or units/second,
+    frequencies are hertz.
+
+    Effects: rotation, translation, scale, color_shift, blink
+-->
+
+<animation fps="25" duration="16">
+
+    <!-- ==================== shape definitions ==================== -->
+
+    <!-- triangle spinning around the center of the frame -->
+    <shape name="spinner" type="triangle"
+           x0="88" y0="98" x1="168" y1="98" x2="128" y2="170"
+           npoints="24" red="255" green="120" blue="0"/>
+
+    <!-- dashed line wobbling up and down -->
+    <shape name="wobble" type="line"
+           x0="30" y0="60" x1="226" y1="60"
+           npoints="40" red="0" green="255" blue="80" blank="5"/>
+
+    <!-- circle pulsing its radius -->
+    <shape name="bubble" type="circle"
+           cx="150" cy="165" r="35"
+           npoints="48" red="40" green="120" blue="255"/>
+
+    <!-- square drifting diagonally -->
+    <shape name="square" type="tetragon"
+           x0="90" y0="90" x1="166" y1="90" x2="166" y2="166" x3="90" y3="166"
+           npoints="12" red="255" green="255" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+
+    <event at="0.0">
+        <create shape="spinner"/>
+        <create shape="wobble"/>
+        <effect shape="spinner" type="rotation" speed="45"/>
+        <effect shape="wobble" type="translation" ay="45" fy="0.25"/>
+    </event>
+
+    <event at="3.0">
+        <create shape="bubble"/>
+        <effect shape="bubble" type="scale" min="0.5" max="1.4" frequency="0.5"/>
+    </event>
+
+    <event at="6.0">
+        <!-- the spinner slowly turns from orange to magenta -->
+        <effect shape="spinner" type="color_shift" dr="-85" dg="-45" db="100"/>
+        <effect shape="wobble" type="blink" period="1.2"/>
+    </event>
+
+    <event at="9.0">
+        <create shape="square"/>
+        <effect shape="square" type="translation" vx="-14" vy="9"/>
+    </event>
+
+    <event at="11.0">
+        <effect shape="bubble" type="rotation" speed="-120"/>
+        <effect shape="square" type="blink" period="0.8" duty="0.75"/>
+    </event>
+
+    <event at="13.0">
+        <destroy shape="square"/>
+    </event>
+
+    <event at="14.5">
+        <destroy shape="bubble"/>
+    </event>
+
+</animation>

@@ -28,9 +28,9 @@ class LaserDisplayProxy(LaserDisplay):
         for i in self.devices:
             i.set_mirror(mirror_x, mirror_y)
 
-    def show_frame(self):
+    def flush_frame(self):
         for i in self.devices:
-          i.show_frame()
+          i.flush_frame()
 
     def draw_point(self, x, y, flags = 0x01):
         for i in self.devices:

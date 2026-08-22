@@ -22,7 +22,7 @@ class LaserDisplaySimulator(LaserDisplay):
     def set_laser_configuration(self):
         pass
 
-    def show_frame(self):
+    def flush_frame(self):
         pygame.display.flip()
         self.surface.fill( (0,0,0) )
 
