@@ -28,8 +28,6 @@ Copyright (c) 2008 Micah Dowty
 
 """
 
-from __future__ import division
-
 import struct
 
 # Format codes
@@ -45,7 +43,7 @@ formatTable = (
     )
 
 # Header values
-HEADER_MAGIC    = "ILDA\0\0\0"
+HEADER_MAGIC    = b"ILDA\0\0\0"
 HEADER_RESERVED = 0
 HEADER_FORMAT   = ">7sB16sHHHBB"
 HEADER_LEN      = struct.calcsize(HEADER_FORMAT)
@@ -76,7 +74,7 @@ class Table(object):
                  self.total, self.scanHead))
 
     def unpackHeader(self, data):
-        magic, self.format, self.name, self.length, \
+        magic, self.format, name, self.length, \
             self.number, self.total, self.scanHead, \
             reserved = struct.unpack(HEADER_FORMAT, data)
 
@@ -84,10 +82,12 @@ class Table(object):
             raise ValueError("Bad ILDA header magic. Not an ILDA file?")
         if reserved != HEADER_RESERVED:
             raise ValueError("Reserved ILDA field is not zero.")
+        self.name = name.decode('ascii', 'replace').rstrip('\0')
 
     def packHeader(self):
         return struct.pack(HEADER_FORMAT, HEADER_MAGIC, self.format,
-                           self.name, self.length, self.number,
+                           self.name.encode('ascii', 'replace')[:16],
+                           self.length, self.number,
                            self.total, self.scanHead, HEADER_RESERVED)
 
     def readHeader(self, stream):
@@ -109,7 +109,7 @@ class Table(object):
             fmt = self._getItemFormat()
             itemSize = struct.calcsize(fmt)
             self.items = [struct.unpack(fmt, stream.read(itemSize))
-                          for i in xrange(self.length)]
+                          for i in range(self.length)]
 
     def write(self, stream):
         """Write the header, then write all items in this table."""
@@ -117,8 +117,8 @@ class Table(object):
         if self.length:
             fmt = self._getItemFormat()
             itemSize = struct.calcsize(fmt)
-            stream.write(''.join([struct.pack(fmt, *item)
-                                  for item in self.items]))
+            stream.write(b''.join([struct.pack(fmt, *item)
+                                   for item in self.items]))
 
     def iterPoints(self):
         """Iterate over Point instances for each item in this table.
@@ -148,9 +148,9 @@ class Point:
         if self.blanking:
             status |= 1 << 14
 
-        return (min(0x7FFF, max(-0x7FFF, self.x * 0x7FFF)),
-                min(0x7FFF, max(-0x7FFF, self.y * 0x7FFF)),
-                min(0x7FFF, max(-0x7FFF, self.z * 0x7FFF)),
+        return (int(min(0x7FFF, max(-0x7FFF, self.x * 0x7FFF))),
+                int(min(0x7FFF, max(-0x7FFF, self.y * 0x7FFF))),
+                int(min(0x7FFF, max(-0x7FFF, self.z * 0x7FFF))),
                 status)
 
     def decode(self, t):
@@ -161,8 +161,9 @@ class Point:
         else:
             self.z = 0.0
 
-        self.color = t[3] & 0xFF
-        self.blanking = (t[3] & (1 << 14)) != 0
+        status = t[-1]
+        self.color = status & 0xFF
+        self.blanking = (status & (1 << 14)) != 0
 
 
 def read(stream):
@@ -206,10 +207,9 @@ def readFirstFrame(stream):
 if __name__ == "__main__":
     # Test program- dump frames and points from a file whose name is
     # specified on the command line
-
     import sys
 
     f = open(sys.argv[1], 'rb')
     for t in readFrames(f):
         for p in t.iterPoints():
-            print "\t%r" % p
+            print("\t%r" % p)

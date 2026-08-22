@@ -1,7 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
 import pygame
-from LaserDisplay import LaserDisplay
+import LaserDisplay
 
 pygame.init()
 
@@ -29,66 +33,75 @@ curve = []
 curvelen = 0
 snap = 1
 
-LD = LaserDisplay({"server":"localhost","port": 50000})
-#LD = LaserDisplay()
+LD = LaserDisplay.create()
+LD.set_zoom(0.1)
+LD.set_scan_rate(10000)
 
 def clamp_int(value, min, max):
   if value > max: return max
   if value < min: return min
   return value
 
-while cont == 1:
-#  clock.tick(FPS)
+try:
+  while cont == 1:
+  #  clock.tick(FPS)
 
-  for event in pygame.event.get():
-    if event.type == pygame.KEYDOWN:
-      if event.key == pygame.K_ESCAPE:
-        cont = 0
-      if event.key == pygame.K_r:
-        curve = []
-        curvelen = 0
-      if event.key == pygame.K_a:
-        numbers.append(curve)
-        print numbers
-    if event.type == pygame.MOUSEBUTTONDOWN:
-      curvelen += 1
-      x = clamp_int(255-(float)(event.pos[0])/WIDTH*255, 3, 252)
-      y = clamp_int(255-(float)(event.pos[1])/HEIGHT*255, 3, 252)
-      if snap:
-        curve.append( [ int(x), int(y) ] )
-      else:
-        curve.append( [ x, y ] )
+    for event in pygame.event.get():
+      if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_ESCAPE:
+          cont = 0
+        if event.key == pygame.K_r:
+          curve = []
+          curvelen = 0
+        if event.key == pygame.K_a:
+          numbers.append(curve)
+          print(numbers)
+      if event.type == pygame.MOUSEBUTTONDOWN:
+        curvelen += 1
+        x = clamp_int(255-(float)(event.pos[0])/WIDTH*255, 3, 252)
+        y = clamp_int(255-(float)(event.pos[1])/HEIGHT*255, 3, 252)
+        if snap:
+          curve.append( [ int(x), int(y) ] )
+        else:
+          curve.append( [ x, y ] )
 
-  m_x = (float)(pygame.mouse.get_pos()[0])/WIDTH
-  m_x = 1.0 - m_x
-  m_y = (float)(pygame.mouse.get_pos()[1])/HEIGHT
-  m_y = 1.0 - m_y
+    m_x = (float)(pygame.mouse.get_pos()[0])/WIDTH
+    m_x = 1.0 - m_x
+    m_y = (float)(pygame.mouse.get_pos()[1])/HEIGHT
+    m_y = 1.0 - m_y
 
-  m_x = clamp_int(m_x * 255, 6, 249)
-  m_y = clamp_int(m_y * 255, 6, 249)
+    m_x = clamp_int(m_x * 255, 6, 249)
+    m_y = clamp_int(m_y * 255, 6, 249)
 
-  MIN_BORDER = 64
-  MAX_BORDER = 192
+    MIN_BORDER = 64
+    MAX_BORDER = 192
 
-  LD.set_color([0xff, 0x00, 0xff])
-  mouse = gen_circle(MIN_BORDER, MIN_BORDER, 1)
-  LD.draw_cubic_bezier(mouse, 2)
-  mouse = gen_circle(MIN_BORDER, MAX_BORDER, 1)
-  LD.draw_cubic_bezier(mouse, 2)
-  mouse = gen_circle(MAX_BORDER, MAX_BORDER, 1)
-  LD.draw_cubic_bezier(mouse, 2)
-  mouse = gen_circle(MAX_BORDER, MIN_BORDER, 1)
-  LD.draw_cubic_bezier(mouse, 2)
+    LD.set_color([0xff, 0x00, 0xff])
+    mouse = gen_circle(MIN_BORDER, MIN_BORDER, 1)
+    LD.draw_cubic_bezier(mouse, 2)
+    mouse = gen_circle(MIN_BORDER, MAX_BORDER, 1)
+    LD.draw_cubic_bezier(mouse, 2)
+    mouse = gen_circle(MAX_BORDER, MAX_BORDER, 1)
+    LD.draw_cubic_bezier(mouse, 2)
+    mouse = gen_circle(MAX_BORDER, MIN_BORDER, 1)
+    LD.draw_cubic_bezier(mouse, 2)
 
-  mouse = gen_circle(m_x, m_y, 3)
-  LD.draw_cubic_bezier(mouse, 2)
+    mouse = gen_circle(m_x, m_y, 3)
+    LD.draw_cubic_bezier(mouse, 2)
 
-  LD.set_color([0xff, 0x00, 0x00])
-  if curvelen >= 3:
-    LD.draw_cubic_bezier(curve, 8);
+    LD.set_color([0xff, 0x00, 0x00])
+    if curvelen >= 3:
+      LD.draw_cubic_bezier(curve, 8);
 
-  if curvelen % 2 == 0 and curvelen > 0:
-    circle = gen_circle(curve[curvelen-1][0], curve[curvelen-1][1], 2)
-    LD.set_color([0x00,0xff,0xff])
-    LD.draw_cubic_bezier(circle,4)
-    LD.draw_cubic_bezier(curve[-2:]+[[m_x,m_y]], 5)
+    if curvelen % 2 == 0 and curvelen > 0:
+      circle = gen_circle(curve[curvelen-1][0], curve[curvelen-1][1], 2)
+      LD.set_color([0x00,0xff,0xff])
+      LD.draw_cubic_bezier(circle,4)
+      LD.draw_cubic_bezier(curve[-2:]+[[m_x,m_y]], 5)
+
+    LD.show_frame()
+except KeyboardInterrupt:
+  pass
+finally:
+  LD.close()
+  pygame.quit()

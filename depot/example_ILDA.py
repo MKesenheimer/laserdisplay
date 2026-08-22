@@ -1,19 +1,22 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # display ILDA animations from a given file
 
-from LaserDisplay import *
-import ILDA
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
-#LD = LaserDisplay()
-LD = LaserDisplay({"server":"localhost","port": 50000})
-LD.set_scan_rate(37000)
+import LaserDisplay
+import ILDA
+import random
+
+LD = LaserDisplay.create()
+LD.set_zoom(0.1)
+LD.set_scan_rate(10000)
 LD.set_blanking_delay(0)
 
+WIDTH = 200
+HEIGHT = 200
 
-WIDTH=200
-HEIGHT=200
-import sys
-import random
 ilda_file = open(sys.argv[1], 'rb')
 ilda_frames = ILDA.readFrames(ilda_file)
 
@@ -25,17 +28,17 @@ for f in ilda_frames:
   frames.append(frame)
 ilda_file.close()
 
-LD.set_color(YELLOW)
-
-for frame in frames:
-  for _ in range(2):
-    for point in frame:
-        #LD.set_color(p.color)
-      if random.random()<=0.5:
-        LD.draw_point(point[0], point[1])
-m = LD.messageBuffer
-
-while True:
-  LD.messageBuffer = m
-  LD.show_frame()
-
+try:
+  while True:
+    for frame in frames:
+      LD.set_color(LD.YELLOW)
+      for _ in range(2):
+        for point in frame:
+          #LD.set_color(p.color)
+          if random.random()<=0.5:
+            LD.draw_point(point[0], point[1])
+      LD.show_frame()
+except KeyboardInterrupt:
+  pass
+finally:
+  LD.close()
