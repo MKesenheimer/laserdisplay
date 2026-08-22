@@ -1,15 +1,14 @@
 Laser Display
 =============
 
+Requirements (Python 3):
 
-
-Requirements:
-
-python-numpy
-python-pygame
-python-usb
-
-
+```
+numpy
+pygame
+pyusb
+twisted
+```
 
 LaserDisplay.create() - factory method
 
@@ -17,4 +16,4 @@ LaserDisplay.create() - factory method
   - if it is empty, it will create Simulator
   - if it contains string "local", it will create Local instance
   - if it contains string in format "remote:host" or "remote:host:port",
-    it will try to content to LaserDisplay server on this host (default port is 31337)
+    it will try to connect to LaserDisplay server on this host (default port is 31337)

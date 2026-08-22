@@ -1,16 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 DEVICE = 'alsa_output.pci-0000_00_1b.0.analog-stereo.monitor'
 
-import pygst
-pygst.require("0.10")
-import gst
+import gi
+gi.require_version('Gst', '1.0')
+from gi.repository import Gst
 import struct
 import LaserDisplay
 
-pipeline = gst.parse_launch('pulsesrc device=%s ! audio/x-raw-int ! appsink name=sink' % DEVICE)
+Gst.init(None)
+
+pipeline = Gst.parse_launch('pulsesrc device=%s ! audio/x-raw,format=S16LE,layout=interleaved ! appsink name=sink emit-signals=true' % DEVICE)
 sink = pipeline.get_by_name('sink')
-pipeline.set_state(gst.STATE_PLAYING)
+pipeline.set_state(Gst.State.PLAYING)
 
 LD = LaserDisplay.create()
 
@@ -24,18 +26,23 @@ def setcolor(v):
 
 while True:
     try:
-        buf = sink.emit('pull-buffer')
-    except:
-        print 'err'
+        sample = sink.emit('pull-sample')
+    except Exception:
+        print('err')
         break
-    raw = struct.unpack(str(len(buf)/2)+'h', buf)
+    if sample is None:
+        break
+    ok, info = sample.get_buffer().map(Gst.MapFlags.READ)
+    if not ok:
+        continue
+    raw = struct.unpack(str(len(info.data)//2)+'h', info.data[:len(info.data)//2*2])
     rawlen = len(raw)
 
-    setcolor(128+raw[0]/128)
-    LD.draw_point(0, 128+raw[0]/128, 0x03 )
+    setcolor(128+raw[0]//128)
+    LD.draw_point(0, 128+raw[0]//128, 0x03 )
     for i in range(1,255):
-        setcolor(128+raw[int(rawlen/256.0*i)]/128)
-        LD.draw_point(i, 128+raw[int(rawlen/256.0*i)]/128, 0x00 )
-    setcolor(128+raw[rawlen-1]/128)
-    LD.draw_point(255, 128+raw[rawlen-1]/128, 0x02 )
+        setcolor(128+raw[int(rawlen/256.0*i)]//128)
+        LD.draw_point(i, 128+raw[int(rawlen/256.0*i)]//128, 0x00 )
+    setcolor(128+raw[rawlen-1]//128)
+    LD.draw_point(255, 128+raw[rawlen-1]//128, 0x02 )
     LD.show_frame()

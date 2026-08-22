@@ -1,17 +1,19 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 DEVICE = 'alsa_output.pci-0000_00_1b.0.analog-stereo.monitor'
 
-import pygst
-pygst.require("0.10")
-import gst
+import gi
+gi.require_version('Gst', '1.0')
+from gi.repository import Gst
 import struct
 import numpy.fft
 import LaserDisplay
 
-pipeline = gst.parse_launch('pulsesrc device=%s ! audio/x-raw-int ! appsink name=sink' % DEVICE)
+Gst.init(None)
+
+pipeline = Gst.parse_launch('pulsesrc device=%s ! audio/x-raw,format=S16LE,layout=interleaved ! appsink name=sink emit-signals=true' % DEVICE)
 sink = pipeline.get_by_name('sink')
-pipeline.set_state(gst.STATE_PLAYING)
+pipeline.set_state(Gst.State.PLAYING)
 
 LD = LaserDisplay.create()
 
@@ -25,11 +27,17 @@ def setcolor(v):
 
 while True:
     try:
-        buf = sink.emit('pull-buffer')
-    except:
-        print 'err'
+        sample = sink.emit('pull-sample')
+    except Exception:
+        print('err')
         break
-    raw = struct.unpack(str(len(buf)/2)+'h', buf)
+    if sample is None:
+        break
+    ok, info = sample.get_buffer().map(Gst.MapFlags.READ)
+    if not ok:
+        continue
+    data = info.data[:len(info.data)//2*2]
+    raw = struct.unpack(str(len(data)//2)+'h', data)
     raw = numpy.log( numpy.abs(numpy.fft.fft(raw))**2 )
 
     idx = 0
@@ -41,7 +49,7 @@ while True:
             idx += 1
         try:
             val = int( 1.5*numpy.exp(val/steps/6) )
-        except:
+        except Exception:
             val = 1
         setcolor(val)
         LD.draw_rect(i*16+3, 255-val, 10, val)

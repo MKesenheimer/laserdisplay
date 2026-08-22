@@ -1,4 +1,5 @@
 import math
+from random import random
 from numpy import matrix
 
 class LaserDisplay():
@@ -123,7 +124,7 @@ class LaserDisplay():
             return (x,y)
         else:
             vector = self.ctm*matrix([x,y,1]).transpose()
-            return vector[0], vector[1]
+            return vector.item(0), vector.item(1)
 
     def save(self):
         self.saved_matrix = self.ctm

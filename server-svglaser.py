@@ -1,29 +1,29 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import BaseHTTPServer
-import urllib
+import http.server
+import urllib.parse
 import threading
-import Queue
+import queue
 import time
 
-q = Queue.Queue()
+q = queue.Queue()
 
-class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class MyHandler(http.server.BaseHTTPRequestHandler):
 
     def do_POST(self):
-        if self.headers.has_key('content-length'):
+        if 'content-length' in self.headers:
             length= int( self.headers['content-length'] )
             content = self.rfile.read(length)
-            svg = urllib.unquote_plus(content[4:])
+            svg = urllib.parse.unquote_plus(content[4:].decode('utf-8'))
             q.put(svg)
         self.send_response(200)
         self.end_headers()
 
 server_address = ('', 8000)
-httpd = BaseHTTPServer.HTTPServer(server_address, MyHandler)
+httpd = http.server.HTTPServer(server_address, MyHandler)
 MyHandler.q = q
 
-print 'listening at 8000 ...'
+print('listening at 8000 ...')
 
 def laser_loop(q):
     import LaserDisplay

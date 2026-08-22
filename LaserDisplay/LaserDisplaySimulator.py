@@ -1,6 +1,6 @@
 import time
 import pygame
-from LaserDisplay import LaserDisplay
+from .LaserDisplay import LaserDisplay
 
 class LaserDisplaySimulator(LaserDisplay):
 
@@ -48,13 +48,12 @@ class LaserDisplaySimulator(LaserDisplay):
         pygame.draw.ellipse(self.surface, self.__color(), pygame.Rect(cx-rx,cy-ry,2*rx,2*ry), self.SCALE)
 
     def draw_polyline(self, points):
-        for i in range(len(points)):
-            points[i] = map(lambda a: a*self.SCALE, points[i] )
+        points = [tuple(a*self.SCALE for a in p) for p in points]
         pygame.draw.lines(self.surface, self.__color(), False, points, self.SCALE)
 
     def draw_quadratic_bezier(self, points, steps):
         if len(points) < 3:
-            print 'Quadratic Bezier curves have to have at least three points'
+            print('Quadratic Bezier curves have to have at least three points')
             return
 
         step_inc = 1.0/(steps)
@@ -76,7 +75,7 @@ class LaserDisplaySimulator(LaserDisplay):
 
     def draw_cubic_bezier(self, points, steps):
         if len(points) < 4:
-            print 'Cubic Bezier curves have to have at least four points'
+            print('Cubic Bezier curves have to have at least four points')
             return
 
         step_inc = 1.0/(steps)

@@ -1,5 +1,4 @@
 import xml.sax
-import LaserDisplay
 
 class SVGHandler(xml.sax.handler.ContentHandler):
 
@@ -123,7 +122,7 @@ class SVGHandler(xml.sax.handler.ContentHandler):
             color = attrs.get('stroke')
             if color:
                 self.LD.set_color(color)
-            points = map(lambda a: map(lambda b: float(b)*self.scale, a.split(',') ), filter(lambda a: len(a)>0, points) )
+            points = [[float(b)*self.scale for b in a.split(',')] for a in points if len(a)>0]
             self.LD.draw_polyline(points)
 
         if name == 'line':

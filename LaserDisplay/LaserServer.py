@@ -35,25 +35,27 @@ def process_line(line):
 
     elif s[0] == 'polyline':
         points = []
-        for i in range((len(s)-1)/2):
+        for i in range((len(s)-1)//2):
             points.append( (float(s[2*i+1]),float(s[2*i+2])) )
         LD.draw_polyline(points)
 
     elif s[0] == 'quadratic':
         points = []
-        for i in range((len(s)-1)/2):
+        for i in range((len(s)-1)//2):
             points.append( (float(s[2*i+1]),float(s[2*i+2])) )
         LD.draw_quadratic_bezier(points, QUAD_QUALITY)
 
     elif s[0] == 'cubic':
         points = []
-        for i in range((len(s)-1)/2):
+        for i in range((len(s)-1)//2):
             points.append( (float(s[2*i+1]),float(s[2*i+2])) )
         LD.draw_cubic_bezier(points, CUBIC_QUALITY)
 
 class LaserProtocol(basic.LineOnlyReceiver):
 
     def lineReceived(self, line):
+        if isinstance(line, bytes):
+            line = line.decode('utf-8')
         process_line(line)
 
 class LaserServer():
@@ -64,13 +66,13 @@ class LaserServer():
     def start(self, emulator = False):
         global LD
         if emulator:
-            from LaserDisplaySimulator import LaserDisplaySimulator
+            from .LaserDisplaySimulator import LaserDisplaySimulator
             LD = LaserDisplaySimulator()
         else:
-            from LaserDisplayLocal import LaserDisplayLocal
+            from .LaserDisplayLocal import LaserDisplayLocal
             LD = LaserDisplayLocal()
         factory = protocol.ServerFactory()
         factory.protocol = LaserProtocol
         reactor.listenTCP(self.port, factory)
-        print 'Listening on port %d ...' % self.port
+        print('Listening on port %d ...' % self.port)
         reactor.run()

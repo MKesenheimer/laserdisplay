@@ -16,11 +16,11 @@ FPS = 25
 try:
     wro = wave.open('youscope-wave.wav')
 except:
-    print '\nPlease download youscope-wave.wav:\n'
-    print 'wget http://mirror.kapsi.fi/koodaa.mine.nu/tvt/youscope-wave.wav'
+    print('\nPlease download youscope-wave.wav:\n')
+    print('wget http://mirror.kapsi.fi/koodaa.mine.nu/tvt/youscope-wave.wav')
     sys.exit(1)
 
-READ_LENGTH = wro.getframerate()/FPS
+READ_LENGTH = wro.getframerate()//FPS
 
 for _ in range(250):
    frames = wro.readframes(READ_LENGTH)

@@ -1,8 +1,10 @@
 import os
-import usb
+import usb.core
+import usb.util
+import usb.control
 import time
 import math
-from LaserDisplay import LaserDisplay
+from .LaserDisplay import LaserDisplay
 
 class LaserDisplayLocal(LaserDisplay):
 
@@ -40,23 +42,17 @@ class LaserDisplayLocal(LaserDisplay):
 
     def __send_initalization(self):
 
-        usbdev = None
-        for bus in usb.busses():
-            for dev in bus.devices:
-                if dev.idVendor == 0x3333:
-                    usbdev = dev
+        usbdev = usb.core.find(idVendor=0x3333)
         if usbdev is None:
             raise IOError('Could not find laser device (3333:5555) ...')
 
-        handle = usbdev.open()
-
-        print 'Initializing device ... ',
+        print('Initializing device ... ')
         initlog = open(os.path.dirname(os.path.abspath(__file__))+'/usbinit.log')
 
         for line in initlog.readlines():
             setup_packet = line.split('|')[0]
             buf = line.split('|')[-1]
-            if len(buf):
+            if len(buf.strip()):
                 values = setup_packet.strip().split(' ')
                 reqType = int(values[0],16)
                 req = int(values[1],16)
@@ -64,17 +60,15 @@ class LaserDisplayLocal(LaserDisplay):
                 index = int(values[4],16)*256+int(values[5],16)
                 length = int(values[6],16)*256+int(values[7],16)
 
-                binbuf = ''
-                for byte in buf.strip().split(' '):
-                    binbuf += chr(int(byte,16))
+                data = bytes([int(byte,16) for byte in buf.strip().split(' ')])
 
-                handle.controlMsg(reqType,req,binbuf,value,index)
+                usbdev.ctrl_transfer(reqType, req, value, index, data)
 
-        print 'done'
+        print('done')
         time.sleep(1)
 
     def set_laser_configuration(self):
-        self.ep.write([self.blanking_delay, (45000 - self.scan_rate)/200])
+        self.ep.write([self.blanking_delay, (45000 - self.scan_rate)//200])
 
     def show_frame(self):
         self.ep.write(self.__buffer, 0)
@@ -117,7 +111,7 @@ class LaserDisplayLocal(LaserDisplay):
 
     def draw_quadratic_bezier(self, points, steps):
         if len(points) < 3:
-            print 'Quadratic Bezier curves have to have at least three points'
+            print('Quadratic Bezier curves have to have at least three points')
             return
 
         step_inc = 1.0/(steps)
@@ -140,7 +134,7 @@ class LaserDisplayLocal(LaserDisplay):
 
     def draw_cubic_bezier(self, points, steps):
         if len(points) < 4:
-            print 'Cubic Bezier curves have to have at least four points'
+            print('Cubic Bezier curves have to have at least four points')
             return
 
         step_inc = 1.0/(steps)

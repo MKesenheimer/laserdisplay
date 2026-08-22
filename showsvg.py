@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import LaserDisplay
 from LaserDisplay.SvgProcessor import SvgProcessor
 
 if len(sys.argv) < 2:
-    print 'Usage: showsvg filename.svg'
+    print('Usage: showsvg filename.svg')
     sys.exit(1)
 
 LD = LaserDisplay.create()

@@ -1,7 +1,7 @@
-from LaserDisplay import LaserDisplay
-from LaserDisplayLocal import LaserDisplayLocal
-from LaserDisplayRemote import LaserDisplayRemote
-from LaserDisplaySimulator import LaserDisplaySimulator
+from .LaserDisplay import LaserDisplay
+from .LaserDisplayLocal import LaserDisplayLocal
+from .LaserDisplayRemote import LaserDisplayRemote
+from .LaserDisplaySimulator import LaserDisplaySimulator
 
 class LaserDisplayProxy(LaserDisplay):
 
