@@ -1,3 +1,6 @@
 [submodule "LaserDisplay/lumax"]
 	path = LaserDisplay/lumax
 	url = https://github.com/MKesenheimer/lumax.git
+[submodule "examples/files/ild-archive"]
+	path = examples/files/ild-archive
+	url = https://github.com/rorosaurus/ild-archive.git

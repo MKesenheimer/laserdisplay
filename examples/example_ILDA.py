@@ -11,7 +11,7 @@ import random
 
 LD = LaserDisplay.create()
 LD.set_zoom(0.1)
-LD.set_scan_rate(10000)
+LD.set_scan_rate(20000)
 LD.set_blanking_delay(0)
 
 WIDTH = 200

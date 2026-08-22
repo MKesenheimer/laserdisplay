@@ -63,14 +63,18 @@ class LaserServer():
     def __init__(self, port = 31337):
         self.port = port
 
-    def start(self, emulator = False):
+    def start(self, backend = "local"):
+        # backend: local, simulator, lumax or empty
         global LD
-        if emulator:
-            from .LaserDisplaySimulator import LaserDisplaySimulator
-            LD = LaserDisplaySimulator()
-        else:
+        if backend == "local":
             from .LaserDisplayLocal import LaserDisplayLocal
             LD = LaserDisplayLocal()
+        elif backend == "simulator" or backend == "":
+            from .LaserDisplaySimulator import LaserDisplaySimulator
+            LD = LaserDisplaySimulator()
+        elif backend == "lumax":
+            from .LaserDisplayLumax import LaserDisplayLumax
+            LD = LaserDisplayLumax()
         factory = protocol.ServerFactory()
         factory.protocol = LaserProtocol
         reactor.listenTCP(self.port, factory)

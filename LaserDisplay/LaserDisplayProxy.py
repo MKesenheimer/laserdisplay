@@ -1,10 +1,10 @@
 from .LaserDisplay import LaserDisplay
 from .LaserDisplayLocal import LaserDisplayLocal
+from .LaserDisplayLumax import LaserDisplayLumax
 from .LaserDisplayRemote import LaserDisplayRemote
 from .LaserDisplaySimulator import LaserDisplaySimulator
 
 class LaserDisplayProxy(LaserDisplay):
-
     def __init__(self, devices):
         self.devices = devices
         LaserDisplay.__init__(self)

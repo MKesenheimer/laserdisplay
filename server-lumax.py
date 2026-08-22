@@ -3,4 +3,4 @@
 from LaserDisplay.LaserServer import LaserServer
 
 LS = LaserServer()
-LS.start("local")
+LS.start("lumax")
