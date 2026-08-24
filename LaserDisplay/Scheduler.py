@@ -322,9 +322,11 @@ class Scheduler:
 
 # ----- main loop -----
 
-    def run(self, duration=None):
+    def run(self, duration=None, speed=1.0):
         """runs the animation until its duration has passed or stop() is called;
-        blocks the calling thread"""
+        blocks the calling thread. speed scales animation time against the
+        wall clock: 1.0 is real time, values above 1 run faster, and 0 runs
+        as fast as possible (no pacing; for validating timeline files)"""
         if duration is None:
             duration = self.duration
         interval = 1.0 / self.fps
@@ -332,25 +334,30 @@ class Scheduler:
             self._running = True
         epoch = time.perf_counter()
         next_frame = epoch
+        virt = 0.0
         try:
             while True:
                 with self._lock:
                     if not self._running:
                         break
-                now = time.perf_counter() - epoch
+                if speed > 0:
+                    virt = (time.perf_counter() - epoch) * speed
                 with self._lock:
-                    self._time = now
-                self.__process_events(now)
-                self.__update_shapes(now)
+                    self._time = virt
+                self.__process_events(virt)
+                self.__update_shapes(virt)
                 self.__render()
-                if duration is not None and now >= duration:
+                if duration is not None and virt >= duration:
                     break
-                next_frame += interval
-                rest = next_frame - time.perf_counter()
-                if rest > 0:
-                    time.sleep(rest)
+                if speed > 0:
+                    next_frame += interval / speed
+                    rest = next_frame - time.perf_counter()
+                    if rest > 0:
+                        time.sleep(rest)
+                    else:
+                        next_frame = time.perf_counter()   # fell behind, catch up
                 else:
-                    next_frame = time.perf_counter()   # fell behind, catch up
+                    virt += interval   # unpaced: one virtual frame per loop
         finally:
             with self._lock:
                 self._running = False
