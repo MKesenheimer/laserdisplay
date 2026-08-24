@@ -117,8 +117,8 @@ class LaserDisplay():
 #   t1 = geometry.triangle(x0, y0, x1, y1, x2, y2, npoints, rd, gr, bl)
 #   l1 = geometry.line(x0, y0, x1, y1, npoints, rd, gr, bl)
 #
-#   animate.apply_translation(t1, dx, dy)
-#   animate.apply_rotation(l1, pivot_x, pivot_y, angle)
+#   apply(t1, Translation(vx=dx_per_second), t)
+#   apply(l1, Rotation(pivot_x=pivot_x, pivot_y=pivot_y), t)
 #
 #   LD.new_frame()
 #   LD.add_shape_to_frame(t1)

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Example
+    Laser show timeline
+
+    <More comments about the show here>
+-->
+<animation fps="25" duration="3.0">
+    <!-- ==================== shape definitions ============================ -->
+
+    <!-- triangle spinning around the center of the frame -->
+    <shape name="spinner" type="triangle"
+           x0="88" y0="98" x1="168" y1="98" x2="128" y2="170"
+           npoints="24" red="255" green="120" blue="0"/>
+
+    <!-- circle -->
+    <shape name="circle" type="circle" cx="128" cy="128" r="8"
+           npoints="36" red="40" green="130" blue="255"/>
+
+    <!-- dashed line wobbling up and down -->
+    <shape name="wobble" type="line"
+           x0="30" y0="60" x1="226" y1="60"
+           npoints="40" red="0" green="255" blue="80" blank="5"/>
+
+    <!-- ==================== paths (never shown) ========================== -->
+
+    <shape name="p_circ_s_L"  type="circle"  cx="80"  cy="128" r="8"
+           npoints="48" red="0" green="0" blue="0"/>
+
+    <!-- ==================== the pinwheel (fast accents, mirrored) ======== -->
+
+    <!-- two rays through the centre; mirrored, spinning in opposite
+         directions -> the left/right symmetry is preserved at all times -->
+    <shape name="rayA" type="line" x0="48" y0="38" x1="208" y1="198"
+           npoints="80" red="255" green="255" blue="255"/>
+    <shape name="rayB" type="line" x0="48" y0="198" x1="208" y1="38"
+           npoints="80" red="255" green="255" blue="255"/>
+
+    <!-- ====================================================================
+         TIMELINE
+         ==================================================================== -->
+
+    <!-- ==================== intro ========================================= -->
+    <event at="0.0">
+        <create shape="spinner"/>
+        <create shape="wobble"/>
+        <effect shape="spinner" type="rotation" speed="45"/>
+        <effect shape="wobble" type="translation" ay="45" fy="0.25"/>
+    </event>
+
+    <event at="1.0">
+        <create shape="circle"/>
+        <effect shape="circle" type="rotation" speed="10" pivot_x="128" pivot_y="128"/>
+        <effect shape="circle" type="scale" min="0.92" max="1.1" frequency="0.2"/>
+        <effect shape="circle" type="color_shift" dr="7" dg="2" db="-5"/>
+    </event>
+
+    <event at="2.0">
+        <!-- a quick pinwheel flick answers the building line -->
+        <create shape="rayA"/>
+        <effect shape="rayA" type="rotation" speed="160"/>
+        <create shape="rayB"/>
+        <effect shape="rayB" type="rotation" speed="-160"/>
+    </event>
+
+    <event at="3.0">
+        <destroy shape="circle"/>
+        <destroy shape="wobble"/>
+        <destroy shape="spinner"/>
+        <destroy shape="rayA"/>
+        <destroy shape="rayB"/>
+    </event>
+</animation>

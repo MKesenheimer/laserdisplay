@@ -1,42 +1,4 @@
-# Scheduler and XML animation timelines
-
-The `Scheduler` class (`LaserDisplay/Scheduler.py`) plays an animation made
-of laser shapes. It runs the main loop at a fixed frame rate, keeps track of
-which shapes are active, applies continuous effects to them every frame and
-displays each frame through the usual LaserDisplay backends.
-
-Events drive the animation: they create shapes, attach effects and destroy
-shapes at given timestamps. Events come either from a human-readable XML
-timeline file or are injected programmatically while the animation is running
-(all public scheduler methods are thread-safe).
-
-A complete example timeline and runner can be found in
-`examples/shapes.xml` and `examples/scheduler.py`.
-
-## Usage
-
-```python
-import LaserDisplay
-from LaserDisplay import Scheduler
-
-LD = LaserDisplay.create()          # backend chosen via $LASER
-scheduler = Scheduler(LD, fps=25)
-scheduler.load_xml('shapes.xml')
-scheduler.run()                     # blocks until the duration has passed
-LD.close()
-```
-
-| Method                              | Meaning                                                        |
-|-------------------------------------|----------------------------------------------------------------|
-| `Scheduler(display, fps=25)`        | create a scheduler for a LaserDisplay instance                 |
-| `load_xml(filename)`                | read an XML timeline (see below)                               |
-| `run(duration=None)`                | run the main loop; blocks the calling thread                   |
-| `run_in_background(duration=None)`  | run the main loop in a daemon thread, returns the thread       |
-| `stop()`                            | stop the main loop (safe to call from other threads)           |
-| `current_time()`                    | current animation time in seconds                              |
-| `schedule(at, function)`            | call `function` when the animation reaches time `at`           |
-
-## XML file format
+# XML file format
 
 The root element is `<animation>`; it accepts the attributes
 
@@ -101,7 +63,7 @@ animation time reaches their timestamp.
 </animation>
 ```
 
-### Units
+## Units
 
 All numbers in the XML use the friendly scale:
 
@@ -113,7 +75,7 @@ All numbers in the XML use the friendly scale:
 - frequencies: hertz
 - the values are converted to the internal 16 bit laser range automatically
 
-### `<shape>` — a named shape definition
+## `<shape>` — a named shape definition
 
 Defines a shape once; it becomes visible when a `<create>` event references
 its name.
@@ -121,7 +83,7 @@ its name.
 | Attribute               | Meaning                                              |
 |-------------------------|------------------------------------------------------|
 | `name`                  | unique name referenced by events                     |
-| `type`                  | `line`, `triangle`, `circle` or `tetragon`           |
+| `type`                  | `line`, `triangle`, `circle`, `ellipse` or `tetragon` |
 | `npoints`               | number of points interpolated along the outline      |
 | `red`, `green`, `blue`  | color, each `0–255` (default `255`)                  |
 | `blank`                 | optional; blank every n-th point (dashed outlines)   |
@@ -133,9 +95,10 @@ The remaining attributes are the geometry coordinates:
 | `line`      | `x0 y0 x1 y1`                          |
 | `triangle`  | `x0 y0 x1 y1 x2 y2`                    |
 | `circle`    | `cx cy r`                              |
+| `ellipse`   | `cx cy w h` (center, horizontal/vertical dimension) |
 | `tetragon`  | `x0 y0 x1 y1 x2 y2 x3 y3`              |
 
-### `<event>` — actions at a timestamp
+## `<event>` — actions at a timestamp
 
 ```xml
 <event at="SECONDS">
@@ -154,7 +117,7 @@ animation time reaches `at`:
 | `<destroy shape="NAME"/>`                 | remove a shape from the animation        |
 | `<effect shape="NAME" type="..." .../>`   | attach a continuous effect, starting now |
 
-### `<effect>` — continuous effects
+## `<effect>` — continuous effects
 
 Effects are re-computed from the shape's original points on every frame, so
 they do not accumulate rounding drift and can be combined freely. When several
@@ -168,28 +131,9 @@ were attached. All attributes are optional unless noted otherwise.
 | `scale`        | static `factor` (default 1.0), or pulsing with `min`, `max`, `frequency`; `center_x`, `center_y` (default: center) |
 | `color_shift`  | `dr`, `dg`, `db` — color change per second (negative values fade a channel out)                        |
 | `blink`        | `period` (s, default 1.0), `duty` (on-fraction 0–1, default 0.5), `every` (blank every n-th point while on) |
-
-## Runtime events
-
-While the animation runs in the background, shapes and effects can be created,
-modified and destroyed from any thread:
-
-```python
-from LaserDisplay import Rotation
-
-scheduler.run_in_background()
-...
-scheduler.create_circle('ping', cx, cy, r, npoints)     # immediate activation
-scheduler.add_effect('ping', Rotation(speed=180))
-scheduler.destroy('ping')
-scheduler.schedule(5.0, some_function)                  # call at animation time 5s
-...
-scheduler.stop()
-```
-
-The immediate creation methods are `create_triangle`, `create_line`,
-`create_circle` and `create_tetragon`; they take internal 16 bit coordinate
-and color values (`0 .. 255*255`). Effects are plain objects from
-`LaserDisplay.Animate` (`Rotation`, `Translation`, `Scale`, `ColorShift`,
-`Blink`). Shapes that were defined in the XML (or via `define_shape()`) can be
-activated later with `create(name)`.
+| `rainbow`      | `cycles` (spectra along the shape, default 1.0), `speed` (spectra/s drift, default 0.1), `phase`, `saturation`, `brightness` |
+| `warp`         | travelling sine wave: `amplitude` (default 15), `wavelength` (default 100), `speed` (wavelengths/s), `phase` (radians), `horizontal` (`1`/`0`) |
+| `multi_color`  | required `colors="r,g,b;r,g,b;..."` — colors consecutive parts of the shape (values `0–255`)           |
+| `move_points`  | required `points` selection — `"3:7"` range, `"-10:"` last points, `"0,5,9"` indices or a single index; moved by `dx`, `dy` or towards `tx`, `ty` (both required for a target); `duration` (s) animates the move |
+| `morph`        | required `target` — name of another defined shape the shape blends into; `duration` (s, default 1.0), `bounce` (`1` = oscillate), `smooth` (`1` = eased) |
+| `translate_by_path` | required `path` — name of another defined shape (paths are usually defined but never created); the shape's center follows the outline of that path with `velocity` (units/s, default 50, negative = backwards); `closed` (`1` = loop around the path, default, `0` = stop at the end); `phase` (starting position as a fraction 0–1 of the path's length, default 0) |

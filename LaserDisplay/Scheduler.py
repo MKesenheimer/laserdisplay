@@ -31,6 +31,14 @@ y points up, times are seconds):
             <destroy shape="tri"/>
         </event>
     </animation>
+
+Effect types: rotation, translation, scale, color_shift, blink, rainbow,
+warp, multi_color (colors="r,g,b;r,g,b;..."), move_points
+(points="3:7"/"-10:"/"0,5,9", moved by dx/dy or towards tx/ty), morph
+(blends the shape into the shape given with target=<shape name>) and
+translate_by_path (moves the shape along the outline of the path given
+with path=<shape name> at velocity units/second, starting at the fraction
+phase of the path's length; the path shape is defined but never created).
 """
 
 import heapq
@@ -40,7 +48,9 @@ import xml.etree.ElementTree as ElementTree
 
 import numpy
 
-from .Animate import Animate, Rotation, Translation, Scale, ColorShift, Blink
+from .Animate import (apply, Rotation, Translation, Scale, ColorShift, Blink,
+                      Morph, MultiColor, Rainbow, Warp, MovePoints,
+                      TranslateByPath)
 from .Geometry import Geometry
 
 MAX = 255 * 255
@@ -57,12 +67,15 @@ _GEOMETRY_PARAMS = {
     'line':     (('x0', 'y0', 'x1', 'y1'), ('npoints',)),
     'triangle': (('x0', 'y0', 'x1', 'y1', 'x2', 'y2'), ('npoints',)),
     'circle':   (('cx', 'cy', 'r'), ('npoints',)),
+    'ellipse':  (('cx', 'cy', 'w', 'h'), ('npoints',)),
     'tetragon': (('x0', 'y0', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3'), ('npoints',)),
 }
 
 # effects understood by the XML format:
 #   parameter -> (default, kind); kind 'coord'/'color' are given in 0..255 and
-#   scaled to the internal 16 bit range, kind 'raw' is used as-is
+#   scaled to the internal 16 bit range, kind 'raw' is used as-is.
+#   'morph', 'multi_color', 'move_points' and 'translate_by_path' need
+#   list/reference parameters and are parsed separately in __effect_builder()
 _EFFECT_PARAMS = {
     'rotation':    {'pivot_x': (None, 'coord'), 'pivot_y': (None, 'coord'),
                     'speed': (45.0, 'raw'), 'phase': (0.0, 'raw')},
@@ -74,6 +87,10 @@ _EFFECT_PARAMS = {
                     'center_x': (None, 'coord'), 'center_y': (None, 'coord')},
     'color_shift': {'dr': (0.0, 'color'), 'dg': (0.0, 'color'), 'db': (0.0, 'color')},
     'blink':       {'period': (1.0, 'raw'), 'duty': (0.5, 'raw'), 'every': (0, 'raw')},
+    'rainbow':     {'cycles': (1.0, 'raw'), 'speed': (0.1, 'raw'), 'phase': (0.0, 'raw'),
+                    'saturation': (1.0, 'raw'), 'brightness': (1.0, 'raw')},
+    'warp':        {'amplitude': (15.0, 'coord'), 'wavelength': (100.0, 'coord'),
+                    'speed': (1.0, 'raw'), 'phase': (0.0, 'raw'), 'horizontal': (1, 'raw')},
 }
 
 CENTER = 128 * SCALE
@@ -153,6 +170,7 @@ class Scheduler:
             'line':     lambda: Geometry.line(*args[:4], args[4], *color),
             'triangle': lambda: Geometry.triangle(*args[:6], args[6], *color),
             'circle':   lambda: Geometry.circle(*args[:3], args[3], *color),
+            'ellipse':  lambda: Geometry.ellipse(*args[:4], args[4], *color),
             'tetragon': lambda: Geometry.tetragon(*args[:8], args[8], *color),
         }
         return builders[type], blank_n
@@ -169,12 +187,26 @@ class Scheduler:
             params = dict(action.attrib)
             params.pop('shape', None)
             params.pop('type', None)
-            effect = self.__effect_builder(action.get('type'), params,
-                                           "effect for shape '%s'" % name)
-            return lambda: self.add_effect(name, effect)
+            factory = self.__effect_builder(action.get('type'), params,
+                                            "effect for shape '%s'" % name)
+            return lambda: self.add_effect(name, factory())
         raise ValueError("unknown action <%s> in event" % action.tag)
 
     def __effect_builder(self, type, params, context):
+        """returns a zero-argument factory that creates the effect object;
+        factories run when their event fires, so parameters referencing other
+        shapes (morph targets) are resolved at that time"""
+        if type == 'morph':
+            return self.__morph_factory(params, context)
+        if type == 'multi_color':
+            colors = self.__parse_colors(params.pop('colors', None), context)
+            if params:
+                raise ValueError("%s: unknown parameter(s) %s" % (context, sorted(params)))
+            return lambda: MultiColor(colors)
+        if type == 'move_points':
+            return self.__move_points_factory(params, context)
+        if type == 'translate_by_path':
+            return self.__translate_by_path_factory(params, context)
         if type not in _EFFECT_PARAMS:
             raise ValueError("%s: unknown effect type '%s'" % (context, type))
         kwargs = {}
@@ -193,8 +225,100 @@ class Scheduler:
         aliases = {'min': 'min_factor', 'max': 'max_factor'}
         kwargs = {aliases.get(k, k): v for k, v in kwargs.items()}
         classes = {'rotation': Rotation, 'translation': Translation, 'scale': Scale,
-                   'color_shift': ColorShift, 'blink': Blink}
-        return classes[type](**kwargs)
+                   'color_shift': ColorShift, 'blink': Blink,
+                   'rainbow': Rainbow, 'warp': Warp}
+        return lambda: classes[type](**kwargs)
+
+    def __morph_factory(self, params, context):
+        target_name = params.pop('target', None)
+        if not target_name:
+            raise ValueError("%s: morph needs a target=<shape name> parameter" % context)
+        try:
+            duration = float(params.pop('duration', 1.0))
+            bounce = bool(int(float(params.pop('bounce', 0))))
+            smooth = bool(int(float(params.pop('smooth', 1))))
+        except ValueError as e:
+            raise ValueError("%s: invalid morph parameter (%s)" % (context, e))
+        if params:
+            raise ValueError("%s: unknown parameter(s) %s" % (context, sorted(params)))
+
+        def factory():
+            with self._lock:
+                if target_name not in self._definitions:
+                    raise KeyError("no shape defined with name '%s'" % target_name)
+                builder, _ = self._definitions[target_name]
+            return Morph(builder().get_points(), duration=duration,
+                         bounce=bounce, smooth=smooth)
+        return factory
+
+    @staticmethod
+    def __parse_colors(spec, context):
+        # parses colors="r,g,b;r,g,b;..." (values 0..255)
+        if not spec:
+            raise ValueError("%s: multi_color needs a colors=\"r,g,b;r,g,b;...\" "
+                             "parameter" % context)
+        try:
+            return [tuple(float(v) * SCALE for v in triplet.split(','))
+                    for triplet in spec.split(';')]
+        except ValueError:
+            raise ValueError("%s: invalid colors specification '%s'" % (context, spec))
+
+    @staticmethod
+    def __parse_selection(spec, context):
+        # parses points="3:7" | points="-10:" | points="0,5,9" | points="4"
+        if not spec:
+            raise ValueError("%s: move_points needs a points=<selection> parameter"
+                             % context)
+        try:
+            if ':' in spec:
+                first, last = spec.split(':', 1)
+                return slice(int(first) if first.strip() else None,
+                             int(last) if last.strip() else None)
+            indices = [int(part) for part in spec.split(',') if part.strip()]
+            return indices[0] if len(indices) == 1 else indices
+        except ValueError:
+            raise ValueError("%s: invalid point selection '%s'" % (context, spec))
+
+    def __move_points_factory(self, params, context):
+        selection = self.__parse_selection(params.pop('points', None), context)
+        try:
+            dx = float(params.pop('dx', 0.0)) * SCALE
+            dy = float(params.pop('dy', 0.0)) * SCALE
+            duration = float(params.pop('duration', 0.0))
+            tx, ty = params.pop('tx', None), params.pop('ty', None)
+            if (tx is None) != (ty is None):
+                raise ValueError("tx and ty must be given together")
+            target = None if tx is None else (float(tx) * SCALE, float(ty) * SCALE)
+        except ValueError as e:
+            raise ValueError("%s: invalid move_points parameter (%s)" % (context, e))
+        if params:
+            raise ValueError("%s: unknown parameter(s) %s" % (context, sorted(params)))
+        return lambda: MovePoints(selection, dx=dx, dy=dy, target=target,
+                                  duration=duration)
+
+    def __translate_by_path_factory(self, params, context):
+        path_name = params.pop('path', None)
+        if not path_name:
+            raise ValueError("%s: translate_by_path needs a path=<shape name> "
+                             "parameter" % context)
+        try:
+            velocity = float(params.pop('velocity', 50.0)) * SCALE
+            closed = bool(int(float(params.pop('closed', 1))))
+            phase = float(params.pop('phase', 0.0))
+        except ValueError as e:
+            raise ValueError("%s: invalid translate_by_path parameter (%s)"
+                             % (context, e))
+        if params:
+            raise ValueError("%s: unknown parameter(s) %s" % (context, sorted(params)))
+
+        def factory():
+            with self._lock:
+                if path_name not in self._definitions:
+                    raise KeyError("no shape defined with name '%s'" % path_name)
+                builder, _ = self._definitions[path_name]
+            return TranslateByPath(builder(), velocity=velocity, closed=closed,
+                                   phase=phase)
+        return factory
 
 # ----- main loop -----
 
@@ -285,6 +409,11 @@ class Scheduler:
         """creates a circle immediately (internal coordinate/color units)"""
         self.__create_now(Geometry.circle(cx, cy, r, npoints, *color), name, blank_n)
 
+    def create_ellipse(self, name, cx, cy, w, h, npoints,
+                       color=(MAX, MAX, MAX), blank_n=0):
+        """creates an ellipse immediately (internal coordinate/color units)"""
+        self.__create_now(Geometry.ellipse(cx, cy, w, h, npoints, *color), name, blank_n)
+
     def create_tetragon(self, name, x0, y0, x1, y1, x2, y2, x3, y3, npoints,
                         color=(MAX, MAX, MAX), blank_n=0):
         """creates a tetragon immediately (internal coordinate/color units)"""
@@ -295,7 +424,7 @@ class Scheduler:
         """removes a shape from the animation"""
         with self._lock:
             if name not in self._active:
-                raise KeyError("no active shape with name '%s'" % name)
+                raise KeyError(f" no active shape with name '%s'" % name)
             del self._active[name]
 
     def add_effect(self, name, effect):
@@ -303,21 +432,20 @@ class Scheduler:
         active shape, starting now"""
         with self._lock:
             if name not in self._active:
-                raise KeyError("no active shape with name '%s'" % name)
+                raise KeyError(f"no active shape with name '%s'" % name)
             self._active[name].effects.append((self._time, effect))
 
 # ----- internals -----
 
     def __create_now(self, shape, name, blank_n):
-        if blank_n > 1:
-            Animate.apply_blank(shape, blank_n)
         with self._lock:
-            self.__activate(name, shape, 0)
+            self.__activate(name, shape, blank_n)
 
     def __activate(self, name, shape, blank_n):
         # caller must hold the lock
         if blank_n > 1:
-            Animate.apply_blank(shape, blank_n)
+            # duty=1.0: never fully off, just blank (beam off at) every n-th point
+            apply(shape, Blink(duty=1.0, every=blank_n))
         self._active[name] = _ActiveShape(shape)
 
     def __process_events(self, now):

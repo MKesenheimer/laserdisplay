@@ -83,8 +83,8 @@ All examples live in `examples/` and select their backend through `LASER`.
 | `pointline.py`             | minimal demo: one moving point and line                            |
 | `cube.py`                  | rotating wireframe cube                                            |
 | `clock.py`                 | analog clock                                                       |
-| `shapes.py`                | shape pipeline demo: Geometry shapes transformed with Animate      |
-| `scheduler.py`             | plays the XML animation timeline `shapes.xml` (see below)          |
+| `shapes.py`                | shape pipeline demo: Geometry shapes transformed with effects      |
+| `scheduler.py`             | plays the XML animation timeline `files/shapes.xml` (see below)          |
 | `pong.py`                  | playable pong — controls: player 1 `q`/`a`, player 2 `o`/`l`, `esc` quits (opens a control window when not running in the simulator) |
 | `bezier-screensaver.py`    | flying quadratic bezier curves                                     |
 | `spaceship.py`             | transformed bezier spaceship                                       |
@@ -147,14 +147,14 @@ should wrap their main loop in `try/except KeyboardInterrupt` and call
 ## Shape animations
 
 Instead of drawing primitives one by one, frames can be composed from shapes
-(`LaserDisplay/Shape.py`, `Geometry.py`) that are transformed by the `Animate`
-class (`LaserDisplay/Animate.py`):
+(`LaserDisplay/Shape.py`, `Geometry.py`) that are transformed by effect
+classes (`LaserDisplay/Animate.py`):
 
 ```python
-from LaserDisplay import Geometry, Animate
+from LaserDisplay import Geometry, Rotation, apply
 
 t1 = Geometry.triangle(x0, y0, x1, y1, x2, y2, npoints, rd, gr, bl)
-Animate.apply_rotation(t1, pivot_x, pivot_y, angle)   # in-place, per frame
+apply(t1, Rotation(speed=45), t)   # in-place: rotate 45 deg/s at time t
 
 LD.new_frame()
 LD.add_shape_to_frame(t1)
@@ -162,9 +162,14 @@ LD.show_frame()
 ```
 
 Shapes use a 16 bit coordinate/color space (`0 .. 255*255`, y pointing up).
-`Animate` provides the in-place transformations `apply_translation`,
-`apply_rotation`, `apply_scale`, `apply_color_shift`, `apply_blank` (beam off
-at every n-th point), `apply_delete_points` and `apply_add_points`.
+The effects `Rotation`, `Translation`, `Scale`, `ColorShift`, `Blink`
+(periodic on/off or beam off at every n-th point), `DeletePoints`,
+`AddPoints`, `Morph` (blend into another shape), `MultiColor` (different
+colors per part), `Rainbow`, `Warp` (travelling sine wave), `MovePoints`
+(move selected points to another position) and `TranslateByPath` (move the
+shape along the outline of a path shape with a constant velocity) are
+evaluated from absolute time, so they are drift-free and can be combined
+freely.
 
 ## Scheduler and XML animation timelines
 
@@ -181,12 +186,12 @@ from LaserDisplay import Scheduler
 
 LD = LaserDisplay.create()
 scheduler = Scheduler(LD, fps=25)
-scheduler.load_xml('shapes.xml')
+scheduler.load_xml('./examples/files/shapes.xml')
 scheduler.run()                     # or run_in_background() for injection
 ```
 
 A ready-made timeline plus runner can be found in
-`examples/shapes.xml` and `examples/scheduler.py`. The complete XML format
+`examples/files/shapes.xml` and `examples/scheduler.py`. The complete XML format
 reference is in [SCHEDULER.md](SCHEDULER.md).
 
 ### XML file format
@@ -230,7 +235,7 @@ animation time reaches their `at` value.
 | Attribute               | Meaning                                              |
 |-------------------------|------------------------------------------------------|
 | `name`                  | unique name referenced by events                     |
-| `type`                  | `line`, `triangle`, `circle` or `tetragon`           |
+| `type`                  | `line`, `triangle`, `circle`, `ellipse` or `tetragon` |
 | `npoints`               | number of points interpolated along the outline      |
 | `red`, `green`, `blue`  | color, each `0–255` (default `255`)                  |
 | `blank`                 | optional; blank every n-th point (dashed outlines)   |
@@ -242,6 +247,7 @@ The remaining attributes are the geometry coordinates:
 | `line`      | `x0 y0 x1 y1`                          |
 | `triangle`  | `x0 y0 x1 y1 x2 y2`                    |
 | `circle`    | `cx cy r`                              |
+| `ellipse`   | `cx cy w h` (center, horizontal/vertical dimension) |
 | `tetragon`  | `x0 y0 x1 y1 x2 y2 x3 y3`              |
 
 #### `<event>` — actions at a timestamp
@@ -268,6 +274,12 @@ degrees or units per second, frequencies in hertz.
 | `scale`        | static `factor`, or pulsing with `min`, `max`, `frequency`; `center_x`, `center_y` (default: center)   |
 | `color_shift`  | `dr`, `dg`, `db` — color change per second (negative values fade a channel out)                        |
 | `blink`        | `period` (s), `duty` (on-fraction 0–1), `every` (blank every n-th point while on)                      |
+| `rainbow`      | `cycles`, `speed`, `phase`, `saturation`, `brightness` — rainbow gradient along the shape               |
+| `warp`         | travelling sine wave: `amplitude`, `wavelength`, `speed`, `phase`, `horizontal` (`1`/`0`)              |
+| `multi_color`  | required `colors="r,g,b;r,g,b;..."` — colors consecutive parts of the shape                            |
+| `move_points`  | required `points` selection (`"3:7"`, `"-10:"`, `"0,5,9"`); moved by `dx`/`dy` or towards `tx`/`ty`; animated with `duration` |
+| `morph`        | required `target` (name of another defined shape) to blend into; `duration`, `bounce`, `smooth`        |
+| `translate_by_path` | required `path` (name of another defined shape); the shape's center follows the path outline with `velocity` (units/s, default 50); `closed` (`1` = loop, default, `0` = stop at the end) |
 
 ### Runtime events
 

@@ -9,7 +9,8 @@
     Times are seconds, speeds are degrees/second or units/second,
     frequencies are hertz.
 
-    Effects: rotation, translation, scale, color_shift, blink
+    Effects: rotation, translation, scale, color_shift, blink, rainbow,
+    warp, multi_color, move_points, morph
 -->
 
 <animation fps="25" duration="16">
@@ -54,6 +55,12 @@
         <!-- the spinner slowly turns from orange to magenta -->
         <effect shape="spinner" type="color_shift" dr="-85" dg="-45" db="100"/>
         <effect shape="wobble" type="blink" period="1.2"/>
+    </event>
+
+    <event at="7.5">
+        <!-- the spinner starts blending back and forth into the bubble's circle
+             (it keeps rotating and changing color while it morphs) -->
+        <effect shape="spinner" type="morph" target="bubble" duration="2.5" bounce="1"/>
     </event>
 
     <event at="9.0">

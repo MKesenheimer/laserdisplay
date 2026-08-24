@@ -3,7 +3,9 @@ import os
 from .LaserDisplay import LaserDisplay
 from .Shape import Shape
 from .Geometry import Geometry
-from .Animate import Animate, Rotation, Translation, Scale, ColorShift, Blink
+from .Animate import (apply, Rotation, Translation, Scale, ColorShift, Blink,
+                      DeletePoints, AddPoints, Morph, MultiColor, Rainbow,
+                      Warp, MovePoints, TranslateByPath)
 from .Scheduler import Scheduler
 
 def create(mode = os.getenv('LASER')):

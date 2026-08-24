@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    "Mother Earth" - Within Temptation
+    Laser show timeline, 359.5 s, synced to examples/files/mother-earth.json
+
+    Acts
+      0-48     Dawn          lone earth rises over calm water
+      48-97    Awakening     drums enter: mountains, stars, a comet
+      97-154   Chorus I      GAIA motif: emerald/gold ring + twin orbiting triangles
+      154-179  Breakdown     the earth morphs into a sprout and back
+      179-205  Chorus II     same motif again (recognition)
+      205-277  Night         moon, aurora mist, rain, a growing heartbeat
+      277-331  Storm builds  final choruses, heartbeat accelerates
+      331-337  CLIMAX        the bloom: rainbow ring + strobing shards
+      337-359  Return        back to the dawn image, fading to black
+-->
+<animation fps="25" duration="359.5">
+
+    <!-- ==================== shape definitions ==================== -->
+
+    <!-- the earth: recurring protagonist -->
+    <shape name="gaia_dawn" type="circle" cx="128" cy="104" r="30"
+           npoints="64" red="0" green="190" blue="100"/>
+    <shape name="gaia_awake" type="circle" cx="128" cy="108" r="38"
+           npoints="72" red="30" green="220" blue="110"/>
+    <!-- chorus ring: emerald half, golden half -->
+    <shape name="gaia_main" type="circle" cx="128" cy="120" r="46"
+           npoints="80" red="0" green="255" blue="120"/>
+    <shape name="gaia_calm" type="circle" cx="128" cy="112" r="32"
+           npoints="64" red="0" green="150" blue="190"/>
+    <shape name="gaia_dim" type="circle" cx="128" cy="116" r="34"
+           npoints="64" red="120" green="80" blue="255"/>
+    <shape name="bloom" type="circle" cx="128" cy="126" r="58"
+           npoints="88" red="255" green="255" blue="255"/>
+
+    <!-- horizons / water -->
+    <shape name="horizon_calm" type="line" x0="8" y0="26" x1="248" y1="26"
+           npoints="80" red="0" green="70" blue="140"/>
+    <shape name="horizon_live" type="line" x0="8" y0="26" x1="248" y1="26"
+           npoints="80" red="0" green="120" blue="200"/>
+
+    <!-- landscape -->
+    <shape name="peak_left" type="triangle" x0="14" y0="26" x1="92" y1="26" x2="50" y2="124"
+           npoints="48" red="0" green="150" blue="80"/>
+    <shape name="peak_right" type="triangle" x0="164" y0="26" x1="242" y1="26" x2="206" y2="132"
+           npoints="48" red="0" green="130" blue="90"/>
+
+    <!-- sky details -->
+    <shape name="star_a" type="circle" cx="52" cy="210" r="3"
+           npoints="10" red="160" green="200" blue="255"/>
+    <shape name="star_b" type="circle" cx="204" cy="222" r="3"
+           npoints="10" red="200" green="180" blue="255"/>
+    <shape name="comet" type="line" x0="208" y0="196" x1="238" y1="212"
+           npoints="24" red="255" green="255" blue="220" blank="4"/>
+    <shape name="moon" type="circle" cx="182" cy="192" r="20"
+           npoints="48" red="210" green="215" blue="255"/>
+    <shape name="mist" type="line" x0="12" y0="150" x1="244" y1="150"
+           npoints="96" red="40" green="120" blue="160"/>
+
+    <!-- twin flames of the chorus: mirror images through the frame centre,
+         so they stay diametrically opposed while orbiting -->
+    <shape name="orb_a" type="triangle" x0="176" y0="158" x1="198" y1="170" x2="184" y2="186"
+           npoints="28" red="255" green="150" blue="40"/>
+    <shape name="orb_b" type="triangle" x0="80" y0="98" x1="58" y1="86" x2="72" y2="70"
+           npoints="28" red="60" green="180" blue="255"/>
+
+    <!-- shimmering diagonals -->
+    <shape name="sparkle" type="line" x0="36" y0="60" x1="224" y1="196"
+           npoints="56" red="255" green="240" blue="150" blank="5"/>
+    <shape name="sparkle2" type="line" x0="36" y0="196" x1="224" y1="60"
+           npoints="56" red="255" green="220" blue="120" blank="5"/>
+
+    <!-- breakdown helpers -->
+    <shape name="riser" type="line" x0="128" y0="44" x1="128" y1="214"
+           npoints="64" red="0" green="220" blue="255"/>
+    <!-- morph target: the earth becomes a sprout -->
+    <shape name="sprout" type="triangle" x0="128" y0="152" x1="82" y1="38" x2="174" y2="38"
+           npoints="64" red="0" green="150" blue="190"/>
+
+    <!-- raindrops (falling dashes) -->
+    <shape name="drop_a" type="line" x0="56" y0="236" x1="56" y1="218"
+           npoints="10" red="90" green="170" blue="230" blank="3"/>
+    <shape name="drop_b" type="line" x0="128" y0="240" x1="128" y1="222"
+           npoints="10" red="90" green="170" blue="230" blank="3"/>
+    <shape name="drop_c" type="line" x0="196" y0="234" x1="196" y1="216"
+           npoints="10" red="90" green="170" blue="230" blank="3"/>
+
+    <!-- heartbeat seed of the bridge -->
+    <shape name="seed" type="circle" cx="128" cy="118" r="14"
+           npoints="40" red="0" green="220" blue="120"/>
+
+    <!-- climax shards: sharp triangles spinning around their own centres -->
+    <shape name="shard_a" type="triangle" x0="40" y0="166" x1="68" y1="172" x2="52" y2="196"
+           npoints="24" red="255" green="120" blue="0"/>
+    <shape name="shard_b" type="triangle" x0="188" y0="168" x1="216" y1="176" x2="198" y2="194"
+           npoints="24" red="0" green="220" blue="255"/>
+    <shape name="shard_c" type="triangle" x0="114" y0="42" x1="142" y1="44" x2="126" y2="66"
+           npoints="24" red="255" green="60" blue="180"/>
+
+    <!-- ======================== ACT I: dawn ========================= -->
+
+    <event at="0.0">
+        <!-- the earth breathes above still water -->
+        <create shape="gaia_dawn"/>
+        <effect shape="gaia_dawn" type="scale" min="0.95" max="1.08" frequency="0.12"/>
+        <effect shape="gaia_dawn" type="rotation" speed="5"/>
+        <create shape="horizon_calm"/>
+        <effect shape="horizon_calm" type="warp" amplitude="6" wavelength="160" speed="0.15"/>
+    </event>
+
+    <event at="18.0">
+        <create shape="star_a"/>
+        <effect shape="star_a" type="blink" period="2.7" duty="0.65"/>
+        <effect shape="star_a" type="translation" vx="-1.5" ay="4" fy="0.11"/>
+    </event>
+
+    <event at="27.0">
+        <create shape="star_b"/>
+        <effect shape="star_b" type="blink" period="3.4" duty="0.6"/>
+        <effect shape="star_b" type="translation" vx="1.5" ay="4" fy="0.09"/>
+    </event>
+
+    <event at="36.0">
+        <!-- dawn brightens towards the sunrise -->
+        <effect shape="gaia_dawn" type="color_shift" dr="0" dg="8" db="4"/>
+    </event>
+
+    <!-- ==================== ACT II: awakening ======================= -->
+
+    <event at="48.065">
+        <!-- drums enter: the earth swells once per bar -->
+        <destroy shape="gaia_dawn"/>
+        <create shape="gaia_awake"/>
+        <effect shape="gaia_awake" type="scale" min="0.92" max="1.12" frequency="0.299"/>
+        <effect shape="gaia_awake" type="rotation" speed="8"/>
+        <effect shape="horizon_calm" type="warp" amplitude="9" wavelength="140" speed="0.25"/>
+        <effect shape="horizon_calm" type="blink" period="3.344" duty="0.9"/>
+    </event>
+
+    <event at="56.0">
+        <!-- the stars fade, mountains grow at the sides of the world -->
+        <destroy shape="star_a"/>
+        <destroy shape="star_b"/>
+        <create shape="peak_left"/>
+        <effect shape="peak_left" type="scale" min="0.96" max="1.05" frequency="0.15"/>
+        <create shape="peak_right"/>
+        <effect shape="peak_right" type="scale" min="0.96" max="1.05" frequency="0.17"/>
+    </event>
+
+    <event at="72.075">
+        <!-- a comet crosses the sky -->
+        <create shape="comet"/>
+        <effect shape="comet" type="translation" vx="-26" vy="-3" ax="6" fx="0.3"/>
+    </event>
+
+    <event at="81.0">
+        <destroy shape="comet"/>
+    </event>
+
+    <event at="88.0">
+        <!-- the earth turns golden: chorus ahead -->
+        <effect shape="gaia_awake" type="color_shift" dr="9" dg="5" db="-6"/>
+    </event>
+
+    <!-- ==================== ACT III: chorus I ======================= -->
+
+    <event at="96.87">
+        <!-- open sky: the signature GAIA ring with twin orbiting flames -->
+        <destroy shape="gaia_awake"/>
+        <destroy shape="peak_left"/>
+        <destroy shape="peak_right"/>
+        <destroy shape="horizon_calm"/>
+        <create shape="horizon_live"/>
+        <effect shape="horizon_live" type="warp" amplitude="8" wavelength="150" speed="0.35"/>
+        <effect shape="horizon_live" type="blink" period="3.344" duty="0.88"/>
+        <create shape="gaia_main"/>
+        <effect shape="gaia_main" type="multi_color" colors="0,255,120;255,210,60"/>
+        <effect shape="gaia_main" type="scale" min="0.93" max="1.1" frequency="0.299"/>
+        <effect shape="gaia_main" type="rotation" speed="6"/>
+        <create shape="orb_a"/>
+        <effect shape="orb_a" type="rotation" speed="30"/>
+        <create shape="orb_b"/>
+        <effect shape="orb_b" type="rotation" speed="30"/>
+    </event>
+
+    <event at="124.37">
+        <!-- strong hit: the twins accelerate, the ring flashes per bar -->
+        <effect shape="orb_a" type="rotation" speed="22"/>
+        <effect shape="orb_b" type="rotation" speed="22"/>
+        <effect shape="gaia_main" type="blink" period="3.344" duty="0.85"/>
+    </event>
+
+    <event at="136.0">
+        <create shape="sparkle"/>
+        <effect shape="sparkle" type="blink" period="0.84" duty="0.55" every="6"/>
+    </event>
+
+    <event at="148.0">
+        <!-- cooling down into the breakdown -->
+        <effect shape="sparkle" type="color_shift" dr="-30" dg="-10" db="20"/>
+    </event>
+
+    <!-- =================== BREAKDOWN: the sprout ==================== -->
+
+    <event at="154.13">
+        <destroy shape="orb_a"/>
+        <destroy shape="orb_b"/>
+        <destroy shape="sparkle"/>
+        <destroy shape="gaia_main"/>
+        <destroy shape="horizon_live"/>
+        <create shape="gaia_calm"/>
+        <effect shape="gaia_calm" type="scale" min="0.97" max="1.04" frequency="0.15"/>
+        <effect shape="gaia_calm" type="rotation" speed="4"/>
+        <create shape="horizon_calm"/>
+        <effect shape="horizon_calm" type="warp" amplitude="5" wavelength="180" speed="0.12"/>
+    </event>
+
+    <event at="161.94">
+        <!-- lift: a beam of light grows in the centre -->
+        <create shape="riser"/>
+        <effect shape="riser" type="blink" period="0.84" duty="0.7"/>
+        <effect shape="riser" type="warp" amplitude="10" wavelength="200" speed="1.2" horizontal="0"/>
+        <effect shape="riser" type="color_shift" dr="0" dg="0" db="15"/>
+    </event>
+
+    <event at="167.83">
+        <destroy shape="riser"/>
+        <!-- the earth morphs into a sprouting seedling -->
+        <effect shape="gaia_calm" type="morph" target="sprout" duration="3.2" smooth="1"/>
+    </event>
+
+    <!-- ==================== CHORUS II =============================== -->
+
+    <event at="178.79">
+        <destroy shape="gaia_calm"/>
+        <destroy shape="horizon_calm"/>
+        <create shape="horizon_live"/>
+        <effect shape="horizon_live" type="warp" amplitude="8" wavelength="150" speed="0.35"/>
+        <effect shape="horizon_live" type="blink" period="3.344" duty="0.88"/>
+        <create shape="gaia_main"/>
+        <effect shape="gaia_main" type="multi_color" colors="0,255,120;255,210,60"/>
+        <effect shape="gaia_main" type="scale" min="0.93" max="1.1" frequency="0.299"/>
+        <effect shape="gaia_main" type="rotation" speed="6"/>
+        <create shape="orb_a"/>
+        <effect shape="orb_a" type="rotation" speed="30"/>
+        <create shape="orb_b"/>
+        <effect shape="orb_b" type="rotation" speed="30"/>
+    </event>
+
+    <event at="187.0">
+        <create shape="sparkle2"/>
+        <effect shape="sparkle2" type="blink" period="0.84" duty="0.5" every="5"/>
+    </event>
+
+    <event at="199.0">
+        <effect shape="gaia_main" type="color_shift" dr="10" dg="0" db="-12"/>
+    </event>
+
+    <!-- ===================== NIGHT: the bridge ====================== -->
+
+    <event at="205.13">
+        <destroy shape="sparkle2"/>
+        <destroy shape="orb_a"/>
+        <destroy shape="orb_b"/>
+        <destroy shape="gaia_main"/>
+        <destroy shape="horizon_live"/>
+        <create shape="moon"/>
+        <effect shape="moon" type="scale" min="0.97" max="1.03" frequency="0.09"/>
+        <create shape="mist"/>
+        <effect shape="mist" type="warp" amplitude="16" wavelength="130" speed="0.18"/>
+        <effect shape="mist" type="blink" period="8" duty="0.92"/>
+        <create shape="horizon_calm"/>
+        <effect shape="horizon_calm" type="warp" amplitude="10" wavelength="200" speed="0.12"/>
+    </event>
+
+    <event at="218.5">
+        <create shape="drop_a"/>
+        <effect shape="drop_a" type="translation" vy="-42" vx="2"/>
+    </event>
+    <event at="223.5">
+        <destroy shape="drop_a"/>
+    </event>
+
+    <event at="225.0">
+        <create shape="drop_b"/>
+        <effect shape="drop_b" type="translation" vy="-45" vx="-2"/>
+    </event>
+    <event at="230.0">
+        <destroy shape="drop_b"/>
+    </event>
+
+    <event at="232.0">
+        <create shape="drop_c"/>
+        <effect shape="drop_c" type="translation" vy="-40" vx="3"/>
+    </event>
+    <event at="237.0">
+        <destroy shape="drop_c"/>
+    </event>
+
+    <event at="240.0">
+        <create shape="drop_a"/>
+        <effect shape="drop_a" type="translation" vy="-46" vx="-3"/>
+    </event>
+    <event at="244.8">
+        <destroy shape="drop_a"/>
+    </event>
+
+    <event at="245.0">
+        <!-- a seed appears: the heartbeat begins -->
+        <create shape="seed"/>
+        <effect shape="seed" type="scale" min="0.85" max="1.25" frequency="0.2"/>
+        <effect shape="seed" type="color_shift" dr="2" dg="6" db="0"/>
+    </event>
+
+    <event at="252.0">
+        <destroy shape="seed"/>
+        <create shape="seed"/>
+        <effect shape="seed" type="scale" min="0.8" max="1.3" frequency="0.3"/>
+    </event>
+
+    <event at="264.0">
+        <!-- the moon sets, all eyes on the seed -->
+        <destroy shape="moon"/>
+        <destroy shape="seed"/>
+        <create shape="seed"/>
+        <effect shape="seed" type="scale" min="0.7" max="1.4" frequency="0.6"/>
+        <effect shape="seed" type="color_shift" dr="4" dg="2" db="-4"/>
+    </event>
+
+    <event at="270.0">
+        <!-- wind picks up -->
+        <effect shape="mist" type="warp" amplitude="8" wavelength="120" speed="0.3"/>
+        <effect shape="horizon_calm" type="warp" amplitude="6" wavelength="120" speed="0.3"/>
+    </event>
+
+    <event at="274.5">
+        <destroy shape="seed"/>
+        <create shape="seed"/>
+        <effect shape="seed" type="scale" min="0.65" max="1.5" frequency="0.8"/>
+    </event>
+
+    <!-- ================== FINAL CHORUSES ============================ -->
+
+    <event at="276.78">
+        <!-- the full chorus picture returns -->
+        <destroy shape="seed"/>
+        <destroy shape="mist"/>
+        <destroy shape="horizon_calm"/>
+        <create shape="horizon_live"/>
+        <effect shape="horizon_live" type="warp" amplitude="8" wavelength="150" speed="0.35"/>
+        <effect shape="horizon_live" type="blink" period="3.344" duty="0.88"/>
+        <create shape="gaia_main"/>
+        <effect shape="gaia_main" type="multi_color" colors="0,255,120;255,210,60"/>
+        <effect shape="gaia_main" type="scale" min="0.93" max="1.1" frequency="0.299"/>
+        <effect shape="gaia_main" type="rotation" speed="6"/>
+        <create shape="orb_a"/>
+        <effect shape="orb_a" type="rotation" speed="36"/>
+        <create shape="orb_b"/>
+        <effect shape="orb_b" type="rotation" speed="36"/>
+        <create shape="sparkle"/>
+        <effect shape="sparkle" type="blink" period="0.84" duty="0.55" every="6"/>
+    </event>
+
+    <event at="280.36">
+        <effect shape="orb_a" type="blink" period="0.84" duty="0.8"/>
+    </event>
+    <event at="289.74">
+        <effect shape="orb_b" type="blink" period="0.84" duty="0.8"/>
+    </event>
+    <event at="297.49">
+        <effect shape="sparkle" type="blink" period="0.42" duty="0.6"/>
+    </event>
+    <event at="305.2">
+        <!-- the ring bursts into colour -->
+        <effect shape="gaia_main" type="rainbow" cycles="1" speed="0.3"/>
+    </event>
+
+    <!-- ================= the calm before the storm ================== -->
+
+    <event at="313.47">
+        <destroy shape="orb_a"/>
+        <destroy shape="orb_b"/>
+        <destroy shape="sparkle"/>
+        <destroy shape="gaia_main"/>
+        <destroy shape="horizon_live"/>
+        <create shape="gaia_dim"/>
+        <effect shape="gaia_dim" type="scale" min="0.97" max="1.05" frequency="0.2"/>
+        <create shape="horizon_calm"/>
+        <effect shape="horizon_calm" type="warp" amplitude="5" wavelength="180" speed="0.12"/>
+        <create shape="moon"/>
+        <effect shape="moon" type="scale" min="0.98" max="1.02" frequency="0.08"/>
+    </event>
+
+    <event at="320.0">
+        <destroy shape="moon"/>
+    </event>
+
+    <event at="322.76">
+        <!-- heartbeat: violet, accelerating -->
+        <destroy shape="gaia_dim"/>
+        <create shape="gaia_dim"/>
+        <effect shape="gaia_dim" type="scale" min="0.85" max="1.2" frequency="0.8"/>
+    </event>
+
+    <event at="324.9">
+        <destroy shape="gaia_dim"/>
+        <create shape="gaia_dim"/>
+        <effect shape="gaia_dim" type="scale" min="0.8" max="1.25" frequency="1.2"/>
+        <effect shape="gaia_dim" type="color_shift" dr="25" dg="0" db="-15"/>
+        <create shape="riser"/>
+        <effect shape="riser" type="blink" period="0.84" duty="0.7"/>
+        <effect shape="riser" type="warp" amplitude="8" wavelength="180" speed="2" horizontal="0"/>
+    </event>
+
+    <event at="327.5">
+        <destroy shape="gaia_dim"/>
+        <create shape="gaia_dim"/>
+        <effect shape="gaia_dim" type="scale" min="0.75" max="1.3" frequency="1.797"/>
+        <effect shape="gaia_dim" type="color_shift" dr="12" dg="20" db="-8"/>
+    </event>
+
+    <event at="329.5">
+        <destroy shape="riser"/>
+        <create shape="riser"/>
+        <effect shape="riser" type="blink" period="0.42" duty="0.65"/>
+        <effect shape="riser" type="warp" amplitude="10" wavelength="160" speed="3" horizontal="0"/>
+    </event>
+
+    <!-- ======================= CLIMAX ================================ -->
+
+    <event at="331.77">
+        <!-- THE BLOOM: life explodes in colour -->
+        <destroy shape="gaia_dim"/>
+        <destroy shape="riser"/>
+        <destroy shape="horizon_calm"/>
+        <create shape="bloom"/>
+        <effect shape="bloom" type="rainbow" cycles="2" speed="0.8"/>
+        <effect shape="bloom" type="scale" min="0.9" max="1.12" frequency="1.197"/>
+        <create shape="shard_a"/>
+        <effect shape="shard_a" type="rotation" speed="300" pivot_x="53" pivot_y="178"/>
+        <effect shape="shard_a" type="blink" period="0.42" duty="0.6"/>
+        <create shape="shard_b"/>
+        <effect shape="shard_b" type="rotation" speed="330" pivot_x="201" pivot_y="179"/>
+        <effect shape="shard_b" type="blink" period="0.39" duty="0.6"/>
+        <create shape="shard_c"/>
+        <effect shape="shard_c" type="rotation" speed="270" pivot_x="127" pivot_y="51"/>
+        <effect shape="shard_c" type="blink" period="0.45" duty="0.6"/>
+        <create shape="horizon_live"/>
+        <effect shape="horizon_live" type="warp" amplitude="7" wavelength="70" speed="2.5"/>
+        <effect shape="horizon_live" type="blink" period="0.84" duty="0.85"/>
+    </event>
+
+    <event at="333.49">
+        <effect shape="shard_a" type="blink" period="0.28" duty="0.7"/>
+    </event>
+    <event at="335.16">
+        <effect shape="shard_b" type="blink" period="0.28" duty="0.7"/>
+    </event>
+    <event at="336.92">
+        <effect shape="shard_c" type="rotation" speed="90"/>
+    </event>
+
+    <!-- ================== final statement ============================ -->
+
+    <event at="337.53">
+        <!-- breathe again: slower shards, softer rainbow -->
+        <destroy shape="shard_c"/>
+        <destroy shape="shard_a"/>
+        <create shape="shard_a"/>
+        <effect shape="shard_a" type="rotation" speed="140" pivot_x="53" pivot_y="178"/>
+        <effect shape="shard_a" type="blink" period="0.84" duty="0.7"/>
+        <destroy shape="shard_b"/>
+        <create shape="shard_b"/>
+        <effect shape="shard_b" type="rotation" speed="120" pivot_x="201" pivot_y="179"/>
+        <effect shape="shard_b" type="blink" period="0.84" duty="0.7"/>
+        <effect shape="bloom" type="rainbow" cycles="1.5" speed="0.4"/>
+    </event>
+
+    <event at="338.64">
+        <effect shape="bloom" type="blink" period="0.84" duty="0.75"/>
+    </event>
+
+    <event at="342.91">
+        <destroy shape="shard_b"/>
+        <effect shape="shard_a" type="blink" period="1.68" duty="0.8"/>
+    </event>
+
+    <event at="345.47">
+        <effect shape="shard_a" type="color_shift" dr="-40" dg="-20" db="-10"/>
+    </event>
+
+    <!-- ===================== OUTRO: return =========================== -->
+
+    <event at="346.91">
+        <!-- back to where we began: the dawn -->
+        <destroy shape="shard_a"/>
+        <destroy shape="bloom"/>
+        <destroy shape="horizon_live"/>
+        <create shape="gaia_dawn"/>
+        <effect shape="gaia_dawn" type="scale" min="0.96" max="1.06" frequency="0.1"/>
+        <effect shape="gaia_dawn" type="rotation" speed="4"/>
+        <create shape="horizon_calm"/>
+        <effect shape="horizon_calm" type="warp" amplitude="5" wavelength="170" speed="0.12"/>
+        <create shape="moon"/>
+        <effect shape="moon" type="scale" min="0.98" max="1.02" frequency="0.08"/>
+    </event>
+
+    <event at="351.41">
+        <!-- fade-out ending: everything dissolves into the night -->
+        <effect shape="gaia_dawn" type="color_shift" dr="-14" dg="-16" db="-14"/>
+        <effect shape="horizon_calm" type="color_shift" dr="0" dg="-12" db="-14"/>
+        <effect shape="moon" type="color_shift" dr="-20" dg="-20" db="-18"/>
+    </event>
+
+    <event at="355.5">
+        <effect shape="moon" type="blink" period="2.2" duty="0.55"/>
+    </event>
+
+    <event at="358.8">
+        <destroy shape="gaia_dawn"/>
+        <destroy shape="horizon_calm"/>
+        <destroy shape="moon"/>
+    </event>
+</animation>

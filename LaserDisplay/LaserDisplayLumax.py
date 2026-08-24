@@ -17,7 +17,7 @@ class LaserDisplayLumax(LaserDisplay):
 
     # Mirror output
     MIRROR_X = 1
-    MIRROR_Y = 0
+    MIRROR_Y = 1
 
     def __init__(self):
         LaserDisplay.__init__(self)
@@ -108,6 +108,14 @@ class LaserDisplayLumax(LaserDisplay):
         # the lumax renderer mirrors on the device side (1 = flipped axis)
         self.renderer.mirrorx = self.mirror_x
         self.renderer.mirrory = self.mirror_y
+
+    def set_blanking_delay(self, value):
+        LaserDisplay.set_blanking_delay(self, value)
+        # forward the delay to the lumax driver (lumaxlib.set_blanking_delay):
+        # the diode cannot react instantly, so the driver shifts the light
+        # channels (colors + TTL) forward by value * scan rate / 1000 points
+        # to keep the beam from trailing the galvo position
+        self.renderer.lmx.set_blanking_delay(value)
 
     def set_laser_configuration(self):
         # scan rate is passed to the device with every frame

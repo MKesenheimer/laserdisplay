@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 # Demonstrates the shape pipeline: shapes are generated with Geometry,
-# transformed with Animate and displayed as a frame via
-# new_frame() / add_shape_to_frame() / show_frame().
+# transformed with effect classes (Rotation, Translation, Scale, Blink, ...)
+# and displayed as a frame via new_frame() / add_shape_to_frame() / show_frame().
 
-import math
+import time
 
 import LaserDisplay
-from LaserDisplay import Geometry, Animate
+from LaserDisplay import Geometry, Rotation, Translation, Scale, Blink, apply
 
 LD = LaserDisplay.create()
 LD.set_scan_rate(10000)
@@ -16,34 +16,39 @@ LD.set_zoom(0.1)
 SIZE = 255 * 255      # shape coordinate/color space (16 bit)
 CENTER = SIZE // 2    # center of the frame
 
-angle = 0.0
+spin = Rotation(pivot_x=CENTER, pivot_y=CENTER, speed=45.0)   # degrees per second
+wobble = Translation(ay=50 * 255, fy=0.25)                    # sinusoidal vertical wobble
+dash = Blink(duty=1.0, every=5)                               # beam off at every 5th point
+pulse = Scale(min_factor=0.4, max_factor=1.6, frequency=0.5,
+              center_x=CENTER, center_y=CENTER)               # pulsing radius
+
+start = time.perf_counter()
 try:
     while True:
-        # triangle rotating about the center of the frame
+        t = time.perf_counter() - start
+
+        # triangle spinning about the center of the frame
         t1 = Geometry.triangle(CENTER - 60 * 255, CENTER - 40 * 255,
                                CENTER + 60 * 255, CENTER - 40 * 255,
                                CENTER,            CENTER + 70 * 255,
                                20, 255 * 255, 0, 0)
-        Animate.apply_rotation(t1, CENTER, CENTER, angle)
+        apply(t1, spin, t)
 
-        # line moving up and down, every 5th point is blanked (dashed line)
-        offset = int(50 * 255 * math.sin(math.radians(angle)))
-        l1 = Geometry.line(40 * 255, CENTER + offset,
-                           216 * 255, CENTER + offset,
+        # horizontal line wobbling up and down, drawn dashed
+        l1 = Geometry.line(40 * 255, CENTER, 216 * 255, CENTER,
                            30, 0, 255 * 255, 0)
-        Animate.apply_blank(l1, 5)
+        apply(l1, wobble, t)
+        apply(l1, dash, t)
 
         # circle pulsing its radius
-        radius = int((30 + 20 * math.sin(math.radians(2 * angle))) * 255)
-        c1 = Geometry.circle(CENTER, CENTER, radius, 40, 0, 0, 255 * 255)
+        c1 = Geometry.circle(CENTER, CENTER, 30 * 255, 40, 0, 0, 255 * 255)
+        apply(c1, pulse, t)
 
         LD.new_frame()
         LD.add_shape_to_frame(t1)
         LD.add_shape_to_frame(l1)
         LD.add_shape_to_frame(c1)
         LD.show_frame()
-
-        angle += 0.5
 except KeyboardInterrupt:
     pass
 finally:

@@ -1,0 +1,1967 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    "Bless the Child" - Nightwish
+    Laser show timeline, 376.56 s, synced to examples/files/bless-the-child-detailed.json
+    (bpm 123.05, beat period 0.4876 s, bar = 1.9504 s, first beat at 0.464 s;
+     every event sits on the beat grid: t = 0.464 + n * 0.4876)
+
+    CONCEPT: THE BLESSING - one small light, protected
+      * THE CHILD    - a tiny circle of light at the centre. It never leaves the
+        screen: it is the song. In the intro and the outro it wanders in a slow
+        circle around the centre (10 deg/s); while the band plays it stays at
+        the centre and pulses on the half-beat (1.025 Hz = 123 bpm / 2). In
+        the build-up it morphs into a diamond - the light crystallises - and
+        only returns to a circle in the outro, the way it began.
+      * THE HORIZON  - a broad line across the lower frame. Its warp amplitude
+        and speed ARE the loudness of the song; its colour tells the section.
+        In the choruses it flashes once per bar, in the climax once per beat.
+      * THE HALO     - a wide circle around the child; the "quiet" motif. It
+        appears in every calm moment (intro, dip, bridge, outro) and warms up
+        before the band returns.
+      * THE WINGS    - two mirrored triangles flanking the child, tumbling in
+        opposite directions (exact left/right mirror symmetry). They are the
+        "band is playing" motif: they return at every chorus. Every time they
+        appear they travel along a different path (translate_by_path): a
+        small circle before the first chorus, circles in chorus I, a
+        rectangle in chorus II, wide ellipses in the loud run and a vertical
+        sine wave in the final choruses.
+      * THE PINWHEEL - two mirrored light rays sweeping through the centre.
+        The fast accent: it flashes on the hi-hat/snare onsets (206.2,
+        244-254, and sustained 311-329 in the climax) - the high-rpm part
+        of the song made visible.
+      * THE DIVES    - two white lines, one per edge, that strike in from the
+        left and right towards the child and vanish in the middle (180 units/s
+        = one edge-to-centre trip per beat). In the loudest passages the pair
+        repeats on every second beat - the fastest accent of the show.
+      * VARIATION    - no motif stays on screen for more than a few seconds.
+        In the verses the picture changes every two to four bars: the wings
+        speed up, slow down, reverse, undulate, breathe and drift, and for a
+        couple of bars they are swapped for sparks, a pinwheel flick or a
+        dive flick. The horizon, the child and the stars follow the same
+        restless pattern, so the eye is always met with something new.
+
+    COLOUR SCHEME (kept throughout the whole show):
+      star blue   40,130,255   quiet parts
+      ice blue   110,210,255   intro horizon
+      deep blue   60,140,230   dimmed quiet horizon
+      violet     150,110,240   the dip and the bridge
+      gold       255,200,90    the blessing light (verses and choruses)
+      ember      255,130,50    high energy
+      white      255,255,255   the climax
+
+    ENERGY MAP (from the loudness curve):
+      0-32      quiet piano intro, slowly rising  -> wide, slow shapes, wandering child
+      32.16     the band enters (0.16 -> 0.58)    -> gold picture, beat pulse
+      67.3-99   chorus I (loud, 0.6-0.75)         -> wings, horizon flashes, dives at the peak
+      99-130    verse II (medium)                 -> everything slows to half time
+      130-144   chorus II (peak 0.72)             -> dives at the peak, horizon peaks
+      144-190   sustained (medium-loud)           -> steady wings, swell before...
+      190.6     SUDDEN DROP (0.69 -> 0.23 in 1 s) -> hard cut to the violet picture
+      195.5     the band slams back in (hat!)     -> gold picture returns
+      196-259   loud run, onsets densify          -> wings, pinwheel accents, dive bursts
+      259.4     quiet break (0.6 -> 0.12)         -> violet quiet picture again
+      274.0-286 build-up, the light crystallises  -> child morphs into a diamond
+      286-349.6 final choruses + climax           -> fastest, white light, pinwheel, dives
+      349.6-373 fade-out (0.56 -> 0)              -> drift back to blue, wandering child, fade
+      373-376.6 silence                           -> black
+
+    At most 4 shapes are on screen at any moment; the child and the horizon
+    are always present, so the show never goes blank before the final silence.
+-->
+<animation fps="25" duration="376.56">
+
+    <!-- ==================== the child (the heart, always present) ======== -->
+
+    <shape name="child_blue"   type="circle" cx="128" cy="128" r="8"
+           npoints="36" red="40" green="130" blue="255"/>
+    <shape name="child_gold"   type="circle" cx="128" cy="128" r="8"
+           npoints="36" red="255" green="200" blue="90"/>
+    <shape name="child_violet" type="circle" cx="128" cy="128" r="8"
+           npoints="36" red="150" green="110" blue="240"/>
+    <shape name="child_white"  type="circle" cx="128" cy="128" r="8"
+           npoints="36" red="255" green="255" blue="255"/>
+    <!-- the crystallised child (build-up and final choruses) -->
+    <shape name="child_diamond" type="tetragon"
+           x0="128" y0="138" x1="118" y1="128" x2="128" y2="118" x3="138" y3="128"
+           npoints="24" red="255" green="200" blue="90"/>
+    <!-- the wandering child (intro and outro): defined 16 units east of the
+         centre, so a rotation around the frame centre makes it circle slowly -->
+    <shape name="child_orbit" type="circle" cx="144" cy="128" r="8"
+           npoints="36" red="40" green="130" blue="255"/>
+
+    <!-- ==================== the horizon (the spine, always present) ====== -->
+
+    <shape name="sky_ice"    type="line" x0="8" y0="96" x1="248" y1="96"
+           npoints="100" red="110" green="210" blue="255"/>
+    <shape name="sky_gold"   type="line" x0="8" y0="96" x1="248" y1="96"
+           npoints="100" red="255" green="200" blue="90"/>
+    <shape name="sky_ember"  type="line" x0="8" y0="96" x1="248" y1="96"
+           npoints="100" red="255" green="130" blue="50"/>
+    <shape name="sky_violet" type="line" x0="8" y0="96" x1="248" y1="96"
+           npoints="100" red="150" green="110" blue="240"/>
+    <shape name="sky_blue"   type="line" x0="8" y0="96" x1="248" y1="96"
+           npoints="100" red="60" green="140" blue="230"/>
+
+    <!-- ==================== the halo (quiet motif) ======================= -->
+
+    <shape name="halo_blue"   type="circle" cx="128" cy="128" r="34"
+           npoints="72" red="60" green="130" blue="230"/>
+    <shape name="halo_gold"   type="circle" cx="128" cy="128" r="34"
+           npoints="72" red="255" green="210" blue="110"/>
+    <shape name="halo_violet" type="circle" cx="128" cy="128" r="34"
+           npoints="72" red="160" green="120" blue="245"/>
+
+    <!-- ==================== the star (quiet motif) ======================= -->
+
+    <shape name="star" type="circle" cx="196" cy="196" r="3"
+           npoints="12" red="220" green="230" blue="255"/>
+
+    <!-- ==================== the wings (loud motif, mirrored) ============= -->
+
+    <!-- gold wings for the choruses: gradient runs base -> tip, mirrored -->
+    <shape name="wingL" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150"
+           npoints="48" red="255" green="200" blue="90"/>
+    <shape name="wingR" type="triangle" x0="158" y0="106" x1="212" y1="128" x2="158" y2="150"
+           npoints="48" red="255" green="200" blue="90"/>
+    <!-- ember wings for the final choruses -->
+    <shape name="wingL_ember" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150"
+           npoints="48" red="255" green="130" blue="50"/>
+    <shape name="wingR_ember" type="triangle" x0="158" y0="106" x1="212" y1="128" x2="158" y2="150"
+           npoints="48" red="255" green="130" blue="50"/>
+
+    <!-- ==================== the wing paths (never shown) ================= -->
+    <!-- outlines for the translate_by_path effect: while the wings keep
+         spinning, their centre follows the path. Defined, never created.
+         The R variants are exact mirrors of the L variants (axis x = 128);
+         for circles and ellipses the right wing therefore runs the path
+         backwards (negative velocity, phase 0.5 - phase_L) so the mirrored
+         motion is preserved; the rectangle is defined in mirrored point
+         order instead, so both wings run it with the same velocity and
+         phase. The thin vertical ellipse p_ell_v, traversed at constant
+         arclength speed, is a vertical sine wave with eased turnarounds. -->
+
+    <shape name="p_circ_s_L"  type="circle"  cx="80"  cy="128" r="8"
+           npoints="48" red="0" green="0" blue="0"/>
+    <shape name="p_circ_s_R"  type="circle"  cx="176" cy="128" r="8"
+           npoints="48" red="0" green="0" blue="0"/>
+    <shape name="p_circ_L"    type="circle"  cx="80"  cy="128" r="12"
+           npoints="64" red="0" green="0" blue="0"/>
+    <shape name="p_circ_R"    type="circle"  cx="176" cy="128" r="12"
+           npoints="64" red="0" green="0" blue="0"/>
+    <shape name="p_ell_h_L"   type="ellipse" cx="80"  cy="128" w="20" h="9"
+           npoints="64" red="0" green="0" blue="0"/>
+    <shape name="p_ell_h_R"   type="ellipse" cx="176" cy="128" w="20" h="9"
+           npoints="64" red="0" green="0" blue="0"/>
+    <shape name="p_rect_L"    type="tetragon"
+           x0="66" y0="120" x1="94" y1="120" x2="94" y2="136" x3="66" y3="136"
+           npoints="16" red="0" green="0" blue="0"/>
+    <shape name="p_rect_R"    type="tetragon"
+           x0="190" y0="120" x1="162" y1="120" x2="162" y2="136" x3="190" y3="136"
+           npoints="16" red="0" green="0" blue="0"/>
+    <shape name="p_circ_l_L"  type="circle"  cx="80"  cy="128" r="14"
+           npoints="72" red="0" green="0" blue="0"/>
+    <shape name="p_circ_l_R"  type="circle"  cx="176" cy="128" r="14"
+           npoints="72" red="0" green="0" blue="0"/>
+    <shape name="p_circ_f_L"  type="circle"  cx="80"  cy="128" r="10"
+           npoints="56" red="0" green="0" blue="0"/>
+    <shape name="p_circ_f_R"  type="circle"  cx="176" cy="128" r="10"
+           npoints="56" red="0" green="0" blue="0"/>
+    <shape name="p_ell_w_L"   type="ellipse" cx="80"  cy="128" w="32" h="14"
+           npoints="80" red="0" green="0" blue="0"/>
+    <shape name="p_ell_w_R"   type="ellipse" cx="176" cy="128" w="32" h="14"
+           npoints="80" red="0" green="0" blue="0"/>
+    <shape name="p_circ_xl_L" type="circle"  cx="80"  cy="128" r="15"
+           npoints="72" red="0" green="0" blue="0"/>
+    <shape name="p_circ_xl_R" type="circle"  cx="176" cy="128" r="15"
+           npoints="72" red="0" green="0" blue="0"/>
+    <shape name="p_ell_v_L"   type="ellipse" cx="80"  cy="128" w="10" h="26"
+           npoints="96" red="0" green="0" blue="0"/>
+    <shape name="p_ell_v_R"   type="ellipse" cx="176" cy="128" w="10" h="26"
+           npoints="96" red="0" green="0" blue="0"/>
+
+    <!-- ==================== the pinwheel (fast accents, mirrored) ======== -->
+
+    <!-- two rays through the centre; mirrored, spinning in opposite
+         directions -> the left/right symmetry is preserved at all times -->
+    <shape name="rayA" type="line" x0="48" y0="38" x1="208" y1="198"
+           npoints="80" red="255" green="255" blue="255"/>
+    <shape name="rayB" type="line" x0="48" y0="198" x1="208" y1="38"
+           npoints="80" red="255" green="255" blue="255"/>
+
+    <!-- ==================== the dives (fast accents, mirrored) =========== -->
+
+    <!-- one line per edge; moved with vx = +/-180 so the tip reaches the
+         centre exactly one beat (0.4876 s) after the line is created -->
+    <shape name="diveL" type="line" x0="0" y0="128" x1="40" y1="128"
+           npoints="24" red="255" green="255" blue="255"/>
+    <shape name="diveR" type="line" x0="255" y0="128" x1="215" y1="128"
+           npoints="24" red="255" green="255" blue="255"/>
+
+    <!-- ==================== verse variation shapes ======================= -->
+
+    <!-- a second star, the mirror of the first (together: the star pair) -->
+    <shape name="star2" type="circle" cx="60" cy="196" r="3"
+           npoints="12" red="220" green="230" blue="255"/>
+
+    <!-- small sparks that replace the wings for a couple of bars in the
+         verses -->
+    <shape name="sparkL" type="triangle" x0="98" y0="158" x1="88" y1="174" x2="108" y2="174"
+           npoints="16" red="255" green="200" blue="90"/>
+    <shape name="sparkR" type="triangle" x0="158" y0="158" x1="168" y1="174" x2="148" y2="174"
+           npoints="16" red="255" green="200" blue="90"/>
+
+    <!-- diamonds the wings morph into (the light crystallises for a moment) -->
+    <shape name="wingL_dia" type="tetragon"
+           x0="96" y0="128" x1="80" y1="144" x2="64" y2="128" x3="80" y3="112"
+           npoints="24" red="255" green="200" blue="90"/>
+    <shape name="wingR_dia" type="tetragon"
+           x0="160" y0="128" x1="176" y1="144" x2="192" y2="128" x3="176" y3="112"
+           npoints="24" red="255" green="200" blue="90"/>
+
+    <!-- steep pinwheel rays, a different flavour for the climax -->
+    <shape name="rayC" type="line" x0="88" y0="48" x1="168" y1="188"
+           npoints="80" red="255" green="255" blue="255"/>
+    <shape name="rayD" type="line" x0="88" y0="188" x1="168" y1="48"
+           npoints="80" red="255" green="255" blue="255"/>
+
+    <!-- ====================================================================
+         TIMELINE
+         ==================================================================== -->
+
+    <!-- ==================== intro: the light is born (0-32) ============== -->
+
+    <event at="0.464">
+        <!-- first beat: the child wanders in a slow circle above a calm horizon -->
+        <create shape="child_orbit"/>
+        <effect shape="child_orbit" type="rotation" speed="10" pivot_x="128" pivot_y="128"/>
+        <effect shape="child_orbit" type="scale" min="0.92" max="1.1" frequency="0.2"/>
+        <!-- the light is already warming (slow drift to gold, arriving exactly
+             when the band enters at 32.158) -->
+        <effect shape="child_orbit" type="color_shift" dr="7" dg="2" db="-5"/>
+        <create shape="sky_ice"/>
+        <effect shape="sky_ice" type="warp" amplitude="5" wavelength="200" speed="0.1"/>
+    </event>
+
+    <event at="8.266">
+        <!-- the second star joins, a mirror of the first to come -->
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="3.0" duty="0.5"/>
+    </event>
+
+    <event at="12.654">
+        <create shape="star"/>
+        <effect shape="star" type="blink" period="2.5" duty="0.55"/>
+    </event>
+
+    <event at="16.067">
+        <!-- the horizon stirs a little -->
+        <destroy shape="sky_ice"/>
+        <create shape="sky_ice"/>
+        <effect shape="sky_ice" type="warp" amplitude="7" wavelength="180" speed="0.15"/>
+    </event>
+
+    <event at="20.943">
+        <destroy shape="star2"/>
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="1.6" duty="0.5"/>
+    </event>
+
+    <event at="24.844">
+        <!-- the halo takes the second star's place; the picture warms up
+             towards the band -->
+        <destroy shape="star2"/>
+        <create shape="halo_blue"/>
+        <effect shape="halo_blue" type="scale" min="0.95" max="1.07" frequency="0.12"/>
+        <effect shape="halo_blue" type="color_shift" dr="27" dg="11" db="-16"/>
+        <effect shape="sky_ice" type="color_shift" dr="20" dg="-1" db="-23"/>
+    </event>
+
+    <!-- ================== the band enters (32.158) ======================== -->
+
+    <event at="32.158">
+        <!-- drums in: the gold blessing picture, the child pulses on the
+             half-beat (123 bpm / 2) -->
+        <destroy shape="child_orbit"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.92" max="1.1" frequency="1.025"/>
+        <destroy shape="sky_ice"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="10" wavelength="140" speed="0.35"/>
+        <destroy shape="halo_blue"/>
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.95" max="1.08" frequency="0.25"/>
+        <destroy shape="star"/>
+    </event>
+
+    <event at="36.059">
+        <!-- the verse picture keeps moving: the halo breathes faster,
+             the horizon stirs -->
+        <destroy shape="halo_gold"/>
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.93" max="1.1" frequency="0.35"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+    </event>
+
+    <event at="39.960">
+        <!-- the star pair replaces the halo for a moment -->
+        <destroy shape="halo_gold"/>
+        <create shape="star"/>
+        <effect shape="star" type="blink" period="1.9504" duty="0.5"/>
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="1.9504" duty="0.5"/>
+    </event>
+
+    <event at="43.860">
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.9" max="1.12" frequency="1.025"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="14" wavelength="120" speed="0.45"/>
+    </event>
+
+    <event at="47.761">
+        <!-- a first, slow flick of the wings -->
+        <destroy shape="star"/>
+        <destroy shape="star2"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="10" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_s_L" velocity="10" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-10" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_s_R" velocity="-10" phase="0.5000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="51.662">
+        <!-- the wings pick up speed and start to undulate -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="18" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_s_L" velocity="10" phase="0.7767"/>
+        <effect shape="wingL" type="warp" amplitude="5" wavelength="70" speed="0.5"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-18" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_s_R" velocity="-10" phase="0.7233"/>
+        <effect shape="wingR" type="warp" amplitude="5" wavelength="70" speed="0.5"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="16" wavelength="110" speed="0.5"/>
+    </event>
+
+    <event at="55.563">
+        <!-- the wings fold away, the halo takes over again -->
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.95" max="1.1" frequency="0.4"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.88" max="1.16" frequency="1.025"/>
+    </event>
+
+    <event at="59.464">
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="18" wavelength="100" speed="0.55"/>
+        <destroy shape="halo_gold"/>
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.92" max="1.12" frequency="0.5"/>
+    </event>
+
+    <event at="63.364">
+        <!-- the build towards the chorus: everything tightens -->
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.85" max="1.2" frequency="1.025"/>
+        <destroy shape="halo_gold"/>
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.9" max="1.15" frequency="0.6"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="20" wavelength="90" speed="0.6"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.85"/>
+    </event>
+
+    <!-- ==================== chorus I (67-99) ============================= -->
+
+    <event at="67.265">
+        <!-- the wings unfold: the loud motif, mirrored left and right -->
+        <destroy shape="halo_gold"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="15" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_L" velocity="14" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-15" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_R" velocity="-14" phase="0.5000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.85"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.88" max="1.14" frequency="1.025"/>
+    </event>
+
+    <event at="70.678">
+        <!-- the wings start to breathe on the half-beat -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="18" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_L" velocity="14" phase="0.6339"/>
+        <effect shape="wingL" type="scale" min="0.94" max="1.08" frequency="0.5125"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-18" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_R" velocity="-14" phase="0.8661"/>
+        <effect shape="wingR" type="scale" min="0.94" max="1.08" frequency="0.5125"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="74.579">
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="24" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_L" velocity="14" phase="0.3585"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-24" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_R" velocity="-14" phase="0.1415"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="76.530">
+        <!-- the wings surge and the child swells -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_L" velocity="14" phase="0.7209"/>
+        <effect shape="wingL" type="warp" amplitude="6" wavelength="60" speed="0.5"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_R" velocity="-14" phase="0.7791"/>
+        <effect shape="wingR" type="warp" amplitude="6" wavelength="60" speed="0.5"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.86" max="1.18" frequency="1.025"/>
+    </event>
+
+    <event at="80.430">
+        <!-- the wings settle into a breathing spin, the horizon strobes per beat -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="24" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_L" velocity="14" phase="0.4453"/>
+        <effect shape="wingL" type="scale" min="0.92" max="1.08" frequency="0.5125"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-24" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_R" velocity="-14" phase="0.0547"/>
+        <effect shape="wingR" type="scale" min="0.92" max="1.08" frequency="0.5125"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="sky_gold" type="blink" period="0.9752" duty="0.8"/>
+    </event>
+
+    <event at="83.844">
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.85"/>
+    </event>
+
+    <event at="87.257">
+        <!-- loudest moment of chorus I: the dives strike in from both sides,
+             repeating on every second beat until the wings return -->
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.85" max="1.2" frequency="1.025"/>
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="87.744">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="88.232">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="88.720">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="89.207">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="89.695">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="90.182">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="90.670">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="91.158">
+        <!-- the dives are done: the wings settle back down -->
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="14" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_L" velocity="16" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-14" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_R" velocity="-16" phase="0.5000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="93.108">
+        <!-- the chorus exhales -->
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="12" wavelength="120" speed="0.4"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.9"/>
+    </event>
+
+    <event at="95.546">
+        <!-- the wings find a looser, wider swing before the verse -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_L" velocity="16" phase="0.9315"/>
+        <effect shape="wingL" type="translation" ay="7" fy="0.12"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_R" velocity="-16" phase="0.5685"/>
+        <effect shape="wingR" type="translation" ay="7" fy="0.12"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="14" wavelength="110" speed="0.45"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.9"/>
+    </event>
+
+    <!-- ==================== verse II (99-130) ============================ -->
+
+    <event at="98.959">
+        <!-- half time: everything breathes per bar instead of per beat -->
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.92" max="1.08" frequency="0.5125"/>
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="10" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_L" velocity="16" phase="0.6560"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-10" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_R" velocity="-16" phase="0.8440"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="10" wavelength="140" speed="0.3"/>
+    </event>
+
+    <event at="104.810">
+        <!-- the wings speed up and start to undulate -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="16" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_L" velocity="16" phase="0.8980"/>
+        <effect shape="wingL" type="warp" amplitude="5" wavelength="60" speed="0.45"/>
+        <effect shape="wingL" type="translation" ay="6" fy="0.1"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-16" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_R" velocity="-16" phase="0.6020"/>
+        <effect shape="wingR" type="warp" amplitude="5" wavelength="60" speed="0.45"/>
+        <effect shape="wingR" type="translation" ay="6" fy="0.1"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="12" wavelength="130" speed="0.35"/>
+    </event>
+
+    <event at="110.662">
+        <!-- the wings fold into sparks for two bars -->
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="sparkL"/>
+        <effect shape="sparkL" type="scale" min="0.9" max="1.1" frequency="0.5125"/>
+        <effect shape="sparkL" type="translation" ay="5" fy="0.15"/>
+        <effect shape="sparkL" type="blink" period="0.9752" duty="0.6"/>
+        <create shape="sparkR"/>
+        <effect shape="sparkR" type="scale" min="0.9" max="1.1" frequency="0.5125"/>
+        <effect shape="sparkR" type="translation" ay="5" fy="0.15"/>
+        <effect shape="sparkR" type="blink" period="0.9752" duty="0.6"/>
+    </event>
+
+    <event at="116.513">
+        <!-- the wings return, spinning the other way now -->
+        <destroy shape="sparkL"/>
+        <destroy shape="sparkR"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="-12" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_h_L" velocity="9" phase="0.0000"/>
+        <effect shape="wingL" type="scale" min="0.94" max="1.06" frequency="0.5125"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="12" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_h_R" velocity="-9" phase="0.5000"/>
+        <effect shape="wingR" type="scale" min="0.94" max="1.06" frequency="0.5125"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="14" wavelength="120" speed="0.4"/>
+    </event>
+
+    <event at="120.414">
+        <!-- a quick pinwheel flick answers the building line -->
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="rayA"/>
+        <effect shape="rayA" type="rotation" speed="160"/>
+        <create shape="rayB"/>
+        <effect shape="rayB" type="rotation" speed="-160"/>
+    </event>
+
+    <event at="124.314">
+        <!-- the wings come back warmed towards ember -->
+        <destroy shape="rayA"/>
+        <destroy shape="rayB"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="18" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_rect_L" velocity="16" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,160,70;255,110,50"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-18" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_rect_R" velocity="16" phase="0.0000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,110,50;255,160,70"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="12" wavelength="130" speed="0.35"/>
+    </event>
+
+    <event at="128.215">
+        <!-- the wings drift inwards and crystallise for a moment -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="12" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_rect_L" velocity="16" phase="0.7093"/>
+        <effect shape="wingL" type="translation" vx="-6" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,160,70;255,110,50"/>
+        <effect shape="wingL" type="morph" target="wingL_dia" duration="1.2"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-12" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_rect_R" velocity="16" phase="0.7093"/>
+        <effect shape="wingR" type="translation" vx="6" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,110,50;255,160,70"/>
+        <effect shape="wingR" type="morph" target="wingR_dia" duration="1.2"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.9" max="1.1" frequency="0.5125"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="10" wavelength="140" speed="0.3"/>
+    </event>
+
+    <!-- ==================== chorus II (130-144) ========================== -->
+
+    <event at="130.166">
+        <!-- the ember horizon peaks in the middle like a blessing -->
+        <destroy shape="sky_gold"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="16" wavelength="110" speed="0.6"/>
+        <effect shape="sky_ember" type="blink" period="1.9504" duty="0.85"/>
+        <effect shape="sky_ember" type="move_points" points="38:62" dy="14" duration="0.4"/>
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_rect_L" velocity="16" phase="0.0640"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_rect_R" velocity="16" phase="0.0640"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.88" max="1.16" frequency="1.025"/>
+    </event>
+
+    <event at="134.554">
+        <!-- the wings spin up ahead of the dives -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_rect_L" velocity="16" phase="0.8618"/>
+        <effect shape="wingL" type="warp" amplitude="5" wavelength="55" speed="0.5"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_rect_R" velocity="16" phase="0.8618"/>
+        <effect shape="wingR" type="warp" amplitude="5" wavelength="55" speed="0.5"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="138.455">
+        <!-- the peak: the dives converge on the child, every second beat -->
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+        <destroy shape="sky_ember"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="20" wavelength="90" speed="0.7"/>
+        <effect shape="sky_ember" type="blink" period="1.9504" duty="0.85"/>
+        <effect shape="sky_ember" type="move_points" points="38:62" dy="14" duration="0.4"/>
+    </event>
+
+    <event at="138.942">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="139.430">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="139.918">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="140.405">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="140.893">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="141.380">
+        <!-- the wings return, still fast but settling -->
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="24" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_rect_L" velocity="16" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-24" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_rect_R" velocity="16" phase="0.0000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="144.306">
+        <!-- back down -->
+        <destroy shape="sky_ember"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="12" wavelength="120" speed="0.4"/>
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="12" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_rect_L" velocity="16" phase="0.5320"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-12" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_rect_R" velocity="16" phase="0.5320"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.92" max="1.08" frequency="0.5125"/>
+    </event>
+
+    <!-- ==================== sustained (144-190) ========================== -->
+
+    <event at="150.157">
+        <!-- the wings breathe on the half-beat -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="16" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_rect_L" velocity="16" phase="0.5958"/>
+        <effect shape="wingL" type="scale" min="0.94" max="1.08" frequency="0.5125"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-16" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_rect_R" velocity="16" phase="0.5958"/>
+        <effect shape="wingR" type="scale" min="0.94" max="1.08" frequency="0.5125"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="14" wavelength="120" speed="0.45"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.9" max="1.1" frequency="0.5125"/>
+    </event>
+
+    <event at="155.033">
+        <!-- the wings reverse and undulate -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="-14" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_rect_L" velocity="16" phase="0.4824"/>
+        <effect shape="wingL" type="warp" amplitude="5" wavelength="60" speed="0.4"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="14" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_rect_R" velocity="16" phase="0.4824"/>
+        <effect shape="wingR" type="warp" amplitude="5" wavelength="60" speed="0.4"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+    </event>
+
+    <event at="161.372">
+        <!-- a single dive flick, gone as fast as it came -->
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="161.860">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_l_L" velocity="15" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_l_R" velocity="-15" phase="0.5000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="166.736">
+        <!-- the wings warm up and the horizon starts to strobe -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="24" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_l_L" velocity="15" phase="0.8318"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,170,80;255,110,50"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-24" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_l_R" velocity="-15" phase="0.6682"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,110,50;255,170,80"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="16" wavelength="110" speed="0.5"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.85"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.88" max="1.16" frequency="1.025"/>
+    </event>
+
+    <event at="172.099">
+        <!-- back to gold, but the wings now ripple -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="18" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_l_L" velocity="15" phase="0.7466"/>
+        <effect shape="wingL" type="warp" amplitude="6" wavelength="55" speed="0.5"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-18" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_l_R" velocity="-15" phase="0.7534"/>
+        <effect shape="wingR" type="warp" amplitude="6" wavelength="55" speed="0.5"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="18" wavelength="100" speed="0.55"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.85"/>
+    </event>
+
+    <event at="179.413">
+        <!-- the pinwheel answers for a couple of bars -->
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="rayA"/>
+        <effect shape="rayA" type="rotation" speed="140"/>
+        <create shape="rayB"/>
+        <effect shape="rayB" type="rotation" speed="-140"/>
+    </event>
+
+    <event at="181.851">
+        <destroy shape="rayA"/>
+        <destroy shape="rayB"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_l_L" velocity="15" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_l_R" velocity="-15" phase="0.5000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="185.752">
+        <!-- the swell right before the drop -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_l_L" velocity="15" phase="0.6654"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_l_R" velocity="-15" phase="0.8346"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.88" max="1.16" frequency="1.025"/>
+    </event>
+
+    <!-- ================== THE DROP (190.628): everything falls =========== -->
+
+    <event at="190.628">
+        <!-- the music cuts away: hard cut to the violet night picture -->
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <destroy shape="sky_gold"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_violet"/>
+        <effect shape="child_violet" type="scale" min="0.95" max="1.05" frequency="0.2"/>
+        <create shape="sky_violet"/>
+        <effect shape="sky_violet" type="warp" amplitude="4" wavelength="200" speed="0.12"/>
+        <create shape="star"/>
+        <effect shape="star" type="blink" period="2.0" duty="0.5"/>
+    </event>
+
+    <!-- ==================== the band slams back in (195.504) ============= -->
+
+    <event at="195.504">
+        <!-- on the hat onset: the gold picture returns -->
+        <destroy shape="child_violet"/>
+        <destroy shape="sky_violet"/>
+        <destroy shape="star"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.9" max="1.12" frequency="1.025"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.85"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_f_L" velocity="20" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_f_R" velocity="-20" phase="0.5000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="200.380">
+        <!-- the wings pick up speed after the slam -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="23" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_f_L" velocity="20" phase="0.5529"/>
+        <effect shape="wingL" type="scale" min="0.94" max="1.08" frequency="0.5125"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-23" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_f_R" velocity="-20" phase="0.9471"/>
+        <effect shape="wingR" type="scale" min="0.94" max="1.08" frequency="0.5125"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="204.768">
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_f_L" velocity="20" phase="0.9504"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_f_R" velocity="-20" phase="0.5496"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <!-- hat accent: the pinwheel flashes for two beats (onset 206.22) -->
+    <event at="206.231">
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="rayA"/>
+        <effect shape="rayA" type="rotation" speed="130"/>
+        <create shape="rayB"/>
+        <effect shape="rayB" type="rotation" speed="-130"/>
+    </event>
+
+    <event at="207.694">
+        <destroy shape="rayA"/>
+        <destroy shape="rayB"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.5000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="211.595">
+        <!-- the wings breathe while the horizon keeps pulsing -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="22" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.0398"/>
+        <effect shape="wingL" type="scale" min="0.94" max="1.08" frequency="0.5125"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-22" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.4602"/>
+        <effect shape="wingR" type="scale" min="0.94" max="1.08" frequency="0.5125"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.85"/>
+    </event>
+
+    <event at="215.983">
+        <!-- the wings reverse and undulate; the child pulses on the beat -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="-18" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.2094"/>
+        <effect shape="wingL" type="warp" amplitude="5" wavelength="60" speed="0.5"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="18" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.2906"/>
+        <effect shape="wingR" type="warp" amplitude="5" wavelength="60" speed="0.5"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.86" max="1.18" frequency="1.025"/>
+    </event>
+
+    <event at="219.396">
+        <!-- the wings flush with ember right before the drives -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.1192"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,170,80;255,110,50"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.3808"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,110,50;255,170,80"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.85"/>
+    </event>
+
+    <event at="221.834">
+        <!-- the drive: dives converge on the child, every second beat -->
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.85"/>
+    </event>
+
+    <event at="222.322">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="222.810">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="223.297">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="223.785">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="224.272">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="224.760">
+        <!-- the wings take the speed back up -->
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="32" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-32" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.5000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="227.198">
+        <!-- the wings slow down and sway wider -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="24" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.6498"/>
+        <effect shape="wingL" type="translation" ay="7" fy="0.12"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-24" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.8502"/>
+        <effect shape="wingR" type="translation" ay="7" fy="0.12"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.85"/>
+    </event>
+
+    <event at="229.636">
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.88" max="1.18" frequency="1.025"/>
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="28" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.2997"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-28" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.2003"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="233.049">
+        <!-- the wings spin up and ripple as the drive builds -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="32" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.2094"/>
+        <effect shape="wingL" type="warp" amplitude="6" wavelength="50" speed="0.6"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-32" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.2906"/>
+        <effect shape="wingR" type="warp" amplitude="6" wavelength="50" speed="0.6"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.85" max="1.2" frequency="1.025"/>
+    </event>
+
+    <!-- ==================== the drive builds (238-259) =================== -->
+
+    <event at="238.413">
+        <!-- the ember horizon strobes on every beat -->
+        <destroy shape="sky_gold"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="22" wavelength="90" speed="0.8"/>
+        <effect shape="sky_ember" type="blink" period="0.9752" duty="0.75"/>
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="36" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.6392"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-36" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.8608"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.85" max="1.2" frequency="1.025"/>
+    </event>
+
+    <!-- the onsets thicken: pinwheel accents answer them -->
+    <event at="244.264">
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="rayA"/>
+        <effect shape="rayA" type="rotation" speed="150"/>
+        <create shape="rayB"/>
+        <effect shape="rayB" type="rotation" speed="-150"/>
+    </event>
+
+    <event at="248.653">
+        <!-- the hat cluster answers with dives from both sides -->
+        <destroy shape="rayA"/>
+        <destroy shape="rayB"/>
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="249.140">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="249.628">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="250.115">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="250.603">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="251.090">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="251.578">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="252.066">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="253.041">
+        <!-- the pinwheel takes over -->
+        <create shape="rayA"/>
+        <effect shape="rayA" type="rotation" speed="180"/>
+        <create shape="rayB"/>
+        <effect shape="rayB" type="rotation" speed="-180"/>
+    </event>
+
+    <event at="254.504">
+        <!-- last hat of the cluster: the wings take over again -->
+        <destroy shape="rayA"/>
+        <destroy shape="rayB"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_xl_L" velocity="24" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_xl_R" velocity="-24" phase="0.5000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="256.454">
+        <!-- the wings spin out of control before the break -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="36" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_circ_xl_L" velocity="24" phase="0.4967"/>
+        <effect shape="wingL" type="warp" amplitude="8" wavelength="45" speed="0.7"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-36" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_circ_xl_R" velocity="-24" phase="0.0033"/>
+        <effect shape="wingR" type="warp" amplitude="8" wavelength="45" speed="0.7"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="258.404">
+        <!-- one last pinwheel spin before the silence -->
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="rayA"/>
+        <effect shape="rayA" type="rotation" speed="180"/>
+        <create shape="rayB"/>
+        <effect shape="rayB" type="rotation" speed="-180"/>
+    </event>
+
+    <!-- ==================== quiet break: night (259-274) ================= -->
+
+    <event at="259.380">
+        <!-- the band goes silent: the violet quiet picture -->
+        <destroy shape="rayA"/>
+        <destroy shape="rayB"/>
+        <destroy shape="sky_ember"/>
+        <destroy shape="child_gold"/>
+        <create shape="child_violet"/>
+        <effect shape="child_violet" type="scale" min="0.95" max="1.05" frequency="0.15"/>
+        <!-- the drift starts at once: by the time the band returns, the
+             child and the horizon are gold again (seamless handover) -->
+        <effect shape="child_violet" type="color_shift" dr="7" dg="6" db="-10"/>
+        <create shape="sky_blue"/>
+        <effect shape="sky_blue" type="warp" amplitude="4" wavelength="200" speed="0.1"/>
+        <effect shape="sky_blue" type="color_shift" dr="13" dg="4" db="-10"/>
+        <create shape="halo_violet"/>
+        <effect shape="halo_violet" type="scale" min="0.95" max="1.07" frequency="0.1"/>
+        <create shape="star"/>
+        <effect shape="star" type="blink" period="2.5" duty="0.55"/>
+    </event>
+
+    <event at="264.256">
+        <!-- the star quickens its blink in the dark -->
+        <destroy shape="star"/>
+        <create shape="star"/>
+        <effect shape="star" type="blink" period="1.6" duty="0.5"/>
+    </event>
+
+    <event at="268.644">
+        <!-- the halo warms up: the band is coming back -->
+        <effect shape="halo_violet" type="color_shift" dr="18" dg="17" db="-25"/>
+    </event>
+
+    <event at="271.082">
+        <!-- another blink pattern: nothing rests in the quiet -->
+        <destroy shape="star"/>
+        <create shape="star"/>
+        <effect shape="star" type="blink" period="1.2" duty="0.5"/>
+    </event>
+
+    <!-- ==================== build-up: the light crystallises (274-286) === -->
+
+    <event at="274.496">
+        <!-- the wings return, and the child morphs into a diamond -->
+        <destroy shape="halo_violet"/>
+        <destroy shape="star"/>
+        <destroy shape="child_violet"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.9" max="1.1" frequency="0.5125"/>
+        <effect shape="child_gold" type="morph" target="child_diamond" duration="2.0"/>
+        <destroy shape="sky_blue"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="10" wavelength="140" speed="0.35"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_v_L" velocity="14" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_v_R" velocity="-14" phase="0.5000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="278.396">
+        <!-- the child keeps its slow build-up pulse until the final chorus -->
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_v_L" velocity="14" phase="0.9197"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_v_R" velocity="-14" phase="0.5803"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="280.346">
+        <!-- the horizon starts strobing ahead of the final chorus -->
+        <destroy shape="sky_gold"/>
+        <create shape="sky_gold"/>
+        <effect shape="sky_gold" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="sky_gold" type="blink" period="1.9504" duty="0.85"/>
+    </event>
+
+    <event at="281.809">
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_v_L" velocity="14" phase="0.7246"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_v_R" velocity="-14" phase="0.7754"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="284.247">
+        <!-- the wings spin up and ripple one last time before the chorus -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="36" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_v_L" velocity="14" phase="0.2995"/>
+        <effect shape="wingL" type="warp" amplitude="6" wavelength="50" speed="0.6"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-36" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_v_R" velocity="-14" phase="0.2005"/>
+        <effect shape="wingR" type="warp" amplitude="6" wavelength="50" speed="0.6"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <!-- ==================== final choruses (286-350) ===================== -->
+
+    <event at="286.198">
+        <!-- the crystallised child takes over, the ember horizon returns -->
+        <destroy shape="child_gold"/>
+        <create shape="child_diamond"/>
+        <effect shape="child_diamond" type="scale" min="0.85" max="1.15" frequency="1.025"/>
+        <destroy shape="sky_gold"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="16" wavelength="110" speed="0.6"/>
+        <effect shape="sky_ember" type="blink" period="1.9504" duty="0.85"/>
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="28" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_v_L" velocity="14" phase="0.7596"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-28" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_v_R" velocity="-14" phase="0.7404"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="290.098">
+        <!-- the wings settle into a slow breath while the diamond pulses -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_v_L" velocity="14" phase="0.6793"/>
+        <effect shape="wingL" type="scale" min="0.92" max="1.1" frequency="0.5125"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_v_R" velocity="-14" phase="0.8207"/>
+        <effect shape="wingR" type="scale" min="0.92" max="1.1" frequency="0.5125"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="child_diamond"/>
+        <create shape="child_diamond"/>
+        <effect shape="child_diamond" type="scale" min="0.88" max="1.2" frequency="1.025"/>
+    </event>
+
+    <event at="293.512">
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="34" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_v_L" velocity="14" phase="0.4845"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-34" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_v_R" velocity="-14" phase="0.0155"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="296.437">
+        <!-- the wings reverse and undulate; the horizon pushes harder -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="-30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_v_L" velocity="14" phase="0.1742"/>
+        <effect shape="wingL" type="warp" amplitude="5" wavelength="55" speed="0.5"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_v_R" velocity="-14" phase="0.3258"/>
+        <effect shape="wingR" type="warp" amplitude="5" wavelength="55" speed="0.5"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+        <destroy shape="sky_ember"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="18" wavelength="100" speed="0.65"/>
+        <effect shape="sky_ember" type="blink" period="1.9504" duty="0.85"/>
+    </event>
+
+    <event at="299.850">
+        <destroy shape="sky_ember"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="20" wavelength="90" speed="0.7"/>
+        <effect shape="sky_ember" type="blink" period="1.9504" duty="0.85"/>
+    </event>
+
+    <event at="300.826">
+        <!-- the final chorus drive: dives converge on every second beat -->
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="301.313">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="301.801">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="302.288">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="302.776">
+        <create shape="diveL"/>
+        <effect shape="diveL" type="translation" vx="180"/>
+        <create shape="diveR"/>
+        <effect shape="diveR" type="translation" vx="-180"/>
+    </event>
+
+    <event at="303.264">
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="303.751">
+        <!-- the wings return at full speed -->
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="34" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_v_L" velocity="14" phase="0.0000"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-34" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_v_R" velocity="-14" phase="0.5000"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <!-- ==================== THE CLIMAX (311-330): white light ============ -->
+
+    <event at="307.652">
+        <!-- the wings spin up into the white light -->
+        <destroy shape="wingL"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="rotation" speed="38" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL" type="translate_by_path" path="p_ell_v_L" velocity="14" phase="0.9200"/>
+        <effect shape="wingL" type="warp" amplitude="6" wavelength="50" speed="0.6"/>
+        <effect shape="wingL" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL" type="multi_color" colors="255,210,110;255,120,40"/>
+        <destroy shape="wingR"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="rotation" speed="-38" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR" type="translate_by_path" path="p_ell_v_R" velocity="-14" phase="0.5800"/>
+        <effect shape="wingR" type="warp" amplitude="6" wavelength="50" speed="0.6"/>
+        <effect shape="wingR" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR" type="multi_color" colors="255,120,40;255,210,110"/>
+    </event>
+
+    <event at="311.553">
+        <!-- on the hat onset: the light goes white, the pinwheel takes over
+             from the wings -->
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+        <destroy shape="child_diamond"/>
+        <create shape="child_white"/>
+        <effect shape="child_white" type="scale" min="0.8" max="1.25" frequency="1.025"/>
+        <destroy shape="sky_ember"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="24" wavelength="80" speed="0.9"/>
+        <effect shape="sky_ember" type="blink" period="0.9752" duty="0.7"/>
+        <create shape="rayA"/>
+        <effect shape="rayA" type="rotation" speed="140"/>
+        <create shape="rayB"/>
+        <effect shape="rayB" type="rotation" speed="-140"/>
+    </event>
+
+    <event at="314.966">
+        <!-- the pinwheel speeds up and picks up a warm glow -->
+        <destroy shape="rayA"/>
+        <create shape="rayA"/>
+        <effect shape="rayA" type="rotation" speed="180"/>
+        <effect shape="rayA" type="multi_color" colors="255,255,255;255,200,120"/>
+        <destroy shape="rayB"/>
+        <create shape="rayB"/>
+        <effect shape="rayB" type="rotation" speed="-180"/>
+        <effect shape="rayB" type="multi_color" colors="255,200,120;255,255,255"/>
+        <destroy shape="child_white"/>
+        <create shape="child_white"/>
+        <effect shape="child_white" type="scale" min="0.82" max="1.22" frequency="1.025"/>
+    </event>
+
+    <event at="317.404">
+        <destroy shape="rayA"/>
+        <create shape="rayA"/>
+        <effect shape="rayA" type="rotation" speed="200"/>
+        <destroy shape="rayB"/>
+        <create shape="rayB"/>
+        <effect shape="rayB" type="rotation" speed="-200"/>
+        <destroy shape="sky_ember"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="28" wavelength="70" speed="1.1"/>
+        <effect shape="sky_ember" type="blink" period="0.9752" duty="0.7"/>
+    </event>
+
+    <event at="320.330">
+        <!-- the pinwheel splits: a second pair of rays crosses it -->
+        <destroy shape="rayA"/>
+        <destroy shape="rayB"/>
+        <create shape="rayC"/>
+        <effect shape="rayC" type="rotation" speed="220"/>
+        <create shape="rayD"/>
+        <effect shape="rayD" type="rotation" speed="-220"/>
+    </event>
+
+    <event at="322.280">
+        <!-- the strobe doubles to half-beats, the white light blinks -->
+        <destroy shape="child_white"/>
+        <create shape="child_white"/>
+        <effect shape="child_white" type="scale" min="0.8" max="1.25" frequency="1.025"/>
+        <effect shape="child_white" type="blink" period="0.9752" duty="0.8"/>
+        <destroy shape="sky_ember"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="28" wavelength="70" speed="1.1"/>
+        <effect shape="sky_ember" type="blink" period="0.4876" duty="0.75"/>
+    </event>
+
+    <event at="324.718">
+        <!-- the crossed rays spin even faster -->
+        <destroy shape="rayC"/>
+        <create shape="rayC"/>
+        <effect shape="rayC" type="rotation" speed="260"/>
+        <destroy shape="rayD"/>
+        <create shape="rayD"/>
+        <effect shape="rayD" type="rotation" speed="-260"/>
+    </event>
+
+    <event at="329.107">
+        <!-- the ember wings take the last push -->
+        <destroy shape="rayC"/>
+        <destroy shape="rayD"/>
+        <create shape="wingL_ember"/>
+        <effect shape="wingL_ember" type="rotation" speed="40" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_ember" type="translate_by_path" path="p_circ_xl_L" velocity="24" phase="0.0000"/>
+        <effect shape="wingL_ember" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL_ember" type="multi_color" colors="255,150,60;255,60,40"/>
+        <create shape="wingR_ember"/>
+        <effect shape="wingR_ember" type="rotation" speed="-40" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_ember" type="translate_by_path" path="p_circ_xl_R" velocity="-24" phase="0.5000"/>
+        <effect shape="wingR_ember" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR_ember" type="multi_color" colors="255,60,40;255,150,60"/>
+    </event>
+
+    <event at="334.958">
+        <destroy shape="wingL_ember"/>
+        <create shape="wingL_ember"/>
+        <effect shape="wingL_ember" type="rotation" speed="32" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_ember" type="translate_by_path" path="p_circ_xl_L" velocity="24" phase="0.4904"/>
+        <effect shape="wingL_ember" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL_ember" type="multi_color" colors="255,150,60;255,60,40"/>
+        <destroy shape="wingR_ember"/>
+        <create shape="wingR_ember"/>
+        <effect shape="wingR_ember" type="rotation" speed="-32" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_ember" type="translate_by_path" path="p_circ_xl_R" velocity="-24" phase="0.0096"/>
+        <effect shape="wingR_ember" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR_ember" type="multi_color" colors="255,60,40;255,150,60"/>
+        <destroy shape="sky_ember"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="20" wavelength="90" speed="0.8"/>
+        <effect shape="sky_ember" type="blink" period="0.9752" duty="0.8"/>
+    </event>
+
+    <event at="337.396">
+        <!-- the ember wings undulate as the horizon tightens -->
+        <destroy shape="wingL_ember"/>
+        <create shape="wingL_ember"/>
+        <effect shape="wingL_ember" type="rotation" speed="36" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_ember" type="translate_by_path" path="p_circ_xl_L" velocity="24" phase="0.1115"/>
+        <effect shape="wingL_ember" type="warp" amplitude="6" wavelength="45" speed="0.7"/>
+        <effect shape="wingL_ember" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL_ember" type="multi_color" colors="255,150,60;255,60,40"/>
+        <destroy shape="wingR_ember"/>
+        <create shape="wingR_ember"/>
+        <effect shape="wingR_ember" type="rotation" speed="-36" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_ember" type="translate_by_path" path="p_circ_xl_R" velocity="-24" phase="0.3885"/>
+        <effect shape="wingR_ember" type="warp" amplitude="6" wavelength="45" speed="0.7"/>
+        <effect shape="wingR_ember" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR_ember" type="multi_color" colors="255,60,40;255,150,60"/>
+        <destroy shape="sky_ember"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="22" wavelength="80" speed="0.9"/>
+        <effect shape="sky_ember" type="blink" period="0.9752" duty="0.8"/>
+    </event>
+
+    <event at="341.296">
+        <!-- the last push: the horizon peaks one final time -->
+        <destroy shape="wingL_ember"/>
+        <create shape="wingL_ember"/>
+        <effect shape="wingL_ember" type="rotation" speed="44" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_ember" type="translate_by_path" path="p_circ_xl_L" velocity="24" phase="0.1049"/>
+        <effect shape="wingL_ember" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL_ember" type="multi_color" colors="255,150,60;255,60,40"/>
+        <destroy shape="wingR_ember"/>
+        <create shape="wingR_ember"/>
+        <effect shape="wingR_ember" type="rotation" speed="-44" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_ember" type="translate_by_path" path="p_circ_xl_R" velocity="-24" phase="0.3951"/>
+        <effect shape="wingR_ember" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR_ember" type="multi_color" colors="255,60,40;255,150,60"/>
+        <destroy shape="sky_ember"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="26" wavelength="80" speed="1.0"/>
+        <effect shape="sky_ember" type="blink" period="0.4876" duty="0.75"/>
+        <effect shape="sky_ember" type="move_points" points="38:62" dy="12" duration="0.4"/>
+    </event>
+
+    <event at="344.222">
+        <!-- the wings reverse into a deeper red for the final bars -->
+        <destroy shape="wingL_ember"/>
+        <create shape="wingL_ember"/>
+        <effect shape="wingL_ember" type="rotation" speed="-40" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_ember" type="translate_by_path" path="p_circ_xl_L" velocity="24" phase="0.8503"/>
+        <effect shape="wingL_ember" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingL_ember" type="multi_color" colors="255,90,50;255,150,70"/>
+        <destroy shape="wingR_ember"/>
+        <create shape="wingR_ember"/>
+        <effect shape="wingR_ember" type="rotation" speed="40" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_ember" type="translate_by_path" path="p_circ_xl_R" velocity="-24" phase="0.6497"/>
+        <effect shape="wingR_ember" type="translation" ay="5" fy="0.08"/>
+        <effect shape="wingR_ember" type="multi_color" colors="255,150,70;255,90,50"/>
+        <destroy shape="sky_ember"/>
+        <create shape="sky_ember"/>
+        <effect shape="sky_ember" type="warp" amplitude="24" wavelength="75" speed="1.0"/>
+        <effect shape="sky_ember" type="blink" period="0.4876" duty="0.75"/>
+        <effect shape="sky_ember" type="move_points" points="38:62" dy="12" duration="0.4"/>
+    </event>
+
+    <!-- ==================== fade-out: the light cools (350-373) ========== -->
+
+    <event at="349.586">
+        <!-- the band fades: the light cools from white/ember back to blue
+             over the next twelve seconds -->
+        <destroy shape="wingL_ember"/>
+        <destroy shape="wingR_ember"/>
+        <destroy shape="child_white"/>
+        <create shape="child_gold"/>
+        <effect shape="child_gold" type="scale" min="0.95" max="1.05" frequency="0.25"/>
+        <!-- drifts to star blue, landing exactly on child_blue at 361.776 -->
+        <effect shape="child_gold" type="color_shift" dr="-18" dg="-6" db="14"/>
+        <effect shape="sky_ember" type="color_shift" dr="-16" dg="1" db="15"/>
+    </event>
+
+    <event at="352.511">
+        <create shape="star"/>
+        <effect shape="star" type="blink" period="2.5" duty="0.55"/>
+    </event>
+
+    <event at="356.412">
+        <create shape="halo_blue"/>
+        <effect shape="halo_blue" type="scale" min="0.95" max="1.07" frequency="0.1"/>
+    </event>
+
+    <event at="358.362">
+        <!-- the halo tightens as the light cools -->
+        <destroy shape="halo_blue"/>
+        <create shape="halo_blue"/>
+        <effect shape="halo_blue" type="scale" min="0.96" max="1.05" frequency="0.15"/>
+    </event>
+
+    <event at="361.776">
+        <!-- the cooled colours land exactly on the blue quiet picture; the
+             child wanders again, the way it began -->
+        <destroy shape="child_gold"/>
+        <create shape="child_orbit"/>
+        <effect shape="child_orbit" type="rotation" speed="10" pivot_x="128" pivot_y="128"/>
+        <effect shape="child_orbit" type="scale" min="0.95" max="1.05" frequency="0.12"/>
+        <destroy shape="sky_ember"/>
+        <create shape="sky_blue"/>
+        <effect shape="sky_blue" type="warp" amplitude="4" wavelength="200" speed="0.1"/>
+    </event>
+
+    <event at="367.139">
+        <!-- the star slows its blink before the end -->
+        <destroy shape="star"/>
+        <create shape="star"/>
+        <effect shape="star" type="blink" period="2.0" duty="0.5"/>
+    </event>
+
+    <event at="371.040">
+        <!-- the light dissolves into the dark -->
+        <effect shape="child_orbit" type="color_shift" dr="-40" dg="-60" db="-60"/>
+        <effect shape="sky_blue" type="color_shift" dr="-60" dg="-35" db="-40"/>
+        <effect shape="halo_blue" type="color_shift" dr="-60" dg="-40" db="-40"/>
+        <effect shape="star" type="color_shift" dr="-60" dg="-60" db="-60"/>
+    </event>
+
+    <event at="372.990">
+        <destroy shape="child_orbit"/>
+        <destroy shape="sky_blue"/>
+        <destroy shape="halo_blue"/>
+        <destroy shape="star"/>
+    </event>
+</animation>

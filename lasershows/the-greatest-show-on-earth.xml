@@ -1,0 +1,2757 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    "The Greatest Show on Earth" - Nightwish
+    Laser show timeline, 1441 s, synced to examples/files/the-greatest-show-on-earth.json
+    (bpm 152.0, beat period 0.3947 s, bar = 1.5788 s, first beat at 0.372 s;
+     every event sits on the beat grid: t = 0.372 + n * 0.3947)
+
+    CONCEPT: THE LAST SHOW - a cosmic theatre staging its final performance
+      * THE SPOTLIGHT - a circle of light at the centre. It never leaves the
+        screen: it is the star of the show, the song itself. In the intro and
+        the outro it wanders in a slow circle; while the band plays it stays
+        at the centre and pulses - slowly per bar in the verses, on the
+        half-beat in the choruses, on the beat in the loudest peaks. In the
+        build-ups it crystallises into a diamond for a moment.
+      * THE STAGE - a broad line across the lower frame. Its warp amplitude
+        and speed ARE the loudness of the song; its colour tells the section.
+        In the loud passages it flashes once per bar, in the climax once per
+        beat.
+      * THE CURTAINS - two crimson lines at the edges. They frame the quiet
+        intro (the theatre before the show), vanish when the show begins,
+        peek in at the biggest moments, and finally slide together and fade -
+        the curtain falls.
+      * THE WINGS - two mirrored triangles flanking the spotlight, tumbling in
+        opposite directions (exact left/right mirror symmetry). The "the show
+        is on" motif: they return at every chorus, each time travelling a
+        different path (translate_by_path) at a speed that fits the section.
+      * THE RAYS - two mirrored beams sweeping through the centre. The fast
+        accent: they flick on the hi-hat / snare onsets, the high-rpm part of
+        the song made visible.
+      * THE DIVES - two white lines that strike in from the left and right
+        towards the spotlight and vanish in the middle (180 units/s = one
+        edge-to-centre trip per beat). The fastest accent, on the downbeats
+        of the loudest peaks.
+      * THE HALO / THE EYE / THE STARS - the quiet motifs. The halo breathes
+        around the spotlight in the calm moments; the violet eye opens in the
+        dips and bridges; small stars (the audience, the cosmos) twinkle in
+        the sparse passages.
+      * VARIATION - no motif stays on screen for more than a few seconds. In
+        the verses the picture changes every two to four bars; in the choruses
+        every bar or two. The eye always meets something new.
+
+    COLOUR SCHEME (kept throughout the whole show):
+      night     25, 45,110   dark frame (intro, finale)
+      starblue  70,140,255   quiet motifs
+      violet   150,100,240   the dips and the bridges
+      gold     255,200, 90   the spotlight, the warm sections
+      ember    255,130, 50   high energy
+      crimson  210, 50, 70   the curtains
+      aurora    90,235,160   the bright sections
+      white    255,255,255   the climaxes
+
+    ENERGY MAP (from the loudness curve):
+      0-95      quiet intro, sparse, dark, rising    -> dim curtains, slow stage,
+                                                         wandering spotlight, stars
+      95.1      THE SLAM (0.15 -> 0.65)              -> white flash, full frame
+      98.8-165  warm build, medium/quiet             -> gold picture, first wings
+      165-173   CLIMAX I (0.71, loudest of the half) -> white, dives, rays
+      173-347   long quiet ballad, slowly rising     -> violet/gold, slow, sparse
+      347-376   bright burst (0.55)                  -> aurora, fast
+      376-389   dip                                  -> the violet eye
+      389-524   THE BIG BRIGHT BODY (peaks 435-449, 495-524)
+                                                        -> wings + stage, accents,
+                                                           verse/chorus variation
+      524-533   drop                                 -> violet
+      533-594   bright, steady                       -> aurora/gold
+      594-611   loud peak (0.6)                      -> white, dives
+      611-651   medium, warm                         -> gold
+      651-712   quiet, sparse                        -> starblue
+      712-826   bright, steady (peaks 712, 822)      -> aurora, dense accents
+      826-864   quiet break                          -> violet
+      864-991   THE GREAT MIDDLE (peaks 968-991)     -> densest, fastest, white
+      991-1204  long quiet ballad II (build)         -> slow, sparse, gold->starblue
+     1204-1233  medium                               -> gold
+     1233-1318  quiet, sparse, bright                -> starblue/aurora, sparse
+     1318-1355  quiet, dark                          -> crimson/night
+     1355-1441  fade-out, silence                    -> the curtain falls, black
+
+    At most 4 shapes are on screen at any moment; the spotlight is always
+    present, so the show never goes blank before the final silence.
+-->
+
+<animation fps="25" duration="1441.0">
+
+    <!-- ==================== shape definitions ==================== -->
+    <shape name="stage_night" type="line" x0="10" y0="44" x1="246" y1="44" npoints="90" red="25" green="45" blue="110"/>
+    <shape name="stage_starblue" type="line" x0="10" y0="44" x1="246" y1="44" npoints="90" red="70" green="140" blue="255"/>
+    <shape name="stage_violet" type="line" x0="10" y0="44" x1="246" y1="44" npoints="90" red="150" green="100" blue="240"/>
+    <shape name="stage_gold" type="line" x0="10" y0="44" x1="246" y1="44" npoints="90" red="255" green="200" blue="90"/>
+    <shape name="stage_ember" type="line" x0="10" y0="44" x1="246" y1="44" npoints="90" red="255" green="130" blue="50"/>
+    <shape name="stage_crimson" type="line" x0="10" y0="44" x1="246" y1="44" npoints="90" red="210" green="50" blue="70"/>
+    <shape name="stage_aurora" type="line" x0="10" y0="44" x1="246" y1="44" npoints="90" red="90" green="235" blue="160"/>
+    <shape name="stage_white" type="line" x0="10" y0="44" x1="246" y1="44" npoints="90" red="255" green="255" blue="255"/>
+    <shape name="curtainL" type="line" x0="24" y0="30" x1="24" y1="226" npoints="60" red="210" green="50" blue="70"/>
+    <shape name="curtainR" type="line" x0="234" y0="30" x1="234" y1="226" npoints="60" red="210" green="50" blue="70"/>
+    <shape name="spot_gold" type="circle" cx="128" cy="128" r="30" npoints="56" red="255" green="200" blue="90"/>
+    <shape name="spot_white" type="circle" cx="128" cy="128" r="30" npoints="56" red="255" green="255" blue="255"/>
+    <shape name="spot_starblue" type="circle" cx="128" cy="128" r="30" npoints="56" red="70" green="140" blue="255"/>
+    <shape name="spot_violet" type="circle" cx="128" cy="128" r="30" npoints="56" red="150" green="100" blue="240"/>
+    <shape name="spot_aurora" type="circle" cx="128" cy="128" r="30" npoints="56" red="90" green="235" blue="160"/>
+    <shape name="spot_ember" type="circle" cx="128" cy="128" r="30" npoints="56" red="255" green="130" blue="50"/>
+    <shape name="spot_orbit" type="circle" cx="146" cy="128" r="24" npoints="48" red="70" green="140" blue="255"/>
+    <shape name="halo_gold" type="circle" cx="128" cy="128" r="52" npoints="72" red="255" green="200" blue="90"/>
+    <shape name="halo_starblue" type="circle" cx="128" cy="128" r="52" npoints="72" red="70" green="140" blue="255"/>
+    <shape name="halo_violet" type="circle" cx="128" cy="128" r="52" npoints="72" red="150" green="100" blue="240"/>
+    <shape name="halo_aurora" type="circle" cx="128" cy="128" r="52" npoints="72" red="90" green="235" blue="160"/>
+    <shape name="eye_violet" type="ellipse" cx="128" cy="128" w="116" h="52" npoints="64" red="150" green="100" blue="240"/>
+    <shape name="eye_starblue" type="ellipse" cx="128" cy="128" w="116" h="52" npoints="64" red="70" green="140" blue="255"/>
+    <shape name="dia_gold" type="tetragon" x0="128" y0="150" x1="104" y1="128" x2="128" y2="106" x3="152" y3="128" npoints="24" red="255" green="200" blue="90"/>
+    <shape name="dia_white" type="tetragon" x0="128" y0="150" x1="104" y1="128" x2="128" y2="106" x3="152" y3="128" npoints="24" red="255" green="255" blue="255"/>
+    <shape name="dia_starblue" type="tetragon" x0="128" y0="150" x1="104" y1="128" x2="128" y2="106" x3="152" y3="128" npoints="24" red="70" green="140" blue="255"/>
+    <shape name="wingL_gold" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150" npoints="48" red="255" green="200" blue="90"/>
+    <shape name="wingR_gold" type="triangle" x0="158" y0="106" x1="212" y1="128" x2="158" y2="150" npoints="48" red="255" green="200" blue="90"/>
+    <shape name="wingL_ember" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150" npoints="48" red="255" green="130" blue="50"/>
+    <shape name="wingR_ember" type="triangle" x0="158" y0="106" x1="212" y1="128" x2="158" y2="150" npoints="48" red="255" green="130" blue="50"/>
+    <shape name="wingL_white" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150" npoints="48" red="255" green="255" blue="255"/>
+    <shape name="wingR_white" type="triangle" x0="158" y0="106" x1="212" y1="128" x2="158" y2="150" npoints="48" red="255" green="255" blue="255"/>
+    <shape name="wingL_aurora" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150" npoints="48" red="90" green="235" blue="160"/>
+    <shape name="wingR_aurora" type="triangle" x0="158" y0="106" x1="212" y1="128" x2="158" y2="150" npoints="48" red="90" green="235" blue="160"/>
+    <shape name="wingL_starblue" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150" npoints="48" red="70" green="140" blue="255"/>
+    <shape name="wingR_starblue" type="triangle" x0="158" y0="106" x1="212" y1="128" x2="158" y2="150" npoints="48" red="70" green="140" blue="255"/>
+    <shape name="wingL_violet" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150" npoints="48" red="150" green="100" blue="240"/>
+    <shape name="wingR_violet" type="triangle" x0="158" y0="106" x1="212" y1="128" x2="158" y2="150" npoints="48" red="150" green="100" blue="240"/>
+    <shape name="wingL_crimson" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150" npoints="48" red="210" green="50" blue="70"/>
+    <shape name="wingR_crimson" type="triangle" x0="158" y0="106" x1="212" y1="128" x2="158" y2="150" npoints="48" red="210" green="50" blue="70"/>
+    <shape name="rayA_white" type="line" x0="48" y0="38" x1="208" y1="198" npoints="80" red="255" green="255" blue="255"/>
+    <shape name="rayB_white" type="line" x0="48" y0="198" x1="208" y1="38" npoints="80" red="255" green="255" blue="255"/>
+    <shape name="rayA_gold" type="line" x0="48" y0="38" x1="208" y1="198" npoints="80" red="255" green="200" blue="90"/>
+    <shape name="rayB_gold" type="line" x0="48" y0="198" x1="208" y1="38" npoints="80" red="255" green="200" blue="90"/>
+    <shape name="rayA_aurora" type="line" x0="48" y0="38" x1="208" y1="198" npoints="80" red="90" green="235" blue="160"/>
+    <shape name="rayB_aurora" type="line" x0="48" y0="198" x1="208" y1="38" npoints="80" red="90" green="235" blue="160"/>
+    <shape name="rayA_starblue" type="line" x0="48" y0="38" x1="208" y1="198" npoints="80" red="70" green="140" blue="255"/>
+    <shape name="rayB_starblue" type="line" x0="48" y0="198" x1="208" y1="38" npoints="80" red="70" green="140" blue="255"/>
+    <shape name="diveL" type="line" x0="0" y0="128" x1="40" y1="128" npoints="24" red="255" green="255" blue="255"/>
+    <shape name="diveR" type="line" x0="255" y0="128" x1="215" y1="128" npoints="24" red="255" green="255" blue="255"/>
+    <shape name="star1" type="circle" cx="60"  cy="196" r="3" npoints="12" red="220" green="230" blue="255"/>
+    <shape name="star2" type="circle" cx="196" cy="196" r="3" npoints="12" red="220" green="230" blue="255"/>
+    <shape name="star3" type="circle" cx="128" cy="220" r="3" npoints="12" red="220" green="230" blue="255"/>
+    <shape name="p_circ_s_L" type="circle" cx="80"  cy="128" r="8" npoints="48" red="0" green="0" blue="0"/>
+    <shape name="p_circ_s_R" type="circle" cx="176" cy="128" r="8" npoints="48" red="0" green="0" blue="0"/>
+    <shape name="p_circ_L" type="circle" cx="80"  cy="128" r="12" npoints="64" red="0" green="0" blue="0"/>
+    <shape name="p_circ_R" type="circle" cx="176" cy="128" r="12" npoints="64" red="0" green="0" blue="0"/>
+    <shape name="p_circ_l_L" type="circle" cx="80"  cy="128" r="16" npoints="72" red="0" green="0" blue="0"/>
+    <shape name="p_circ_l_R" type="circle" cx="176" cy="128" r="16" npoints="72" red="0" green="0" blue="0"/>
+    <shape name="p_ell_h_L" type="ellipse" cx="80"  cy="128" w="24" h="10" npoints="64" red="0" green="0" blue="0"/>
+    <shape name="p_ell_h_R" type="ellipse" cx="176" cy="128" w="24" h="10" npoints="64" red="0" green="0" blue="0"/>
+    <shape name="p_ell_w_L" type="ellipse" cx="80"  cy="128" w="40" h="16" npoints="80" red="0" green="0" blue="0"/>
+    <shape name="p_ell_w_R" type="ellipse" cx="176" cy="128" w="40" h="16" npoints="80" red="0" green="0" blue="0"/>
+    <shape name="p_rect_L" type="tetragon" x0="66" y0="120" x1="94" y1="120" x2="94" y2="136" x3="66" y3="136" npoints="16" red="0" green="0" blue="0"/>
+    <shape name="p_rect_R" type="tetragon" x0="190" y0="120" x1="162" y1="120" x2="162" y2="136" x3="190" y3="136" npoints="16" red="0" green="0" blue="0"/>
+    <shape name="p_ell_v_L" type="ellipse" cx="80"  cy="128" w="10" h="30" npoints="96" red="0" green="0" blue="0"/>
+    <shape name="p_ell_v_R" type="ellipse" cx="176" cy="128" w="10" h="30" npoints="96" red="0" green="0" blue="0"/>
+
+    <!-- ======================== timeline ========================= -->
+    <!-- first beat: the wandering spotlight above a dim stage -->
+    <event at="0.372">
+        <create shape="curtainL"/>
+        <create shape="curtainR"/>
+        <create shape="spot_orbit"/>
+        <effect shape="spot_orbit" type="rotation" speed="9" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.94" max="1.06" frequency="0.15"/>
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="3.2" duty="0.5"/>
+    </event>
+
+    <!-- the second star joins -->
+    <event at="7.871">
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="2.6" duty="0.5"/>
+        <effect shape="spot_orbit" type="rotation" speed="9" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.94" max="1.06" frequency="0.15"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <!-- the curtains stir almost imperceptibly -->
+    <event at="15.765">
+        <create shape="curtainL"/>
+        <effect shape="curtainL" type="translation" ax="2" fx="0.06"/>
+        <effect shape="curtainL" type="translation" ax="2" fx="0.06" phase="3.14159"/>
+        <create shape="curtainR"/>
+        <effect shape="curtainR" type="translation" ax="2" fx="0.06"/>
+        <effect shape="curtainR" type="translation" ax="2" fx="0.06" phase="3.14159"/>
+        <effect shape="spot_orbit" type="rotation" speed="9" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.94" max="1.06" frequency="0.15"/>
+        <effect shape="star2" type="blink" period="2.6" duty="0.5"/>
+    </event>
+
+    <!-- the stars keep swapping -->
+    <event at="23.659">
+        <create shape="star3"/>
+        <effect shape="star3" type="blink" period="2.9" duty="0.5"/>
+        <create shape="spot_orbit"/>
+        <effect shape="spot_orbit" type="rotation" speed="12" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.9" max="1.1" frequency="0.2"/>
+        <effect shape="curtainL" type="translation" ax="2" fx="0.06"/>
+        <effect shape="curtainL" type="translation" ax="2" fx="0.06" phase="3.14159"/>
+        <effect shape="curtainR" type="translation" ax="2" fx="0.06"/>
+        <effect shape="curtainR" type="translation" ax="2" fx="0.06" phase="3.14159"/>
+        <destroy shape="star2"/>
+    </event>
+
+    <event at="31.553">
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="2" duty="0.5"/>
+        <create shape="curtainL"/>
+        <effect shape="curtainL" type="translation" ax="3" fx="0.06"/>
+        <effect shape="curtainL" type="translation" ax="3" fx="0.06" phase="3.14159"/>
+        <destroy shape="curtainL"/>
+        <create shape="curtainR"/>
+        <effect shape="curtainR" type="translation" ax="3" fx="0.06"/>
+        <effect shape="curtainR" type="translation" ax="3" fx="0.06" phase="3.14159"/>
+        <destroy shape="curtainR"/>
+        <effect shape="spot_orbit" type="rotation" speed="12" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.9" max="1.1" frequency="0.2"/>
+        <destroy shape="star3"/>
+    </event>
+
+    <!-- the orbit quickens -->
+    <event at="39.447">
+        <create shape="spot_orbit"/>
+        <effect shape="spot_orbit" type="rotation" speed="15" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.88" max="1.12" frequency="0.22"/>
+        <effect shape="curtainL" type="translation" ax="3" fx="0.06"/>
+        <effect shape="curtainL" type="translation" ax="3" fx="0.06" phase="3.14159"/>
+        <effect shape="curtainR" type="translation" ax="3" fx="0.06"/>
+        <effect shape="curtainR" type="translation" ax="3" fx="0.06" phase="3.14159"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <event at="47.341">
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="1.8" duty="0.5"/>
+        <destroy shape="curtainL"/>
+        <destroy shape="curtainR"/>
+        <destroy shape="spot_orbit"/>
+    </event>
+
+    <event at="55.235">
+        <create shape="curtainL"/>
+        <effect shape="curtainL" type="translation" ax="3" fx="0.06"/>
+        <effect shape="curtainL" type="translation" ax="3" fx="0.06" phase="3.14159"/>
+        <create shape="curtainR"/>
+        <effect shape="curtainR" type="translation" ax="3" fx="0.06"/>
+        <effect shape="curtainR" type="translation" ax="3" fx="0.06" phase="3.14159"/>
+        <create shape="spot_orbit"/>
+        <effect shape="spot_orbit" type="rotation" speed="15" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.86" max="1.14" frequency="0.24"/>
+        <destroy shape="star2"/>
+    </event>
+
+    <event at="63.129">
+        <create shape="star3"/>
+        <effect shape="star3" type="blink" period="1.7" duty="0.5"/>
+        <destroy shape="curtainL"/>
+        <destroy shape="curtainR"/>
+        <destroy shape="spot_orbit"/>
+    </event>
+
+    <event at="71.023">
+        <create shape="spot_orbit"/>
+        <effect shape="spot_orbit" type="rotation" speed="18" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.84" max="1.16" frequency="0.26"/>
+        <destroy shape="star3"/>
+    </event>
+
+    <event at="78.917">
+        <create shape="curtainL"/>
+        <effect shape="curtainL" type="translation" ax="4" fx="0.06"/>
+        <effect shape="curtainL" type="translation" ax="4" fx="0.06" phase="3.14159"/>
+        <create shape="curtainR"/>
+        <effect shape="curtainR" type="translation" ax="4" fx="0.06"/>
+        <effect shape="curtainR" type="translation" ax="4" fx="0.06" phase="3.14159"/>
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="1.5" duty="0.5"/>
+        <create shape="spot_orbit"/>
+        <effect shape="spot_orbit" type="rotation" speed="20" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.82" max="1.18" frequency="0.28"/>
+        <destroy shape="spot_orbit"/>
+    </event>
+
+    <event at="86.811">
+        <create shape="spot_orbit"/>
+        <effect shape="spot_orbit" type="rotation" speed="22" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.8" max="1.2" frequency="0.3"/>
+        <destroy shape="spot_orbit"/>
+        <destroy shape="curtainL"/>
+        <destroy shape="curtainR"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <!-- tension: the light pulses wider and faster -->
+    <event at="91.153">
+        <effect shape="spot_orbit" type="rotation" speed="22" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.8" max="1.2" frequency="0.3"/>
+    </event>
+
+    <!-- THE SLAM (0.15 -> 0.65): white flash, full frame -->
+    <event at="95.1">
+        <create shape="rayA_white"/>
+        <effect shape="rayA_white" type="rotation" speed="160"/>
+        <create shape="rayB_white"/>
+        <effect shape="rayB_white" type="rotation" speed="-160"/>
+        <create shape="spot_white"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="1.266"/>
+        <create shape="stage_white"/>
+        <effect shape="stage_white" type="warp" amplitude="18" wavelength="110" speed="0.6"/>
+        <effect shape="stage_white" type="blink" period="1.579" duty="0.9"/>
+        <destroy shape="spot_orbit"/>
+    </event>
+
+    <!-- the white settles into gold -->
+    <event at="98.652">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.95" max="1.08" frequency="0.3"/>
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.85" max="1.15" frequency="0.633"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+        <destroy shape="rayA_white"/>
+        <destroy shape="rayB_white"/>
+        <destroy shape="spot_white"/>
+        <destroy shape="stage_white"/>
+    </event>
+
+    <!-- the wings unfold: the show is on -->
+    <event at="105.757">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="10" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_circ_s_L" velocity="8" phase="0.0000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-10" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_circ_s_R" velocity="-8" phase="0.5000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <effect shape="spot_gold" type="scale" min="0.85" max="1.15" frequency="0.633"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+        <destroy shape="halo_gold"/>
+    </event>
+
+    <!-- the wings gather speed -->
+    <event at="112.861">
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="120" speed="0.45"/>
+        <destroy shape="stage_gold"/>
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="16" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_circ_L" velocity="12" phase="0.2000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-16" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_circ_R" velocity="-12" phase="0.3000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.85" max="1.15" frequency="0.633"/>
+    </event>
+
+    <!-- the wings fold, the halo returns -->
+    <event at="120.755">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.93" max="1.1" frequency="0.4"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+        <destroy shape="stage_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.85" max="1.15" frequency="0.633"/>
+        <destroy shape="wingL_gold"/>
+        <destroy shape="wingR_gold"/>
+    </event>
+
+    <!-- the wings return, undulating -->
+    <event at="128.65">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="12" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_ell_h_L" velocity="10" phase="0.0000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <effect shape="wingL_gold" type="warp" amplitude="5" wavelength="70" speed="0.45"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-12" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_ell_h_R" velocity="-10" phase="0.5000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <effect shape="wingR_gold" type="warp" amplitude="5" wavelength="70" speed="0.45"/>
+        <effect shape="spot_gold" type="scale" min="0.85" max="1.15" frequency="0.633"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+        <destroy shape="halo_gold"/>
+    </event>
+
+    <!-- the build tightens -->
+    <event at="136.544">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <destroy shape="spot_gold"/>
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="18" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_circ_l_L" velocity="14" phase="0.4000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-18" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_circ_l_R" velocity="-14" phase="0.1000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+    </event>
+
+    <!-- the stage begins to flash -->
+    <event at="144.438">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.95" max="1.08" frequency="0.3"/>
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.85" max="1.15" frequency="0.633"/>
+        <destroy shape="spot_gold"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="16" wavelength="110" speed="0.5"/>
+        <effect shape="stage_gold" type="blink" period="1.579" duty="0.85"/>
+        <destroy shape="stage_gold"/>
+        <destroy shape="wingL_gold"/>
+        <destroy shape="wingR_gold"/>
+    </event>
+
+    <!-- the spotlight crystallises into a diamond -->
+    <event at="152.332">
+        <create shape="dia_gold"/>
+        <effect shape="dia_gold" type="scale" min="0.9" max="1.1" frequency="1.266"/>
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.95" max="1.08" frequency="0.4"/>
+        <destroy shape="halo_gold"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+        <destroy shape="stage_gold"/>
+        <destroy shape="spot_gold"/>
+    </event>
+
+    <!-- the diamond pulses, the halo swells -->
+    <event at="156.279">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.85" max="1.15" frequency="0.633"/>
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.9" max="1.12" frequency="0.6"/>
+        <destroy shape="halo_gold"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="18" wavelength="100" speed="0.55"/>
+        <destroy shape="stage_gold"/>
+        <destroy shape="dia_gold"/>
+    </event>
+
+    <!-- the wings strike back -->
+    <event at="160.226">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="24" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_ell_v_L" velocity="16" phase="0.0000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-24" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_ell_v_R" velocity="-16" phase="0.5000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+        <destroy shape="stage_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.85" max="1.15" frequency="0.633"/>
+        <destroy shape="halo_gold"/>
+    </event>
+
+    <!-- CLIMAX I (0.71): white, the dives -->
+    <event at="164.962">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <create shape="spot_white"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <create shape="stage_white"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="90" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="spot_gold"/>
+        <destroy shape="stage_gold"/>
+        <destroy shape="wingL_gold"/>
+        <destroy shape="wingR_gold"/>
+    </event>
+
+    <!-- the beams answer the dives -->
+    <event at="167.33">
+        <create shape="rayA_white"/>
+        <effect shape="rayA_white" type="rotation" speed="200"/>
+        <create shape="rayB_white"/>
+        <effect shape="rayB_white" type="rotation" speed="-200"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="90" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- the dives again -->
+    <event at="168.909">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="90" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="rayA_white"/>
+        <destroy shape="rayB_white"/>
+    </event>
+
+    <!-- the stage flashes on every beat -->
+    <event at="170.488">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.95" max="1.08" frequency="0.4"/>
+        <create shape="stage_white"/>
+        <effect shape="stage_white" type="warp" amplitude="24" wavelength="80" speed="0.8"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.85"/>
+        <destroy shape="stage_white"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- the white wings, fastest -->
+    <event at="171.672">
+        <create shape="wingL_white"/>
+        <effect shape="wingL_white" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_white" type="translate_by_path" path="p_ell_w_L" velocity="22" phase="0.3000"/>
+        <effect shape="wingL_white" type="multi_color" colors="255,255,255;170,200,255"/>
+        <create shape="wingR_white"/>
+        <effect shape="wingR_white" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_white" type="translate_by_path" path="p_ell_w_R" velocity="-22" phase="0.2000"/>
+        <effect shape="wingR_white" type="multi_color" colors="170,200,255;255,255,255"/>
+        <create shape="stage_white"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="90" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="stage_white"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <destroy shape="halo_gold"/>
+    </event>
+
+    <!-- hard cut to the ballad: blue light, slow and broad -->
+    <event at="173.251">
+        <create shape="halo_starblue"/>
+        <effect shape="halo_starblue" type="scale" min="0.96" max="1.06" frequency="0.12"/>
+        <create shape="spot_starblue"/>
+        <effect shape="spot_starblue" type="scale" min="0.94" max="1.06" frequency="0.15"/>
+        <create shape="stage_starblue"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <destroy shape="spot_white"/>
+        <destroy shape="stage_white"/>
+        <destroy shape="wingL_white"/>
+        <destroy shape="wingR_white"/>
+    </event>
+
+    <!-- a star twinkles -->
+    <event at="183.513">
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="3.5" duty="0.5"/>
+        <effect shape="halo_starblue" type="scale" min="0.96" max="1.06" frequency="0.12"/>
+        <effect shape="spot_starblue" type="scale" min="0.94" max="1.06" frequency="0.15"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+    </event>
+
+    <!-- the light warms to gold -->
+    <event at="194.17">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+        <destroy shape="halo_starblue"/>
+        <destroy shape="spot_starblue"/>
+        <destroy shape="stage_starblue"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <event at="204.432">
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="3" duty="0.5"/>
+        <destroy shape="spot_gold"/>
+        <destroy shape="stage_gold"/>
+    </event>
+
+    <!-- the violet eye opens -->
+    <event at="215.089">
+        <create shape="eye_violet"/>
+        <effect shape="eye_violet" type="scale" min="0.96" max="1.05" frequency="0.1"/>
+        <create shape="spot_starblue"/>
+        <effect shape="spot_starblue" type="scale" min="0.94" max="1.06" frequency="0.15"/>
+        <create shape="stage_starblue"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <destroy shape="star2"/>
+    </event>
+
+    <!-- the halo returns, a star with it -->
+    <event at="225.351">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.95" max="1.07" frequency="0.18"/>
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="3.2" duty="0.5"/>
+        <effect shape="spot_starblue" type="scale" min="0.94" max="1.06" frequency="0.15"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <destroy shape="eye_violet"/>
+    </event>
+
+    <!-- the light breathes per bar -->
+    <event at="235.613">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.92" max="1.08" frequency="0.32"/>
+        <effect shape="halo_gold" type="scale" min="0.95" max="1.07" frequency="0.18"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <destroy shape="spot_starblue"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <event at="246.27">
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="8" wavelength="160" speed="0.15"/>
+        <effect shape="spot_gold" type="scale" min="0.92" max="1.08" frequency="0.32"/>
+        <destroy shape="halo_gold"/>
+        <destroy shape="stage_starblue"/>
+    </event>
+
+    <event at="256.532">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.94" max="1.08" frequency="0.2"/>
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="2.8" duty="0.5"/>
+        <effect shape="spot_gold" type="scale" min="0.92" max="1.08" frequency="0.32"/>
+        <effect shape="stage_gold" type="warp" amplitude="8" wavelength="160" speed="0.15"/>
+    </event>
+
+    <event at="266.795">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.9" max="1.1" frequency="0.4"/>
+        <destroy shape="spot_gold"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="9" wavelength="150" speed="0.18"/>
+        <destroy shape="stage_gold"/>
+        <destroy shape="halo_gold"/>
+        <destroy shape="star2"/>
+    </event>
+
+    <!-- the eye opens again -->
+    <event at="277.451">
+        <create shape="eye_violet"/>
+        <effect shape="eye_violet" type="scale" min="0.95" max="1.06" frequency="0.12"/>
+        <effect shape="spot_gold" type="scale" min="0.9" max="1.1" frequency="0.4"/>
+        <effect shape="stage_gold" type="warp" amplitude="9" wavelength="150" speed="0.18"/>
+    </event>
+
+    <event at="287.714">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.93" max="1.09" frequency="0.22"/>
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="2.6" duty="0.5"/>
+        <effect shape="spot_gold" type="scale" min="0.9" max="1.1" frequency="0.4"/>
+        <effect shape="stage_gold" type="warp" amplitude="9" wavelength="150" speed="0.18"/>
+        <destroy shape="eye_violet"/>
+    </event>
+
+    <event at="297.976">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.88" max="1.12" frequency="0.5"/>
+        <destroy shape="spot_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="9" wavelength="150" speed="0.18"/>
+        <destroy shape="halo_gold"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <event at="308.633">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.9" max="1.12" frequency="0.3"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="11" wavelength="140" speed="0.22"/>
+        <destroy shape="stage_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.88" max="1.12" frequency="0.5"/>
+    </event>
+
+    <event at="318.895">
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="2.4" duty="0.5"/>
+        <effect shape="halo_gold" type="scale" min="0.9" max="1.12" frequency="0.3"/>
+        <effect shape="spot_gold" type="scale" min="0.88" max="1.12" frequency="0.5"/>
+        <destroy shape="stage_gold"/>
+    </event>
+
+    <event at="329.157">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.86" max="1.14" frequency="0.6"/>
+        <destroy shape="spot_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.9" max="1.12" frequency="0.3"/>
+        <destroy shape="star2"/>
+    </event>
+
+    <!-- the ballad crests before the burst -->
+    <event at="339.814">
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="13" wavelength="130" speed="0.28"/>
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.9" max="1.14" frequency="0.4"/>
+        <destroy shape="halo_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.86" max="1.14" frequency="0.6"/>
+    </event>
+
+    <!-- the burst: aurora light -->
+    <event at="346.919">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.85" max="1.15" frequency="1.266"/>
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_circ_L" velocity="16" phase="0.0000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_circ_R" velocity="-16" phase="0.5000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="halo_gold"/>
+        <destroy shape="spot_gold"/>
+        <destroy shape="stage_gold"/>
+    </event>
+
+    <event at="352.839">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.3000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.2000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.85" max="1.15" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+    </event>
+
+    <!-- the beams sweep -->
+    <event at="358.76">
+        <effect shape="spot_aurora" type="scale" min="0.85" max="1.15" frequency="1.266"/>
+        <effect shape="wingL_aurora" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.3000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.2000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="stage_aurora"/>
+    </event>
+
+    <!-- the wings on the sine path -->
+    <event at="364.68">
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_v_L" velocity="22" phase="0.5000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_v_R" velocity="-22" phase="0.0000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.85" max="1.15" frequency="1.266"/>
+    </event>
+
+    <event at="370.601">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <destroy shape="spot_aurora"/>
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+        <destroy shape="stage_aurora"/>
+        <destroy shape="wingL_aurora"/>
+        <destroy shape="wingR_aurora"/>
+    </event>
+
+    <!-- the dip: the violet eye opens -->
+    <event at="375.732">
+        <create shape="eye_violet"/>
+        <effect shape="eye_violet" type="scale" min="0.95" max="1.06" frequency="0.12"/>
+        <create shape="spot_violet"/>
+        <effect shape="spot_violet" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <create shape="stage_violet"/>
+        <effect shape="stage_violet" type="warp" amplitude="5" wavelength="170" speed="0.1"/>
+        <destroy shape="spot_aurora"/>
+        <destroy shape="stage_aurora"/>
+    </event>
+
+    <event at="382.442">
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="3" duty="0.5"/>
+        <effect shape="eye_violet" type="scale" min="0.95" max="1.06" frequency="0.12"/>
+        <effect shape="spot_violet" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <effect shape="stage_violet" type="warp" amplitude="5" wavelength="170" speed="0.1"/>
+    </event>
+
+    <event at="385.994">
+        <create shape="eye_violet"/>
+        <effect shape="eye_violet" type="scale" min="0.93" max="1.08" frequency="0.15"/>
+        <destroy shape="eye_violet"/>
+        <effect shape="spot_violet" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <effect shape="stage_violet" type="warp" amplitude="5" wavelength="170" speed="0.1"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <!-- the band slams back in: gold -->
+    <event at="389.546">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_gold" type="blink" period="1.579" duty="0.85"/>
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="22" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_circ_L" velocity="18" phase="0.0000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-22" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_circ_R" velocity="-18" phase="0.5000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="eye_violet"/>
+        <destroy shape="spot_violet"/>
+        <destroy shape="stage_violet"/>
+    </event>
+
+    <!-- verse: wings on ellipse -->
+    <event at="395.467">
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <destroy shape="stage_gold"/>
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="28" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_ell_h_L" velocity="18" phase="0.4000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-28" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_ell_h_R" velocity="-18" phase="0.1000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+    </event>
+
+    <!-- verse: the halo breathes -->
+    <event at="401.387">
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_gold" type="blink" period="1.579" duty="0.85"/>
+        <destroy shape="stage_gold"/>
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="22" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_circ_L" velocity="18" phase="0.0000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-22" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_circ_R" velocity="-18" phase="0.5000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+    </event>
+
+    <!-- verse: wings on rectangle -->
+    <event at="406.913">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="24" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_rect_L" velocity="18" phase="0.0000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-24" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_rect_R" velocity="-18" phase="0.0000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_gold" type="blink" period="1.579" duty="0.85"/>
+    </event>
+
+    <event at="412.834">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.5000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.0000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_gold" type="blink" period="1.579" duty="0.85"/>
+    </event>
+
+    <!-- the light pulses harder -->
+    <event at="418.754">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.8" max="1.2" frequency="1.266"/>
+        <destroy shape="spot_gold"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+        <destroy shape="stage_gold"/>
+        <destroy shape="wingL_gold"/>
+        <destroy shape="wingR_gold"/>
+    </event>
+
+    <!-- CHORUS peak: white, the dives -->
+    <event at="435.331">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <create shape="spot_white"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <create shape="stage_white"/>
+        <effect shape="stage_white" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="spot_gold"/>
+        <destroy shape="stage_gold"/>
+    </event>
+
+    <!-- the beams flick -->
+    <event at="436.91">
+        <create shape="rayA_white"/>
+        <effect shape="rayA_white" type="rotation" speed="200"/>
+        <create shape="rayB_white"/>
+        <effect shape="rayB_white" type="rotation" speed="-200"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- the dives answer -->
+    <event at="439.278">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="rayA_white"/>
+        <destroy shape="rayB_white"/>
+    </event>
+
+    <!-- the white wings, wide -->
+    <event at="442.831">
+        <create shape="wingL_white"/>
+        <effect shape="wingL_white" type="rotation" speed="34" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_white" type="translate_by_path" path="p_ell_w_L" velocity="24" phase="0.0000"/>
+        <effect shape="wingL_white" type="multi_color" colors="255,255,255;170,200,255"/>
+        <create shape="wingR_white"/>
+        <effect shape="wingR_white" type="rotation" speed="-34" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_white" type="translate_by_path" path="p_ell_w_R" velocity="-24" phase="0.5000"/>
+        <effect shape="wingR_white" type="multi_color" colors="170,200,255;255,255,255"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="445.199">
+        <create shape="wingL_white"/>
+        <effect shape="wingL_white" type="rotation" speed="40" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_white" type="translate_by_path" path="p_ell_v_L" velocity="26" phase="0.5000"/>
+        <effect shape="wingL_white" type="multi_color" colors="255,255,255;170,200,255"/>
+        <destroy shape="wingL_white"/>
+        <create shape="wingR_white"/>
+        <effect shape="wingR_white" type="rotation" speed="-40" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_white" type="translate_by_path" path="p_ell_v_R" velocity="-26" phase="0.0000"/>
+        <effect shape="wingR_white" type="multi_color" colors="170,200,255;255,255,255"/>
+        <destroy shape="wingR_white"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+    </event>
+
+    <!-- back to gold -->
+    <event at="449.541">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="1.266"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_circ_s_L" velocity="14" phase="0.0000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_circ_s_R" velocity="-14" phase="0.5000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="spot_white"/>
+        <destroy shape="stage_white"/>
+        <destroy shape="wingL_white"/>
+        <destroy shape="wingR_white"/>
+    </event>
+
+    <event at="455.461">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_circ_L" velocity="16" phase="0.3000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_circ_R" velocity="-16" phase="0.2000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="1.266"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+    </event>
+
+    <!-- the halo breathes -->
+    <event at="461.382">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_circ_s_L" velocity="14" phase="0.0000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_circ_s_R" velocity="-14" phase="0.5000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="1.266"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+    </event>
+
+    <!-- wings on ellipse -->
+    <event at="466.907">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="22" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_ell_h_L" velocity="16" phase="0.1000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-22" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_ell_h_R" velocity="-16" phase="0.4000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="1.266"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+    </event>
+
+    <event at="472.828">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="28" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_rect_L" velocity="18" phase="0.5000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-28" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_rect_R" velocity="-18" phase="0.5000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="1.266"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+    </event>
+
+    <event at="478.748">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <destroy shape="spot_gold"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <destroy shape="stage_gold"/>
+        <destroy shape="wingL_gold"/>
+        <destroy shape="wingR_gold"/>
+    </event>
+
+    <!-- CHORUS peak II: white, dense hats -->
+    <event at="495.326">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <create shape="spot_white"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <create shape="stage_white"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="spot_gold"/>
+        <destroy shape="stage_gold"/>
+    </event>
+
+    <!-- the beams flick -->
+    <event at="498.878">
+        <create shape="rayA_white"/>
+        <effect shape="rayA_white" type="rotation" speed="220"/>
+        <create shape="rayB_white"/>
+        <effect shape="rayB_white" type="rotation" speed="-220"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- the dives answer -->
+    <event at="502.43">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="rayA_white"/>
+        <destroy shape="rayB_white"/>
+    </event>
+
+    <!-- the white wings, wide -->
+    <event at="505.588">
+        <create shape="wingL_white"/>
+        <effect shape="wingL_white" type="rotation" speed="38" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_white" type="translate_by_path" path="p_ell_w_L" velocity="26" phase="0.2000"/>
+        <effect shape="wingL_white" type="multi_color" colors="255,255,255;170,200,255"/>
+        <create shape="wingR_white"/>
+        <effect shape="wingR_white" type="rotation" speed="-38" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_white" type="translate_by_path" path="p_ell_w_R" velocity="-26" phase="0.3000"/>
+        <effect shape="wingR_white" type="multi_color" colors="170,200,255;255,255,255"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="509.535">
+        <create shape="wingL_white"/>
+        <effect shape="wingL_white" type="rotation" speed="44" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_white" type="translate_by_path" path="p_ell_v_L" velocity="28" phase="0.6000"/>
+        <effect shape="wingL_white" type="multi_color" colors="255,255,255;170,200,255"/>
+        <destroy shape="wingL_white"/>
+        <create shape="wingR_white"/>
+        <effect shape="wingR_white" type="rotation" speed="-44" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_white" type="translate_by_path" path="p_ell_v_R" velocity="-28" phase="0.9000"/>
+        <effect shape="wingR_white" type="multi_color" colors="170,200,255;255,255,255"/>
+        <destroy shape="wingR_white"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+    </event>
+
+    <!-- the loudest the show has been -->
+    <event at="513.482">
+        <create shape="spot_white"/>
+        <effect shape="spot_white" type="scale" min="0.75" max="1.25" frequency="2.533"/>
+        <destroy shape="spot_white"/>
+        <create shape="stage_white"/>
+        <effect shape="stage_white" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+        <destroy shape="stage_white"/>
+        <destroy shape="wingL_white"/>
+        <destroy shape="wingR_white"/>
+    </event>
+
+    <!-- the dives one last time -->
+    <event at="517.429">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_white" type="scale" min="0.75" max="1.25" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+    </event>
+
+    <!-- the beams, fastest -->
+    <event at="521.376">
+        <create shape="rayA_white"/>
+        <effect shape="rayA_white" type="rotation" speed="240"/>
+        <create shape="rayB_white"/>
+        <effect shape="rayB_white" type="rotation" speed="-240"/>
+        <effect shape="spot_white" type="scale" min="0.75" max="1.25" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- THE DROP (0.58 -> 0.28): violet eye -->
+    <event at="524.139">
+        <create shape="eye_violet"/>
+        <effect shape="eye_violet" type="scale" min="0.95" max="1.06" frequency="0.12"/>
+        <create shape="spot_violet"/>
+        <effect shape="spot_violet" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <create shape="stage_violet"/>
+        <effect shape="stage_violet" type="warp" amplitude="5" wavelength="170" speed="0.1"/>
+        <destroy shape="rayA_white"/>
+        <destroy shape="rayB_white"/>
+        <destroy shape="spot_white"/>
+        <destroy shape="stage_white"/>
+    </event>
+
+    <event at="529.27">
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="3.2" duty="0.5"/>
+        <effect shape="eye_violet" type="scale" min="0.95" max="1.06" frequency="0.12"/>
+        <effect shape="spot_violet" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <effect shape="stage_violet" type="warp" amplitude="5" wavelength="170" speed="0.1"/>
+    </event>
+
+    <!-- aurora returns -->
+    <event at="532.822">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.84" max="1.16" frequency="1.266"/>
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_circ_L" velocity="16" phase="0.0000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_circ_R" velocity="-16" phase="0.5000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="eye_violet"/>
+        <destroy shape="spot_violet"/>
+        <destroy shape="stage_violet"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <event at="538.743">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_h_L" velocity="18" phase="0.3000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_h_R" velocity="-18" phase="0.2000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.84" max="1.16" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+    </event>
+
+    <!-- the halo breathes -->
+    <event at="544.663">
+        <effect shape="spot_aurora" type="scale" min="0.84" max="1.16" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+        <effect shape="wingL_aurora" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_h_L" velocity="18" phase="0.3000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_h_R" velocity="-18" phase="0.2000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+    </event>
+
+    <!-- wings on rectangle -->
+    <event at="550.584">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="24" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_rect_L" velocity="18" phase="0.1000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-24" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_rect_R" velocity="-18" phase="0.1000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.84" max="1.16" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+    </event>
+
+    <event at="556.504">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="20" phase="0.4000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-20" phase="0.1000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.84" max="1.16" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="14" wavelength="120" speed="0.5"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+    </event>
+
+    <event at="562.425">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="1.266"/>
+        <destroy shape="spot_aurora"/>
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+        <destroy shape="stage_aurora"/>
+        <destroy shape="wingL_aurora"/>
+        <destroy shape="wingR_aurora"/>
+    </event>
+
+    <!-- the beams sweep -->
+    <event at="568.345">
+        <create shape="rayA_aurora"/>
+        <effect shape="rayA_aurora" type="rotation" speed="180"/>
+        <create shape="rayB_aurora"/>
+        <effect shape="rayB_aurora" type="rotation" speed="-180"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+    </event>
+
+    <!-- wings on sine path -->
+    <event at="574.266">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="28" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_v_L" velocity="22" phase="0.6000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-28" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_v_R" velocity="-22" phase="0.9000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+        <destroy shape="rayA_aurora"/>
+        <destroy shape="rayB_aurora"/>
+    </event>
+
+    <!-- the break: blue light -->
+    <event at="580.186">
+        <create shape="halo_starblue"/>
+        <effect shape="halo_starblue" type="scale" min="0.96" max="1.06" frequency="0.15"/>
+        <create shape="spot_starblue"/>
+        <effect shape="spot_starblue" type="scale" min="0.94" max="1.06" frequency="0.25"/>
+        <create shape="stage_starblue"/>
+        <effect shape="stage_starblue" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+        <destroy shape="spot_aurora"/>
+        <destroy shape="stage_aurora"/>
+        <destroy shape="wingL_aurora"/>
+        <destroy shape="wingR_aurora"/>
+    </event>
+
+    <event at="584.133">
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="3" duty="0.5"/>
+        <effect shape="halo_starblue" type="scale" min="0.96" max="1.06" frequency="0.15"/>
+        <effect shape="spot_starblue" type="scale" min="0.94" max="1.06" frequency="0.25"/>
+        <effect shape="stage_starblue" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+    </event>
+
+    <event at="589.264">
+        <create shape="spot_starblue"/>
+        <effect shape="spot_starblue" type="scale" min="0.92" max="1.08" frequency="0.3"/>
+        <destroy shape="spot_starblue"/>
+        <effect shape="halo_starblue" type="scale" min="0.96" max="1.06" frequency="0.15"/>
+        <effect shape="stage_starblue" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+        <destroy shape="star2"/>
+    </event>
+
+    <!-- LOUD: white, dense hats -->
+    <event at="594.395">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <create shape="spot_white"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <create shape="stage_white"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="halo_starblue"/>
+        <destroy shape="spot_starblue"/>
+        <destroy shape="stage_starblue"/>
+    </event>
+
+    <!-- the beams flick -->
+    <event at="597.948">
+        <create shape="rayA_white"/>
+        <effect shape="rayA_white" type="rotation" speed="220"/>
+        <create shape="rayB_white"/>
+        <effect shape="rayB_white" type="rotation" speed="-220"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- the dives answer -->
+    <event at="602.289">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="rayA_white"/>
+        <destroy shape="rayB_white"/>
+    </event>
+
+    <!-- the white wings -->
+    <event at="606.236">
+        <create shape="wingL_white"/>
+        <effect shape="wingL_white" type="rotation" speed="38" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_white" type="translate_by_path" path="p_ell_w_L" velocity="26" phase="0.2000"/>
+        <effect shape="wingL_white" type="multi_color" colors="255,255,255;170,200,255"/>
+        <create shape="wingR_white"/>
+        <effect shape="wingR_white" type="rotation" speed="-38" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_white" type="translate_by_path" path="p_ell_w_R" velocity="-26" phase="0.3000"/>
+        <effect shape="wingR_white" type="multi_color" colors="170,200,255;255,255,255"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- warm and steady: gold -->
+    <event at="610.973">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.94" max="1.08" frequency="0.3"/>
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.633"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="10" wavelength="140" speed="0.35"/>
+        <destroy shape="spot_white"/>
+        <destroy shape="stage_white"/>
+        <destroy shape="wingL_white"/>
+        <destroy shape="wingR_white"/>
+    </event>
+
+    <event at="618.867">
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="2.8" duty="0.5"/>
+        <effect shape="halo_gold" type="scale" min="0.94" max="1.08" frequency="0.3"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.633"/>
+        <effect shape="stage_gold" type="warp" amplitude="10" wavelength="140" speed="0.35"/>
+    </event>
+
+    <!-- wings, slow -->
+    <event at="627.156">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="16" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_circ_s_L" velocity="12" phase="0.0000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-16" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_circ_s_R" velocity="-12" phase="0.5000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.633"/>
+        <effect shape="stage_gold" type="warp" amplitude="10" wavelength="140" speed="0.35"/>
+        <destroy shape="halo_gold"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <event at="635.05">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_ell_h_L" velocity="14" phase="0.3000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_ell_h_R" velocity="-14" phase="0.2000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.633"/>
+        <effect shape="stage_gold" type="warp" amplitude="10" wavelength="140" speed="0.35"/>
+    </event>
+
+    <!-- the halo returns -->
+    <event at="642.944">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.92" max="1.1" frequency="0.4"/>
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.86" max="1.14" frequency="0.633"/>
+        <destroy shape="spot_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="10" wavelength="140" speed="0.35"/>
+        <destroy shape="wingL_gold"/>
+        <destroy shape="wingR_gold"/>
+    </event>
+
+    <!-- sparse and blue -->
+    <event at="651.232">
+        <create shape="spot_starblue"/>
+        <effect shape="spot_starblue" type="scale" min="0.94" max="1.06" frequency="0.18"/>
+        <create shape="stage_starblue"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="3.5" duty="0.5"/>
+        <destroy shape="halo_gold"/>
+        <destroy shape="spot_gold"/>
+        <destroy shape="stage_gold"/>
+    </event>
+
+    <event at="661.889">
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="3" duty="0.5"/>
+        <effect shape="spot_starblue" type="scale" min="0.94" max="1.06" frequency="0.18"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <event at="672.151">
+        <create shape="spot_starblue"/>
+        <effect shape="spot_starblue" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <destroy shape="spot_starblue"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <effect shape="star2" type="blink" period="3" duty="0.5"/>
+    </event>
+
+    <!-- the halo, very slow -->
+    <event at="682.414">
+        <create shape="halo_starblue"/>
+        <effect shape="halo_starblue" type="scale" min="0.96" max="1.06" frequency="0.12"/>
+        <effect shape="spot_starblue" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <destroy shape="star2"/>
+    </event>
+
+    <event at="693.07">
+        <create shape="star3"/>
+        <effect shape="star3" type="blink" period="3.2" duty="0.5"/>
+        <create shape="stage_starblue"/>
+        <effect shape="stage_starblue" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+        <destroy shape="stage_starblue"/>
+        <effect shape="halo_starblue" type="scale" min="0.96" max="1.06" frequency="0.12"/>
+        <effect shape="spot_starblue" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+    </event>
+
+    <event at="703.333">
+        <create shape="spot_starblue"/>
+        <effect shape="spot_starblue" type="scale" min="0.9" max="1.1" frequency="0.25"/>
+        <destroy shape="spot_starblue"/>
+        <effect shape="halo_starblue" type="scale" min="0.96" max="1.06" frequency="0.12"/>
+        <effect shape="stage_starblue" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+        <destroy shape="star3"/>
+    </event>
+
+    <!-- peak at 712: aurora -->
+    <event at="712.411">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="24" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_circ_L" velocity="18" phase="0.0000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-24" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_circ_R" velocity="-18" phase="0.5000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="halo_starblue"/>
+        <destroy shape="spot_starblue"/>
+        <destroy shape="stage_starblue"/>
+    </event>
+
+    <!-- pulses on the beat -->
+    <event at="715.568">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <destroy shape="spot_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+        <effect shape="wingL_aurora" type="rotation" speed="24" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_circ_L" velocity="18" phase="0.0000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-24" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_circ_R" velocity="-18" phase="0.5000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+    </event>
+
+    <event at="721.489">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_h_L" velocity="20" phase="0.3000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_h_R" velocity="-20" phase="0.2000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+    </event>
+
+    <!-- beams sweep -->
+    <event at="727.015">
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="wingL_aurora" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_h_L" velocity="20" phase="0.3000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_h_R" velocity="-20" phase="0.2000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="stage_aurora"/>
+    </event>
+
+    <!-- wings on rectangle -->
+    <event at="732.935">
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_rect_L" velocity="20" phase="0.1000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_rect_R" velocity="-20" phase="0.1000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+    </event>
+
+    <event at="738.856">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="32" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="22" phase="0.4000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-32" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-22" phase="0.1000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+    </event>
+
+    <event at="744.776">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="1.266"/>
+        <destroy shape="spot_aurora"/>
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+        <destroy shape="stage_aurora"/>
+        <destroy shape="wingL_aurora"/>
+        <destroy shape="wingR_aurora"/>
+    </event>
+
+    <!-- the halo breathes -->
+    <event at="750.697">
+        <create shape="halo_aurora"/>
+        <effect shape="halo_aurora" type="scale" min="0.9" max="1.12" frequency="0.5"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+    </event>
+
+    <!-- wings on sine path -->
+    <event at="756.617">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="28" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_v_L" velocity="22" phase="0.5000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-28" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_v_R" velocity="-22" phase="0.0000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+        <destroy shape="halo_aurora"/>
+    </event>
+
+    <event at="762.538">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="34" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_circ_l_L" velocity="24" phase="0.2000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-34" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_circ_l_R" velocity="-24" phase="0.3000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+    </event>
+
+    <!-- beams again -->
+    <event at="768.458">
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="1.266"/>
+        <effect shape="wingL_aurora" type="rotation" speed="34" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_circ_l_L" velocity="24" phase="0.2000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-34" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_circ_l_R" velocity="-24" phase="0.3000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="stage_aurora"/>
+    </event>
+
+    <!-- wings, wide -->
+    <event at="774.379">
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="30" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="24" phase="0.6000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-30" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-24" phase="0.9000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="1.266"/>
+    </event>
+
+    <!-- pulses on the beat -->
+    <event at="780.299">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <destroy shape="spot_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="18" wavelength="100" speed="0.6"/>
+        <destroy shape="wingL_aurora"/>
+        <destroy shape="wingR_aurora"/>
+    </event>
+
+    <!-- stage flashes on half-bar -->
+    <event at="786.22">
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="stage_aurora" type="blink" period="0.789" duty="0.85"/>
+        <destroy shape="stage_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+    </event>
+
+    <!-- the dives -->
+    <event at="790.167">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="stage_aurora" type="blink" period="0.789" duty="0.85"/>
+    </event>
+
+    <!-- beams flick -->
+    <event at="794.903">
+        <create shape="rayA_aurora"/>
+        <effect shape="rayA_aurora" type="rotation" speed="220"/>
+        <create shape="rayB_aurora"/>
+        <effect shape="rayB_aurora" type="rotation" speed="-220"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="stage_aurora" type="blink" period="0.789" duty="0.85"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- the dives answer -->
+    <event at="800.034">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="stage_aurora" type="blink" period="0.789" duty="0.85"/>
+        <destroy shape="rayA_aurora"/>
+        <destroy shape="rayB_aurora"/>
+    </event>
+
+    <!-- wings, fastest -->
+    <event at="805.165">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="40" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_v_L" velocity="28" phase="0.0000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-40" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_v_R" velocity="-28" phase="0.5000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="stage_aurora" type="blink" period="0.789" duty="0.85"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="809.902">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="44" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="30" phase="0.5000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-44" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-30" phase="0.0000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="20" wavelength="90" speed="0.65"/>
+        <effect shape="stage_aurora" type="blink" period="0.789" duty="0.85"/>
+    </event>
+
+    <!-- pulses on beat, stage surges -->
+    <event at="815.822">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.78" max="1.22" frequency="2.533"/>
+        <destroy shape="spot_aurora"/>
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <destroy shape="stage_aurora"/>
+        <destroy shape="wingL_aurora"/>
+        <destroy shape="wingR_aurora"/>
+    </event>
+
+    <!-- dives on last downbeat -->
+    <event at="821.743">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_aurora" type="scale" min="0.78" max="1.22" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+    </event>
+
+    <!-- stage flashes on beat -->
+    <event at="822.137">
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+        <effect shape="stage_aurora" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="stage_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.78" max="1.22" frequency="2.533"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- the break: violet eye -->
+    <event at="826.084">
+        <create shape="eye_violet"/>
+        <effect shape="eye_violet" type="scale" min="0.95" max="1.06" frequency="0.12"/>
+        <create shape="spot_violet"/>
+        <effect shape="spot_violet" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <create shape="stage_violet"/>
+        <effect shape="stage_violet" type="warp" amplitude="5" wavelength="170" speed="0.1"/>
+        <destroy shape="spot_aurora"/>
+        <destroy shape="stage_aurora"/>
+    </event>
+
+    <event at="833.584">
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="3.2" duty="0.5"/>
+        <effect shape="eye_violet" type="scale" min="0.95" max="1.06" frequency="0.12"/>
+        <effect shape="spot_violet" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <effect shape="stage_violet" type="warp" amplitude="5" wavelength="170" speed="0.1"/>
+    </event>
+
+    <event at="839.899">
+        <create shape="spot_violet"/>
+        <effect shape="spot_violet" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <destroy shape="spot_violet"/>
+        <effect shape="eye_violet" type="scale" min="0.95" max="1.06" frequency="0.12"/>
+        <effect shape="stage_violet" type="warp" amplitude="5" wavelength="170" speed="0.1"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <!-- the halo takes the eye's place -->
+    <event at="846.214">
+        <create shape="halo_violet"/>
+        <effect shape="halo_violet" type="scale" min="0.96" max="1.06" frequency="0.12"/>
+        <effect shape="eye_violet" type="scale" min="0.95" max="1.06" frequency="0.12"/>
+        <effect shape="spot_violet" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <effect shape="stage_violet" type="warp" amplitude="5" wavelength="170" speed="0.1"/>
+    </event>
+
+    <!-- the eye opens again -->
+    <event at="852.924">
+        <create shape="eye_violet"/>
+        <effect shape="eye_violet" type="scale" min="0.94" max="1.07" frequency="0.15"/>
+        <destroy shape="eye_violet"/>
+        <effect shape="spot_violet" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <effect shape="stage_violet" type="warp" amplitude="5" wavelength="170" speed="0.1"/>
+        <destroy shape="halo_violet"/>
+    </event>
+
+    <event at="859.239">
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="3" duty="0.5"/>
+        <effect shape="eye_violet" type="scale" min="0.94" max="1.07" frequency="0.15"/>
+        <effect shape="spot_violet" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <effect shape="stage_violet" type="warp" amplitude="5" wavelength="170" speed="0.1"/>
+    </event>
+
+    <!-- great middle: aurora -->
+    <event at="863.976">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_circ_L" velocity="20" phase="0.0000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_circ_R" velocity="-20" phase="0.5000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="eye_violet"/>
+        <destroy shape="spot_violet"/>
+        <destroy shape="stage_violet"/>
+        <destroy shape="star2"/>
+    </event>
+
+    <event at="869.896">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="32" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_h_L" velocity="22" phase="0.3000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-32" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_h_R" velocity="-22" phase="0.2000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+    </event>
+
+    <!-- beams sweep -->
+    <event at="875.422">
+        <effect shape="spot_aurora" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <effect shape="wingL_aurora" type="rotation" speed="32" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_h_L" velocity="22" phase="0.3000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-32" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_h_R" velocity="-22" phase="0.2000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="stage_aurora"/>
+    </event>
+
+    <!-- wings on rectangle -->
+    <event at="881.342">
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="28" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_rect_L" velocity="22" phase="0.1000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-28" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_rect_R" velocity="-22" phase="0.1000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+    </event>
+
+    <event at="887.263">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="34" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="24" phase="0.4000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-34" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-24" phase="0.1000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+    </event>
+
+    <!-- pulses on beat -->
+    <event at="893.183">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <destroy shape="spot_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+        <effect shape="wingL_aurora" type="rotation" speed="34" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="24" phase="0.4000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-34" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-24" phase="0.1000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+    </event>
+
+    <!-- dives on densest hats -->
+    <event at="896.736">
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="wingL_aurora" type="rotation" speed="34" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="24" phase="0.4000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-34" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-24" phase="0.1000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="stage_aurora"/>
+    </event>
+
+    <!-- beams flick -->
+    <event at="901.077">
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="wingL_aurora" type="rotation" speed="34" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="24" phase="0.4000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-34" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-24" phase="0.1000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+    </event>
+
+    <!-- dives answer -->
+    <event at="905.419">
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="wingL_aurora" type="rotation" speed="34" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="24" phase="0.4000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-34" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-24" phase="0.1000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+    </event>
+
+    <!-- wings, fastest -->
+    <event at="909.761">
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="40" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_v_L" velocity="28" phase="0.0000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-40" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_v_R" velocity="-28" phase="0.5000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+    </event>
+
+    <event at="914.102">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="46" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="30" phase="0.5000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-46" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-30" phase="0.0000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="16" wavelength="110" speed="0.55"/>
+        <effect shape="stage_aurora" type="blink" period="1.579" duty="0.85"/>
+    </event>
+
+    <!-- pulses on beat, stage flashes -->
+    <event at="918.049">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.78" max="1.22" frequency="2.533"/>
+        <destroy shape="spot_aurora"/>
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_aurora" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="stage_aurora"/>
+        <destroy shape="wingL_aurora"/>
+        <destroy shape="wingR_aurora"/>
+    </event>
+
+    <!-- dives again -->
+    <event at="922.391">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_aurora" type="scale" min="0.78" max="1.22" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_aurora" type="blink" period="0.395" duty="0.9"/>
+    </event>
+
+    <!-- beams, fastest -->
+    <event at="926.733">
+        <create shape="rayA_aurora"/>
+        <effect shape="rayA_aurora" type="rotation" speed="240"/>
+        <create shape="rayB_aurora"/>
+        <effect shape="rayB_aurora" type="rotation" speed="-240"/>
+        <effect shape="spot_aurora" type="scale" min="0.78" max="1.22" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_aurora" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- dives answer -->
+    <event at="931.075">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_aurora" type="scale" min="0.78" max="1.22" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_aurora" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="rayA_aurora"/>
+        <destroy shape="rayB_aurora"/>
+    </event>
+
+    <!-- wings, widest -->
+    <event at="935.416">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="44" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_v_L" velocity="30" phase="0.2000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-44" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_v_R" velocity="-30" phase="0.3000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <effect shape="spot_aurora" type="scale" min="0.78" max="1.22" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_aurora" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="939.758">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="48" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="32" phase="0.6000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <destroy shape="wingL_aurora"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-48" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-32" phase="0.9000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <destroy shape="wingR_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.78" max="1.22" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="22" wavelength="80" speed="0.7"/>
+        <effect shape="stage_aurora" type="blink" period="0.395" duty="0.9"/>
+    </event>
+
+    <!-- pulses on beat, stage surges -->
+    <event at="944.1">
+        <create shape="spot_aurora"/>
+        <effect shape="spot_aurora" type="scale" min="0.76" max="1.24" frequency="2.533"/>
+        <destroy shape="spot_aurora"/>
+        <create shape="stage_aurora"/>
+        <effect shape="stage_aurora" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+        <destroy shape="stage_aurora"/>
+        <destroy shape="wingL_aurora"/>
+        <destroy shape="wingR_aurora"/>
+    </event>
+
+    <!-- beams, fastest yet -->
+    <event at="948.441">
+        <create shape="rayA_aurora"/>
+        <effect shape="rayA_aurora" type="rotation" speed="240"/>
+        <create shape="rayB_aurora"/>
+        <effect shape="rayB_aurora" type="rotation" speed="-240"/>
+        <effect shape="spot_aurora" type="scale" min="0.76" max="1.24" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+    </event>
+
+    <!-- the dives -->
+    <event at="952.783">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_aurora" type="scale" min="0.76" max="1.24" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+        <destroy shape="rayA_aurora"/>
+        <destroy shape="rayB_aurora"/>
+    </event>
+
+    <!-- wings hold the line -->
+    <event at="956.73">
+        <create shape="wingL_aurora"/>
+        <effect shape="wingL_aurora" type="rotation" speed="42" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_aurora" type="translate_by_path" path="p_ell_w_L" velocity="30" phase="0.3000"/>
+        <effect shape="wingL_aurora" type="multi_color" colors="140,250,190;40,180,120"/>
+        <create shape="wingR_aurora"/>
+        <effect shape="wingR_aurora" type="rotation" speed="-42" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_aurora" type="translate_by_path" path="p_ell_w_R" velocity="-30" phase="0.2000"/>
+        <effect shape="wingR_aurora" type="multi_color" colors="40,180,120;140,250,190"/>
+        <effect shape="spot_aurora" type="scale" min="0.76" max="1.24" frequency="2.533"/>
+        <effect shape="stage_aurora" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- the white flash: brightest moment -->
+    <event at="968.176">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <create shape="spot_white"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <create shape="stage_white"/>
+        <effect shape="stage_white" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="spot_aurora"/>
+        <destroy shape="stage_aurora"/>
+        <destroy shape="wingL_aurora"/>
+        <destroy shape="wingR_aurora"/>
+    </event>
+
+    <!-- beams flick -->
+    <event at="972.518">
+        <create shape="rayA_white"/>
+        <effect shape="rayA_white" type="rotation" speed="240"/>
+        <create shape="rayB_white"/>
+        <effect shape="rayB_white" type="rotation" speed="-240"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <!-- dives answer -->
+    <event at="976.86">
+        <create shape="diveL"/>
+        <destroy shape="diveL"/>
+        <create shape="diveR"/>
+        <destroy shape="diveR"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="rayA_white"/>
+        <destroy shape="rayB_white"/>
+    </event>
+
+    <!-- white wings, widest -->
+    <event at="980.412">
+        <create shape="wingL_white"/>
+        <effect shape="wingL_white" type="rotation" speed="44" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_white" type="translate_by_path" path="p_ell_w_L" velocity="32" phase="0.0000"/>
+        <effect shape="wingL_white" type="multi_color" colors="255,255,255;170,200,255"/>
+        <create shape="wingR_white"/>
+        <effect shape="wingR_white" type="rotation" speed="-44" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_white" type="translate_by_path" path="p_ell_w_R" velocity="-32" phase="0.5000"/>
+        <effect shape="wingR_white" type="multi_color" colors="170,200,255;255,255,255"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+        <destroy shape="diveL"/>
+        <destroy shape="diveR"/>
+    </event>
+
+    <event at="983.57">
+        <create shape="wingL_white"/>
+        <effect shape="wingL_white" type="rotation" speed="48" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_white" type="translate_by_path" path="p_ell_v_L" velocity="34" phase="0.5000"/>
+        <effect shape="wingL_white" type="multi_color" colors="255,255,255;170,200,255"/>
+        <destroy shape="wingL_white"/>
+        <create shape="wingR_white"/>
+        <effect shape="wingR_white" type="rotation" speed="-48" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_white" type="translate_by_path" path="p_ell_v_R" velocity="-34" phase="0.0000"/>
+        <effect shape="wingR_white" type="multi_color" colors="170,200,255;255,255,255"/>
+        <destroy shape="wingR_white"/>
+        <effect shape="spot_white" type="scale" min="0.8" max="1.2" frequency="2.533"/>
+        <effect shape="stage_white" type="warp" amplitude="24" wavelength="70" speed="0.8"/>
+        <effect shape="stage_white" type="blink" period="0.395" duty="0.9"/>
+    </event>
+
+    <!-- loudest, fastest -->
+    <event at="987.911">
+        <create shape="spot_white"/>
+        <effect shape="spot_white" type="scale" min="0.75" max="1.25" frequency="2.533"/>
+        <destroy shape="spot_white"/>
+        <create shape="stage_white"/>
+        <effect shape="stage_white" type="warp" amplitude="26" wavelength="60" speed="0.85"/>
+        <destroy shape="stage_white"/>
+        <destroy shape="wingL_white"/>
+        <destroy shape="wingR_white"/>
+    </event>
+
+    <!-- second ballad: gold, slow -->
+    <event at="990.674">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.96" max="1.06" frequency="0.15"/>
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+        <destroy shape="spot_white"/>
+        <destroy shape="stage_white"/>
+    </event>
+
+    <!-- a star twinkles -->
+    <event at="1000.936">
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="3.5" duty="0.5"/>
+        <effect shape="halo_gold" type="scale" min="0.96" max="1.06" frequency="0.15"/>
+        <effect shape="spot_gold" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <effect shape="stage_gold" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+    </event>
+
+    <event at="1010.804">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.92" max="1.08" frequency="0.3"/>
+        <destroy shape="spot_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.96" max="1.06" frequency="0.15"/>
+        <effect shape="stage_gold" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <!-- the violet eye opens -->
+    <event at="1021.066">
+        <create shape="eye_violet"/>
+        <effect shape="eye_violet" type="scale" min="0.95" max="1.06" frequency="0.1"/>
+        <effect shape="halo_gold" type="scale" min="0.96" max="1.06" frequency="0.15"/>
+        <effect shape="spot_gold" type="scale" min="0.92" max="1.08" frequency="0.3"/>
+        <effect shape="stage_gold" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+    </event>
+
+    <event at="1030.934">
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="3" duty="0.5"/>
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.94" max="1.08" frequency="0.18"/>
+        <destroy shape="halo_gold"/>
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.9" max="1.1" frequency="0.4"/>
+        <destroy shape="spot_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+        <destroy shape="eye_violet"/>
+    </event>
+
+    <event at="1041.196">
+        <effect shape="halo_gold" type="scale" min="0.94" max="1.08" frequency="0.18"/>
+        <effect shape="spot_gold" type="scale" min="0.9" max="1.1" frequency="0.4"/>
+        <effect shape="stage_gold" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+        <destroy shape="star2"/>
+    </event>
+
+    <event at="1051.063">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.92" max="1.1" frequency="0.22"/>
+        <destroy shape="halo_gold"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="8" wavelength="160" speed="0.15"/>
+        <destroy shape="stage_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.9" max="1.1" frequency="0.4"/>
+    </event>
+
+    <event at="1060.931">
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="2.8" duty="0.5"/>
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.88" max="1.12" frequency="0.5"/>
+        <destroy shape="spot_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.92" max="1.1" frequency="0.22"/>
+        <effect shape="stage_gold" type="warp" amplitude="8" wavelength="160" speed="0.15"/>
+    </event>
+
+    <event at="1071.193">
+        <effect shape="halo_gold" type="scale" min="0.92" max="1.1" frequency="0.22"/>
+        <effect shape="spot_gold" type="scale" min="0.88" max="1.12" frequency="0.5"/>
+        <effect shape="stage_gold" type="warp" amplitude="8" wavelength="160" speed="0.15"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <event at="1081.061">
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="10" wavelength="150" speed="0.18"/>
+        <destroy shape="stage_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.88" max="1.12" frequency="0.5"/>
+        <destroy shape="halo_gold"/>
+    </event>
+
+    <!-- eye opens again -->
+    <event at="1090.928">
+        <create shape="eye_violet"/>
+        <effect shape="eye_violet" type="scale" min="0.94" max="1.07" frequency="0.12"/>
+        <effect shape="spot_gold" type="scale" min="0.88" max="1.12" frequency="0.5"/>
+        <effect shape="stage_gold" type="warp" amplitude="10" wavelength="150" speed="0.18"/>
+    </event>
+
+    <event at="1101.19">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.9" max="1.12" frequency="0.25"/>
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="2.6" duty="0.5"/>
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.86" max="1.14" frequency="0.6"/>
+        <destroy shape="spot_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="10" wavelength="150" speed="0.18"/>
+        <destroy shape="eye_violet"/>
+    </event>
+
+    <event at="1111.058">
+        <effect shape="halo_gold" type="scale" min="0.9" max="1.12" frequency="0.25"/>
+        <effect shape="spot_gold" type="scale" min="0.86" max="1.14" frequency="0.6"/>
+        <effect shape="stage_gold" type="warp" amplitude="10" wavelength="150" speed="0.18"/>
+        <destroy shape="star2"/>
+    </event>
+
+    <event at="1120.925">
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="140" speed="0.22"/>
+        <destroy shape="stage_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.86" max="1.14" frequency="0.6"/>
+        <destroy shape="halo_gold"/>
+    </event>
+
+    <event at="1131.188">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.9" max="1.14" frequency="0.3"/>
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="2.4" duty="0.5"/>
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.8"/>
+        <destroy shape="spot_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="140" speed="0.22"/>
+    </event>
+
+    <event at="1141.055">
+        <effect shape="halo_gold" type="scale" min="0.9" max="1.14" frequency="0.3"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.8"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="140" speed="0.22"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <event at="1150.923">
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="130" speed="0.28"/>
+        <destroy shape="stage_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.8"/>
+        <destroy shape="halo_gold"/>
+    </event>
+
+    <!-- wings, slow -->
+    <event at="1161.185">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="16" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_circ_s_L" velocity="12" phase="0.0000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-16" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_circ_s_R" velocity="-12" phase="0.5000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.8"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="130" speed="0.28"/>
+    </event>
+
+    <event at="1171.052">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_ell_h_L" velocity="14" phase="0.3000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_ell_h_R" velocity="-14" phase="0.2000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.8"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="130" speed="0.28"/>
+    </event>
+
+    <!-- halo returns -->
+    <event at="1180.92">
+        <create shape="halo_gold"/>
+        <effect shape="halo_gold" type="scale" min="0.9" max="1.14" frequency="0.35"/>
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <destroy shape="spot_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="14" wavelength="130" speed="0.28"/>
+        <destroy shape="wingL_gold"/>
+        <destroy shape="wingR_gold"/>
+    </event>
+
+    <!-- ballad crests -->
+    <event at="1191.182">
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="16" wavelength="120" speed="0.32"/>
+        <destroy shape="stage_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <destroy shape="halo_gold"/>
+    </event>
+
+    <!-- medium: gold -->
+    <event at="1203.812">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="20" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_circ_L" velocity="16" phase="0.0000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-20" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_circ_R" velocity="-16" phase="0.5000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.633"/>
+        <destroy shape="spot_gold"/>
+        <create shape="stage_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+        <destroy shape="stage_gold"/>
+    </event>
+
+    <event at="1210.128">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_ell_h_L" velocity="18" phase="0.3000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_ell_h_R" velocity="-18" phase="0.2000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.633"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+    </event>
+
+    <!-- halo breathes -->
+    <event at="1216.048">
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.633"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+        <effect shape="wingL_gold" type="rotation" speed="26" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_ell_h_L" velocity="18" phase="0.3000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <effect shape="wingR_gold" type="rotation" speed="-26" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_ell_h_R" velocity="-18" phase="0.2000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+    </event>
+
+    <!-- wings on rectangle -->
+    <event at="1221.968">
+        <create shape="wingL_gold"/>
+        <effect shape="wingL_gold" type="rotation" speed="22" pivot_x="80" pivot_y="128"/>
+        <effect shape="wingL_gold" type="translate_by_path" path="p_rect_L" velocity="18" phase="0.1000"/>
+        <effect shape="wingL_gold" type="multi_color" colors="255,210,110;255,130,40"/>
+        <destroy shape="wingL_gold"/>
+        <create shape="wingR_gold"/>
+        <effect shape="wingR_gold" type="rotation" speed="-22" pivot_x="176" pivot_y="128"/>
+        <effect shape="wingR_gold" type="translate_by_path" path="p_rect_R" velocity="-18" phase="0.1000"/>
+        <effect shape="wingR_gold" type="multi_color" colors="255,130,40;255,210,110"/>
+        <destroy shape="wingR_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.84" max="1.16" frequency="0.633"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+    </event>
+
+    <!-- pulses on half-bar -->
+    <event at="1227.889">
+        <create shape="spot_gold"/>
+        <effect shape="spot_gold" type="scale" min="0.82" max="1.18" frequency="1.266"/>
+        <destroy shape="spot_gold"/>
+        <effect shape="stage_gold" type="warp" amplitude="12" wavelength="130" speed="0.4"/>
+        <destroy shape="wingL_gold"/>
+        <destroy shape="wingR_gold"/>
+    </event>
+
+    <!-- sparse and blue -->
+    <event at="1233.415">
+        <create shape="spot_starblue"/>
+        <effect shape="spot_starblue" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <create shape="stage_starblue"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="3.5" duty="0.5"/>
+        <destroy shape="spot_gold"/>
+        <destroy shape="stage_gold"/>
+    </event>
+
+    <event at="1244.072">
+        <create shape="star2"/>
+        <effect shape="star2" type="blink" period="3" duty="0.5"/>
+        <effect shape="spot_starblue" type="scale" min="0.94" max="1.06" frequency="0.2"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <event at="1253.939">
+        <create shape="spot_starblue"/>
+        <effect shape="spot_starblue" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <destroy shape="spot_starblue"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <effect shape="star2" type="blink" period="3" duty="0.5"/>
+    </event>
+
+    <!-- halo, very slow -->
+    <event at="1263.807">
+        <create shape="halo_starblue"/>
+        <effect shape="halo_starblue" type="scale" min="0.96" max="1.06" frequency="0.12"/>
+        <effect shape="spot_starblue" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+        <destroy shape="star2"/>
+    </event>
+
+    <event at="1274.069">
+        <create shape="star3"/>
+        <effect shape="star3" type="blink" period="3.2" duty="0.5"/>
+        <effect shape="halo_starblue" type="scale" min="0.96" max="1.06" frequency="0.12"/>
+        <effect shape="spot_starblue" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <effect shape="stage_starblue" type="warp" amplitude="5" wavelength="180" speed="0.1"/>
+    </event>
+
+    <!-- blue eye opens -->
+    <event at="1283.936">
+        <create shape="eye_starblue"/>
+        <effect shape="eye_starblue" type="scale" min="0.95" max="1.06" frequency="0.1"/>
+        <create shape="stage_starblue"/>
+        <effect shape="stage_starblue" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+        <destroy shape="stage_starblue"/>
+        <effect shape="spot_starblue" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <destroy shape="halo_starblue"/>
+        <destroy shape="star3"/>
+    </event>
+
+    <event at="1293.804">
+        <effect shape="eye_starblue" type="scale" min="0.95" max="1.06" frequency="0.1"/>
+        <effect shape="spot_starblue" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <effect shape="stage_starblue" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+    </event>
+
+    <!-- halo returns -->
+    <event at="1304.066">
+        <create shape="halo_starblue"/>
+        <effect shape="halo_starblue" type="scale" min="0.94" max="1.07" frequency="0.15"/>
+        <create shape="star1"/>
+        <effect shape="star1" type="blink" period="3" duty="0.5"/>
+        <effect shape="spot_starblue" type="scale" min="0.92" max="1.08" frequency="0.22"/>
+        <effect shape="stage_starblue" type="warp" amplitude="6" wavelength="170" speed="0.12"/>
+        <destroy shape="eye_starblue"/>
+    </event>
+
+    <!-- dark: curtains return, violet -->
+    <event at="1317.881">
+        <create shape="curtainL"/>
+        <create shape="curtainR"/>
+        <create shape="spot_violet"/>
+        <effect shape="spot_violet" type="scale" min="0.94" max="1.06" frequency="0.15"/>
+        <create shape="stage_violet"/>
+        <effect shape="stage_violet" type="warp" amplitude="4" wavelength="190" speed="0.08"/>
+        <destroy shape="halo_starblue"/>
+        <destroy shape="spot_starblue"/>
+        <destroy shape="stage_starblue"/>
+        <destroy shape="star1"/>
+    </event>
+
+    <!-- curtains stir -->
+    <event at="1327.748">
+        <create shape="curtainL"/>
+        <effect shape="curtainL" type="translation" ax="2" fx="0.06"/>
+        <effect shape="curtainL" type="translation" ax="2" fx="0.06" phase="3.14159"/>
+        <destroy shape="curtainL"/>
+        <create shape="curtainR"/>
+        <effect shape="curtainR" type="translation" ax="2" fx="0.06"/>
+        <effect shape="curtainR" type="translation" ax="2" fx="0.06" phase="3.14159"/>
+        <destroy shape="curtainR"/>
+        <effect shape="spot_violet" type="scale" min="0.94" max="1.06" frequency="0.15"/>
+        <effect shape="stage_violet" type="warp" amplitude="4" wavelength="190" speed="0.08"/>
+    </event>
+
+    <!-- curtains part; a last star -->
+    <event at="1338.01">
+        <create shape="spot_violet"/>
+        <effect shape="spot_violet" type="scale" min="0.92" max="1.08" frequency="0.18"/>
+        <destroy shape="spot_violet"/>
+        <effect shape="curtainL" type="translation" ax="2" fx="0.06"/>
+        <effect shape="curtainL" type="translation" ax="2" fx="0.06" phase="3.14159"/>
+        <effect shape="curtainR" type="translation" ax="2" fx="0.06"/>
+        <effect shape="curtainR" type="translation" ax="2" fx="0.06" phase="3.14159"/>
+        <effect shape="stage_violet" type="warp" amplitude="4" wavelength="190" speed="0.08"/>
+    </event>
+
+    <event at="1347.878">
+        <create shape="spot_violet"/>
+        <effect shape="spot_violet" type="scale" min="0.9" max="1.1" frequency="0.2"/>
+        <destroy shape="spot_violet"/>
+        <effect shape="curtainL" type="translation" ax="2" fx="0.06"/>
+        <effect shape="curtainL" type="translation" ax="2" fx="0.06" phase="3.14159"/>
+        <effect shape="curtainR" type="translation" ax="2" fx="0.06"/>
+        <effect shape="curtainR" type="translation" ax="2" fx="0.06" phase="3.14159"/>
+        <effect shape="stage_violet" type="warp" amplitude="4" wavelength="190" speed="0.08"/>
+    </event>
+
+    <!-- the curtain falls: curtains slide together -->
+    <event at="1354.982">
+        <create shape="spot_orbit"/>
+        <effect shape="spot_orbit" type="rotation" speed="6" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.95" max="1.05" frequency="0.1"/>
+        <effect shape="spot_orbit" type="color_shift" dr="-3" dg="-4" db="-7"/>
+        <create shape="stage_night"/>
+        <effect shape="stage_night" type="warp" amplitude="3" wavelength="200" speed="0.06"/>
+        <create shape="curtainL"/>
+        <effect shape="curtainL" type="translation" vx="3"/>
+        <effect shape="curtainL" type="translation" vx="-3"/>
+        <effect shape="curtainL" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <effect shape="curtainL" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <destroy shape="curtainL"/>
+        <create shape="curtainR"/>
+        <effect shape="curtainR" type="translation" vx="3"/>
+        <effect shape="curtainR" type="translation" vx="-3"/>
+        <effect shape="curtainR" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <effect shape="curtainR" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <destroy shape="curtainR"/>
+        <destroy shape="spot_violet"/>
+        <destroy shape="stage_violet"/>
+    </event>
+
+    <!-- a last light twinkles -->
+    <event at="1373.139">
+        <effect shape="curtainL" type="translation" vx="3"/>
+        <effect shape="curtainL" type="translation" vx="-3"/>
+        <effect shape="curtainL" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <effect shape="curtainL" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <effect shape="curtainR" type="translation" vx="3"/>
+        <effect shape="curtainR" type="translation" vx="-3"/>
+        <effect shape="curtainR" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <effect shape="curtainR" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <effect shape="spot_orbit" type="rotation" speed="6" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.95" max="1.05" frequency="0.1"/>
+        <effect shape="spot_orbit" type="color_shift" dr="-3" dg="-4" db="-7"/>
+        <effect shape="stage_night" type="warp" amplitude="3" wavelength="200" speed="0.06"/>
+    </event>
+
+    <!-- last light fades; closing curtains remain -->
+    <event at="1388.927">
+        <create shape="spot_orbit"/>
+        <effect shape="spot_orbit" type="rotation" speed="4" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.97" max="1.03" frequency="0.06"/>
+        <destroy shape="spot_orbit"/>
+        <effect shape="curtainL" type="translation" vx="3"/>
+        <effect shape="curtainL" type="translation" vx="-3"/>
+        <effect shape="curtainL" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <effect shape="curtainL" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <effect shape="curtainR" type="translation" vx="3"/>
+        <effect shape="curtainR" type="translation" vx="-3"/>
+        <effect shape="curtainR" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <effect shape="curtainR" type="color_shift" dr="-6" dg="-2" db="-3"/>
+        <destroy shape="stage_night"/>
+    </event>
+
+    <!-- light slows to a halt -->
+    <event at="1405.109">
+        <effect shape="spot_orbit" type="rotation" speed="4" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.97" max="1.03" frequency="0.06"/>
+        <destroy shape="curtainL"/>
+        <destroy shape="curtainR"/>
+    </event>
+
+    <!-- light fades out -->
+    <event at="1420.897">
+        <create shape="spot_orbit"/>
+        <effect shape="spot_orbit" type="rotation" speed="4" pivot_x="128" pivot_y="128"/>
+        <effect shape="spot_orbit" type="scale" min="0.97" max="1.03" frequency="0.06"/>
+        <effect shape="spot_orbit" type="color_shift" dr="-6" dg="-8" db="-14"/>
+        <destroy shape="spot_orbit"/>
+    </event>
+
+    <!-- darkness -->
+    <event at="1433.133">
+        <destroy shape="spot_orbit"/>
+    </event>
+
+</animation>
