@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: clap — fast bright vertical lines slam in from left
+    and right toward the center, then fade out.
+
+    - Two vertical lines start near the edges, translate toward center
+      with translation (vx), then a color_shift with negative blue/green
+      fades them out.
+-->
+<animation fps="25" duration="0.3">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="clap_l" type="line" x0="20" y0="40" x1="20" y1="216"
+           npoints="48" red="255" green="255" blue="255"/>
+    <shape name="clap_r" type="line" x0="236" y0="40" x1="236" y1="216"
+           npoints="48" red="255" green="255" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="clap_l"/>
+        <create shape="clap_r"/>
+        <!-- fast inward translation -->
+        <effect shape="clap_l" type="translation" vx="500"/>
+        <effect shape="clap_r" type="translation" vx="-500"/>
+    </event>
+
+    <event at="0.1">
+        <!-- after meeting at center, fade out -->
+        <effect shape="clap_l" type="color_shift" dr="-255" dg="-200" db="-180"/>
+        <effect shape="clap_r" type="color_shift" dr="-255" dg="-200" db="-180"/>
+    </event>
+
+    <event at="0.23">
+        <destroy shape="clap_l"/>
+        <destroy shape="clap_r"/>
+    </event>
+</animation>

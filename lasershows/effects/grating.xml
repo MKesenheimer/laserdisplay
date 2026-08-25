@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: grating — many dots of the same color scattered
+    across the screen.
+
+    Uses small circles (2 points = a dot) at various positions.
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <!-- scattered dots in a single color -->
+    <shape name="g1"  type="circle" cx="25"  cy="40"  r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g2"  type="circle" cx="80"  cy="120" r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g3"  type="circle" cx="160" cy="60"  r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g4"  type="circle" cx="210" cy="180" r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g5"  type="circle" cx="50"  cy="200" r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g6"  type="circle" cx="130" cy="30"  r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g7"  type="circle" cx="190" cy="140" r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g8"  type="circle" cx="100" cy="170" r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g9"  type="circle" cx="230" cy="90"  r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g10" type="circle" cx="15"  cy="150" r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g11" type="circle" cx="145" cy="210" r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g12" type="circle" cx="75"  cy="75"  r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g13" type="circle" cx="200" cy="30"  r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g14" type="circle" cx="115" cy="100" r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g15" type="circle" cx="170" cy="200" r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g16" type="circle" cx="60"  cy="10"  r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g17" type="circle" cx="225" cy="150" r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g18" type="circle" cx="140" cy="85"  r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g19" type="circle" cx="35"  cy="170" r="3" npoints="2" red="80"  green="200" blue="255"/>
+    <shape name="g20" type="circle" cx="185" cy="110" r="3" npoints="2" red="80"  green="200" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="g1"/>
+        <create shape="g2"/>
+        <create shape="g3"/>
+        <create shape="g4"/>
+        <create shape="g5"/>
+        <create shape="g6"/>
+        <create shape="g7"/>
+        <create shape="g8"/>
+        <create shape="g9"/>
+        <create shape="g10"/>
+        <create shape="g11"/>
+        <create shape="g12"/>
+        <create shape="g13"/>
+        <create shape="g14"/>
+        <create shape="g15"/>
+        <create shape="g16"/>
+        <create shape="g17"/>
+        <create shape="g18"/>
+        <create shape="g19"/>
+        <create shape="g20"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="g1"/>
+        <destroy shape="g2"/>
+        <destroy shape="g3"/>
+        <destroy shape="g4"/>
+        <destroy shape="g5"/>
+        <destroy shape="g6"/>
+        <destroy shape="g7"/>
+        <destroy shape="g8"/>
+        <destroy shape="g9"/>
+        <destroy shape="g10"/>
+        <destroy shape="g11"/>
+        <destroy shape="g12"/>
+        <destroy shape="g13"/>
+        <destroy shape="g14"/>
+        <destroy shape="g15"/>
+        <destroy shape="g16"/>
+        <destroy shape="g17"/>
+        <destroy shape="g18"/>
+        <destroy shape="g19"/>
+        <destroy shape="g20"/>
+    </event>
+</animation>

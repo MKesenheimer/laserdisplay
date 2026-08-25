@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: high notes — short diagonal lines appear in the upper
+    left and right corners and move diagonally through the screen at
+    various speeds.
+
+    Uses translation with both vx and vy components. Lines start in
+    the upper corners and travel across the display.
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <!-- diagonal lines for upper-left origin -->
+    <shape name="h1" type="line" x0="20" y0="210" x1="35" y1="195"
+           npoints="8" red="255" green="100" blue="255"/>
+    <shape name="h2" type="line" x0="15" y0="190" x1="30" y1="175"
+           npoints="8" red="200" green="80"  blue="255"/>
+    <shape name="h3" type="line" x0="25" y0="170" x1="40" y1="155"
+           npoints="8" red="255" green="140" blue="240"/>
+
+    <!-- diagonal lines for upper-right origin -->
+    <shape name="h4" type="line" x0="235" y0="210" x1="220" y1="195"
+           npoints="8" red="100" green="255" blue="200"/>
+    <shape name="h5" type="line" x0="240" y0="190" x1="225" y1="175"
+           npoints="8" red="80"  green="220" blue="180"/>
+    <shape name="h6" type="line" x0="230" y0="170" x1="215" y1="155"
+           npoints="8" red="140" green="255" blue="210"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <!-- upper-left lines move down-right -->
+        <create shape="h1"/>
+        <create shape="h3"/>
+        <effect shape="h1" type="translation" vx="50" vy="40"/>
+        <effect shape="h3" type="translation" vx="65" vy="55"/>
+    </event>
+
+    <event at="1.0">
+        <!-- upper-right lines move down-left -->
+        <create shape="h4"/>
+        <create shape="h6"/>
+        <effect shape="h4" type="translation" vx="-55" vy="45"/>
+        <effect shape="h6" type="translation" vx="-40" vy="60"/>
+    </event>
+
+    <event at="2.5">
+        <create shape="h2"/>
+        <effect shape="h2" type="translation" vx="70" vy="35"/>
+    </event>
+
+    <event at="3.5">
+        <create shape="h5"/>
+        <effect shape="h5" type="translation" vx="-60" vy="50"/>
+    </event>
+
+    <event at="5.0">
+        <!-- second wave -->
+        <create shape="h1"/>
+        <create shape="h4"/>
+        <effect shape="h1" type="translation" vx="58" vy="48"/>
+        <effect shape="h4" type="translation" vx="-48" vy="55"/>
+    </event>
+
+    <event at="6.5">
+        <create shape="h2"/>
+        <create shape="h5"/>
+        <effect shape="h2" type="translation" vx="62" vy="42"/>
+        <effect shape="h5" type="translation" vx="-52" vy="38"/>
+    </event>
+
+    <event at="8.0">
+        <create shape="h3"/>
+        <create shape="h6"/>
+        <effect shape="h3" type="translation" vx="45" vy="60"/>
+        <effect shape="h6" type="translation" vx="-65" vy="43"/>
+    </event>
+
+    <event at="9.5">
+        <destroy shape="h1"/>
+        <destroy shape="h2"/>
+        <destroy shape="h3"/>
+        <destroy shape="h4"/>
+        <destroy shape="h5"/>
+        <destroy shape="h6"/>
+    </event>
+</animation>

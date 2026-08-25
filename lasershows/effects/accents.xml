@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: accents — short lines flicker quickly on and off,
+    appearing and disappearing at random positions across the screen.
+
+    Uses multiple line shapes at different positions, each with a fast
+    blink effect (short period, low duty cycle).
+-->
+<animation fps="25" duration="8">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="acc1" type="line" x0="30" y0="80" x1="50" y1="80"
+           npoints="8" red="255" green="100" blue="255"/>
+    <shape name="acc2" type="line" x0="120" y0="160" x1="140" y1="160"
+           npoints="8" red="100" green="255" blue="200"/>
+    <shape name="acc3" type="line" x0="190" y0="60" x1="210" y1="60"
+           npoints="8" red="255" green="220" blue="60"/>
+    <shape name="acc4" type="line" x0="60" y0="190" x1="80" y1="190"
+           npoints="8" red="255" green="60" blue="120"/>
+    <shape name="acc5" type="line" x0="160" y0="130" x1="175" y1="130"
+           npoints="8" red="60" green="180" blue="255"/>
+    <shape name="acc6" type="line" x0="100" y0="40" x1="120" y1="40"
+           npoints="8" red="255" green="255" blue="100"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="acc1"/>
+        <create shape="acc3"/>
+        <create shape="acc5"/>
+        <!-- staggered accents appear -->
+        <effect shape="acc1" type="blink" period="0.3" duty="0.2"/>
+        <effect shape="acc3" type="blink" period="0.25" duty="0.15"/>
+        <effect shape="acc5" type="blink" period="0.35" duty="0.2"/>
+    </event>
+
+    <event at="1.5">
+        <create shape="acc2"/>
+        <create shape="acc4"/>
+        <effect shape="acc2" type="blink" period="0.2" duty="0.25"/>
+        <effect shape="acc4" type="blink" period="0.3" duty="0.15"/>
+    </event>
+
+    <event at="3.0">
+        <destroy shape="acc1"/>
+        <destroy shape="acc3"/>
+        <destroy shape="acc5"/>
+        <create shape="acc1"/>
+        <create shape="acc3"/>
+        <create shape="acc5"/>
+        <effect shape="acc1" type="blink" period="0.22" duty="0.1"/>
+        <effect shape="acc3" type="blink" period="0.28" duty="0.2"/>
+        <effect shape="acc5" type="blink" period="0.18" duty="0.15"/>
+    </event>
+
+    <event at="5.0">
+        <destroy shape="acc2"/>
+        <destroy shape="acc4"/>
+        <destroy shape="acc6"/>
+        <create shape="acc2"/>
+        <create shape="acc4"/>
+        <create shape="acc6"/>
+        <effect shape="acc2" type="blink" period="0.15" duty="0.2"/>
+        <effect shape="acc4" type="blink" period="0.32" duty="0.1"/>
+        <effect shape="acc6" type="blink" period="0.2" duty="0.25"/>
+    </event>
+
+    <event at="7.0">
+        <destroy shape="acc1"/>
+        <destroy shape="acc2"/>
+        <destroy shape="acc3"/>
+        <destroy shape="acc4"/>
+        <destroy shape="acc5"/>
+        <destroy shape="acc6"/>
+    </event>
+</animation>

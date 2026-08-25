@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: rotating star — a five-pointed star quickly rotating.
+
+    Built from 5 line segments radiating from center, each rotated to
+    form a point. All share the same rotation effect so the whole star
+    spins as one unit.
+-->
+<animation fps="25" duration="8">
+    <!-- ==================== shape definitions ============================ -->
+    <!-- 5 rays forming a star, each offset by 72 degrees -->
+    <shape name="s0" type="line" x0="128" y0="128" x1="128" y1="55"
+           npoints="20" red="255" green="220" blue="60"/>
+    <shape name="s1" type="line" x0="128" y0="128" x1="196" y1="104"
+           npoints="20" red="255" green="220" blue="60"/>
+    <shape name="s2" type="line" x0="128" y0="128" x1="176" y1="200"
+           npoints="20" red="255" green="220" blue="60"/>
+    <shape name="s3" type="line" x0="128" y0="128" x1="80"  y1="200"
+           npoints="20" red="255" green="220" blue="60"/>
+    <shape name="s4" type="line" x0="128" y0="128" x1="60"  y1="104"
+           npoints="20" red="255" green="220" blue="60"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="s0"/>
+        <create shape="s1"/>
+        <create shape="s2"/>
+        <create shape="s3"/>
+        <create shape="s4"/>
+        <!-- fast rotation around frame center -->
+        <effect shape="s0" type="rotation" speed="120"/>
+        <effect shape="s1" type="rotation" speed="120"/>
+        <effect shape="s2" type="rotation" speed="120"/>
+        <effect shape="s3" type="rotation" speed="120"/>
+        <effect shape="s4" type="rotation" speed="120"/>
+    </event>
+
+    <event at="8.0">
+        <destroy shape="s0"/>
+        <destroy shape="s1"/>
+        <destroy shape="s2"/>
+        <destroy shape="s3"/>
+        <destroy shape="s4"/>
+    </event>
+</animation>
