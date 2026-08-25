@@ -205,7 +205,7 @@ were attached. All attributes are optional unless noted otherwise.
 | `type`         | Attributes                                                                                             |
 |----------------|--------------------------------------------------------------------------------------------------------|
 | `rotation`     | `pivot_x`, `pivot_y` (default: frame center), `speed` (deg/s, default 45), `phase` (degrees)           |
-| `translation`  | `vx`, `vy` (units/s) plus optional wobble `ax`, `ay` (amplitude) and `fx`, `fy` (Hz), `phase` (radians) |
+| `translation`  | `vx`, `vy` (units/s) plus optional wobble `ax`, `ay` (amplitude) and `fx`, `fy` (Hz), `phase` (radians); `wrap` (`1`/`0`, default 1) — when the shape's center leaves the screen it re-appears at the opposite side (`x = 0` ↔ `x = 255`, likewise for `y`) |
 | `scale`        | static `factor` (default 1.0), or pulsing with `min`, `max`, `frequency`; `center_x`, `center_y` (default: center) |
 | `color_shift`  | `dr`, `dg`, `db` — color change per second (negative values fade a channel out)                        |
 | `blink`        | `period` (s, default 1.0), `duty` (on-fraction 0–1, default 0.5), `every` (blank every n-th point while on) |

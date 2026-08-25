@@ -45,9 +45,14 @@ class Rotation:
 
 
 class Translation:
-    """moves the shape with constant velocity plus optional sinusoidal wobble"""
+    """moves the shape with constant velocity plus optional sinusoidal wobble.
+    By default the shape wraps around the screen: when its center leaves the
+    screen it re-appears at the opposite side (x = 0 maps to x = 255, and
+    likewise for y). Pass wrap=False to let the shape leave the screen for
+    good."""
 
-    def __init__(self, vx=0.0, vy=0.0, ax=0.0, ay=0.0, fx=0.25, fy=0.25, phase=0.0):
+    def __init__(self, vx=0.0, vy=0.0, ax=0.0, ay=0.0, fx=0.25, fy=0.25,
+                 phase=0.0, wrap=True):
         self.vx = float(vx)              # units per second
         self.vy = float(vy)
         self.ax = float(ax)              # wobble amplitude / frequency (Hz)
@@ -55,11 +60,21 @@ class Translation:
         self.fx = float(fx)
         self.fy = float(fy)
         self.phase = float(phase)
+        self.wrap = bool(wrap)
 
     def transform(self, pts, dt):
         out = pts.copy()
         out[:, 0] += self.vx * dt + self.ax * math.sin(2 * math.pi * self.fx * dt + self.phase)
         out[:, 1] += self.vy * dt + self.ay * math.sin(2 * math.pi * self.fy * dt + self.phase)
+        if self.wrap and len(out) > 0:
+            # shift the whole shape by a whole number of screen widths so
+            # that its center lies in 0..MAX: while the center is on the
+            # screen the shape stays put, once it has left it re-appears at
+            # the opposite side
+            cx = out[:, 0].mean()
+            cy = out[:, 1].mean()
+            out[:, 0] += (cx % MAX) - cx
+            out[:, 1] += (cy % MAX) - cy
         return out
 
 

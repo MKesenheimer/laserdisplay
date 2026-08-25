@@ -7,18 +7,23 @@
     Pure White (#FFFFFF), Rose (#FF6090)
 
     Structure:
-      0-5s    Intro (very quiet, slow fade-in)
-      5-15s   Build-up 1
-      15-55s  Chorus 1 (40s — orbiting circles, diamond, ellipse, rainbow)
-      55-80s  Verse 1 (cyan/orb + crimson line)
-      80-90s  Build-up 2
-      90-130s Chorus 2 (40s — same pattern)
-      130-170s Verse 2 (rose + amber tetragon)
-      170-185s Build-up 3
-      185-195s Chorus 3 (10s — brief final chorus hit)
-      195-220s Bridge (atmospheric, large rainbow orb)
-      220-255s Crescendo (max energy, fast red tetragons)
-      255-269s Outro (fade to black)
+      0-3.44s       Intro (very quiet, slow fade-in)
+      3.44-13.79s   Build-up 1
+      13.79-24.08   Instrumental
+      24.08-44.56   Verse 1
+      44.56-65.15   Bridge 1
+      65.15-85.61   Instrumental / Crescendo
+      85.61-106.22  Chorus 1
+      106.22-116.35 Instrumental
+      116.35-136.95 Verse 2
+      136.95-157.47 Bridge 2
+      157.47-162.56 Instrumental 
+      162.56-183.19 Chrous 2
+      183.19-203.62 Drop
+      203.62-224.18 Instrumental
+      224.18-244.76 Chorus 3
+      244.76-265.27 Instrumental / Crescendo
+      265,27-269.00 Outro (fade to black)
 -->
 <animation fps="25" duration="269">
 
@@ -552,10 +557,6 @@
         <effect shape="tri" type="rotation" speed="-140"/>
         <effect shape="diamond" type="translation" vx="-15" vy="22" ax="40" fx="0.7"/>
         <effect shape="ellipse" type="rotation" speed="70"/>
-    </event>
-    <event at="179.0">
-        <create shape="cont"/>
-        <effect shape="cont" type="translation" vx="5" vy="-5" ax="10" fx="0.15"/>
     </event>
     <event at="180.0">
         <effect shape="line" type="speedup" factor="1.5"/>
