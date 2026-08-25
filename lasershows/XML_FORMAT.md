@@ -47,14 +47,18 @@ animation time reaches their timestamp.
     </event>
 
     <event at="3.0">
+        <!-- the bubble pulses and flips between both sides of the frame -->
         <create shape="bubble"/>
         <effect shape="bubble" type="scale" min="0.5" max="1.4" frequency="0.5"/>
+        <effect shape="bubble" type="flip" axis="vertical" period="2"/>
     </event>
 
     <event at="6.0">
         <!-- the spinner slowly turns from orange to magenta -->
         <effect shape="spinner" type="color_shift" dr="-85" dg="-45" db="100"/>
         <effect shape="wobble" type="blink" period="1.2"/>
+        <!-- the wobble line gains an exact mirror copy on the other side -->
+        <effect shape="wobble" type="mirror" axis="horizontal"/>
     </event>
 
     <event at="13.0">
@@ -137,3 +141,5 @@ were attached. All attributes are optional unless noted otherwise.
 | `move_points`  | required `points` selection — `"3:7"` range, `"-10:"` last points, `"0,5,9"` indices or a single index; moved by `dx`, `dy` or towards `tx`, `ty` (both required for a target); `duration` (s) animates the move |
 | `morph`        | required `target` — name of another defined shape the shape blends into; `duration` (s, default 1.0), `bounce` (`1` = oscillate), `smooth` (`1` = eased) |
 | `translate_by_path` | required `path` — name of another defined shape (paths are usually defined but never created); the shape's center follows the outline of that path with `velocity` (units/s, default 50, negative = backwards); `closed` (`1` = loop around the path, default, `0` = stop at the end); `phase` (starting position as a fraction 0–1 of the path's length, default 0) |
+| `flip` | flips the shape in place (including the effects attached before it) at the middle vertical (default, left/right) or horizontal (top/bottom) axis of the frame: `axis` (`vertical`/`horizontal`); `period` (s, default 0 = fixed flip, >0 = flips between mirrored and original position every `period` seconds); `phase` (s, shifts the flip cycle) |
+| `mirror` | adds an exactly mirrored copy of the shape (the original is left untouched; a blanked point between both halves keeps the beam off while travelling to the copy, so no line is drawn between them): `axis` (`vertical` = left/right copy, default, `horizontal` = top/bottom copy) |

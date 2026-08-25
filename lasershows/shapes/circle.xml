@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: circle
+
+    <shape name="..." type="circle" cx cy r npoints [blank] red green blue/>
+
+    Three circles showing the effects that suit a circle best:
+    - halo: breathing (pulsing scale) with a slow color drift
+    - moon: orbiting the frame center (rotation around the default pivot)
+    - seed: a small dot orbiting the other way
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="halo" type="circle" cx="128" cy="128" r="58"
+           npoints="72" red="255" green="170" blue="60"/>
+    <shape name="moon" type="circle" cx="128" cy="190" r="12"
+           npoints="28" red="120" green="220" blue="255"/>
+    <shape name="seed" type="circle" cx="128" cy="70" r="6"
+           npoints="16" red="255" green="255" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="halo"/>
+        <effect shape="halo" type="scale" min="0.75" max="1.2" frequency="0.2"/>
+        <effect shape="halo" type="color_shift" dr="-8" dg="-4" db="10"/>
+        <create shape="moon"/>
+        <effect shape="moon" type="rotation" speed="45"/>
+        <create shape="seed"/>
+        <effect shape="seed" type="rotation" speed="-30"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="halo"/>
+        <destroy shape="moon"/>
+        <destroy shape="seed"/>
+    </event>
+</animation>

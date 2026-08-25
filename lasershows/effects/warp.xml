@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: warp
+
+    <effect shape="NAME" type="warp" amplitude wavelength speed phase horizontal/>
+    displaces the points with a travelling sine wave; horizontal="1"
+    (default) drives the wave along x and displaces the points vertically
+    (a horizontal line becomes a sine wave), horizontal="0" does the
+    opposite. speed is in wavelengths/second.
+
+    - sine: a full-width line rippling into a travelling sine wave
+    - wob:  a circle with a wobbly, jelly-like outline
+    - vine: a vertical line waving horizontally
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="sine" type="line" x0="8" y0="128" x1="248" y1="128"
+           npoints="96" red="80" green="255" blue="160"/>
+    <shape name="wob" type="circle" cx="128" cy="128" r="45"
+           npoints="64" red="255" green="160" blue="80"/>
+    <shape name="vine" type="line" x0="128" y0="20" x1="128" y1="236"
+           npoints="64" red="200" green="120" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="sine"/>
+        <effect shape="sine" type="warp" amplitude="25" wavelength="120" speed="0.5"/>
+        <create shape="wob"/>
+        <effect shape="wob" type="warp" amplitude="10" wavelength="70" speed="0.8"/>
+        <create shape="vine"/>
+        <effect shape="vine" type="warp" horizontal="0" amplitude="18" wavelength="90" speed="0.4"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="sine"/>
+        <destroy shape="wob"/>
+        <destroy shape="vine"/>
+    </event>
+</animation>

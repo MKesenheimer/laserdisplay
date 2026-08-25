@@ -166,8 +166,12 @@ The effects `Rotation`, `Translation`, `Scale`, `ColorShift`, `Blink`
 (periodic on/off or beam off at every n-th point), `DeletePoints`,
 `AddPoints`, `Morph` (blend into another shape), `MultiColor` (different
 colors per part), `Rainbow`, `Warp` (travelling sine wave), `MovePoints`
-(move selected points to another position) and `TranslateByPath` (move the
-shape along the outline of a path shape with a constant velocity) are
+(move selected points to another position), `TranslateByPath` (move the
+shape along the outline of a path shape with a constant velocity),
+`Flip` (mirror the shape and its already applied effects in place at the
+middle vertical or horizontal frame axis, optionally animated) and
+`Mirror` (add an exactly mirrored copy of the shape, vertical or
+horizontal; the original is left untouched) are
 evaluated from absolute time, so they are drift-free and can be combined
 freely.
 
@@ -280,6 +284,8 @@ degrees or units per second, frequencies in hertz.
 | `move_points`  | required `points` selection (`"3:7"`, `"-10:"`, `"0,5,9"`); moved by `dx`/`dy` or towards `tx`/`ty`; animated with `duration` |
 | `morph`        | required `target` (name of another defined shape) to blend into; `duration`, `bounce`, `smooth`        |
 | `translate_by_path` | required `path` (name of another defined shape); the shape's center follows the path outline with `velocity` (units/s, default 50); `closed` (`1` = loop, default, `0` = stop at the end) |
+| `flip` | mirrors the shape and its already applied effects in place at the middle vertical (default, left/right) or horizontal (top/bottom) frame axis: `axis` (`vertical`/`horizontal`), `period` (s, default 0 = fixed flip, >0 = flip between mirrored and original), `phase` (s) |
+| `mirror` | adds an exactly mirrored copy of the shape (original untouched; a blanked point between both halves keeps the travel line invisible): `axis` (`vertical` default / `horizontal`) |
 
 ### Runtime events
 

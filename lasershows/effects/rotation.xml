@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: rotation
+
+    <effect shape="NAME" type="rotation" pivot_x pivot_y speed phase/>
+    speed in degrees/second (positive = counter-clockwise, negative =
+    clockwise); pivot defaults to the frame center.
+
+    - spin:  a triangle spinning around the frame center
+    - orbit: a dot circling the frame center (off-center shape + default
+             pivot = orbit)
+    - cw:    the mirrored triangle spinning the other way
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="spin" type="triangle" x0="128" y0="173" x1="89" y1="106" x2="167" y2="106"
+           npoints="24" red="255" green="140" blue="30"/>
+    <shape name="orbit" type="circle" cx="128" cy="190" r="10"
+           npoints="24" red="80" green="220" blue="255"/>
+    <shape name="cw" type="triangle" x0="128" y0="173" x1="167" y1="106" x2="89" y2="106"
+           npoints="24" red="255" green="80" blue="200"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="spin"/>
+        <effect shape="spin" type="rotation" speed="60"/>
+        <create shape="orbit"/>
+        <effect shape="orbit" type="rotation" speed="90"/>
+        <create shape="cw"/>
+        <effect shape="cw" type="rotation" speed="-120"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="spin"/>
+        <destroy shape="orbit"/>
+        <destroy shape="cw"/>
+    </event>
+</animation>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: color_shift
+
+    <effect shape="NAME" type="color_shift" dr dg db/>
+    Color change per second for each channel (0-255 scale); negative
+    values fade a channel out, positive values raise it. Channels stop
+    at black/white, they never wrap.
+
+    - warm:  warm white drifting towards blue
+    - orb:   red drifting through orange/yellow/green into cyan
+    - fade:  a triangle fading completely out to black
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="warm" type="line" x0="20" y0="180" x1="236" y1="180"
+           npoints="48" red="255" green="240" blue="180"/>
+    <shape name="orb" type="circle" cx="128" cy="128" r="45"
+           npoints="56" red="255" green="80" blue="80"/>
+    <shape name="fade" type="triangle" x0="128" y0="173" x1="89" y1="106" x2="167" y2="106"
+           npoints="24" red="120" green="220" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="warm"/>
+        <effect shape="warm" type="color_shift" dr="-15" dg="-30" db="25"/>
+        <create shape="orb"/>
+        <effect shape="orb" type="color_shift" dr="-25" dg="35" db="35"/>
+        <create shape="fade"/>
+        <effect shape="fade" type="color_shift" dr="-50" dg="-45" db="-30"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="warm"/>
+        <destroy shape="orb"/>
+    </event>
+</animation>

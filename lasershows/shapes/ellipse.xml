@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: ellipse
+
+    <shape name="..." type="ellipse" cx cy w h npoints [blank] red green blue/>
+    (cx/cy = center, w/h = horizontal/vertical dimension)
+
+    Three ellipses:
+    - pond:  a wide, flat ellipse at the bottom with a gentle ripple (warp)
+    - petal: a vertical ellipse and petal2 a horizontal one, both spinning
+             in opposite directions around the frame center -> a slowly
+             turning four-petal flower
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="pond" type="ellipse" cx="128" cy="55" w="150" h="34"
+           npoints="64" red="60" green="160" blue="220"/>
+    <shape name="petal" type="ellipse" cx="128" cy="128" w="26" h="84"
+           npoints="48" red="255" green="140" blue="180"/>
+    <shape name="petal2" type="ellipse" cx="128" cy="128" w="84" h="26"
+           npoints="48" red="255" green="190" blue="120"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="pond"/>
+        <effect shape="pond" type="warp" amplitude="6" wavelength="140" speed="0.4"/>
+        <create shape="petal"/>
+        <effect shape="petal" type="rotation" speed="50"/>
+        <create shape="petal2"/>
+        <effect shape="petal2" type="rotation" speed="-50"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="pond"/>
+        <destroy shape="petal"/>
+        <destroy shape="petal2"/>
+    </event>
+</animation>

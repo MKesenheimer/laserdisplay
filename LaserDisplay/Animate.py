@@ -348,6 +348,66 @@ class TranslateByPath:
         return out
 
 
+class Flip:
+    """flips the shape at the middle vertical axis (left/right, the default)
+    or the middle horizontal axis (top/bottom) of the frame. With period > 0
+    the shape flips back and forth between the mirrored and the original
+    position, smoothly easing through the axis, every period seconds
+    (period 0 = fixed flip); phase shifts the flip cycle in seconds.
+    Effects are applied in the order they are attached, so a flip attached
+    after other effects flips their combined result."""
+
+    def __init__(self, axis='vertical', period=0.0, phase=0.0):
+        if axis not in ('vertical', 'horizontal'):
+            raise ValueError("axis must be 'vertical' or 'horizontal'")
+        self.axis = axis
+        self.period = float(period)
+        self.phase = float(phase)
+
+    def transform(self, pts, dt):
+        out = pts.copy()
+        m = 1.0                            # +1 flipped, -1 unflipped
+        if self.period > 0:
+            tri = 1.0 - abs(((dt + self.phase) / (self.period / 2.0)) % 2.0 - 1.0)
+            m = 1.0 - 2.0 * _ease(tri)
+        c = 128 * SCALE                    # middle of the frame
+        if self.axis == 'vertical':
+            out[:, 0] = c - m * (out[:, 0] - c)
+        else:
+            out[:, 1] = c - m * (out[:, 1] - c)
+        return out
+
+
+class Mirror:
+    """adds an exactly mirrored copy of the shape, leaving the original
+    untouched: with axis='vertical' (the default) the copy is mirrored
+    left/right at the middle vertical axis of the frame, with
+    axis='horizontal' top/bottom at the middle horizontal axis. A blanked
+    (color zero) point between the two halves keeps the beam off while the
+    scanner travels from the original to the copy, so no line is drawn
+    between them. Effects attached after the mirror act on both the original
+    and the copy."""
+
+    def __init__(self, axis='vertical'):
+        if axis not in ('vertical', 'horizontal'):
+            raise ValueError("axis must be 'vertical' or 'horizontal'")
+        self.axis = axis
+
+    def transform(self, pts, dt):
+        out = pts.copy()
+        if len(out) == 0:
+            return out
+        m = out.copy()
+        c = 2 * 128 * SCALE                # 2 * middle of the frame
+        if self.axis == 'vertical':
+            m[:, 0] = c - m[:, 0]
+        else:
+            m[:, 1] = c - m[:, 1]
+        blank = m[:1].copy()               # beam off at the seam
+        blank[:, 2:5] = 0
+        return numpy.vstack([out, blank, m])
+
+
 # ---------------------------------------------------------------------------
 # helper functions
 # ---------------------------------------------------------------------------

@@ -5,7 +5,7 @@
 
     <More comments about the show here>
 -->
-<animation fps="25" duration="3.0">
+<animation fps="25" duration="5.0">
     <!-- ==================== shape definitions ============================ -->
 
     <!-- triangle spinning around the center of the frame -->
@@ -14,7 +14,7 @@
            npoints="24" red="255" green="120" blue="0"/>
 
     <!-- circle -->
-    <shape name="circle" type="circle" cx="128" cy="128" r="8"
+    <shape name="circle" type="circle" cx="56" cy="128" r="8"
            npoints="36" red="40" green="130" blue="255"/>
 
     <!-- dashed line wobbling up and down -->
@@ -22,19 +22,23 @@
            x0="30" y0="60" x1="226" y1="60"
            npoints="40" red="0" green="255" blue="80" blank="5"/>
 
-    <!-- ==================== paths (never shown) ========================== -->
-
+    <!-- paths (never shown) -->
     <shape name="p_circ_s_L"  type="circle"  cx="80"  cy="128" r="8"
            npoints="48" red="0" green="0" blue="0"/>
 
-    <!-- ==================== the pinwheel (fast accents, mirrored) ======== -->
-
-    <!-- two rays through the centre; mirrored, spinning in opposite
-         directions -> the left/right symmetry is preserved at all times -->
+    <!-- two rays through the centre; rayB is defined with the same geometry
+         as rayA and gets the same rotation plus a mirror effect on the
+         timeline below -> the left/right symmetry is preserved at all
+         times -->
     <shape name="rayA" type="line" x0="48" y0="38" x1="208" y1="198"
            npoints="80" red="255" green="255" blue="255"/>
-    <shape name="rayB" type="line" x0="48" y0="198" x1="208" y1="38"
+    <shape name="rayB" type="line" x0="48" y0="38" x1="208" y1="198"
            npoints="80" red="255" green="255" blue="255"/>
+
+    <!-- circle pulsing its radius -->
+    <shape name="bubble" type="circle"
+           cx="50" cy="165" r="35"
+           npoints="48" red="40" green="120" blue="255"/>
 
     <!-- ====================================================================
          TIMELINE
@@ -53,6 +57,7 @@
         <effect shape="circle" type="rotation" speed="10" pivot_x="128" pivot_y="128"/>
         <effect shape="circle" type="scale" min="0.92" max="1.1" frequency="0.2"/>
         <effect shape="circle" type="color_shift" dr="7" dg="2" db="-5"/>
+        <effect shape="circle" type="flip" axis="vertical"/>
     </event>
 
     <event at="2.0">
@@ -60,14 +65,26 @@
         <create shape="rayA"/>
         <effect shape="rayA" type="rotation" speed="160"/>
         <create shape="rayB"/>
-        <effect shape="rayB" type="rotation" speed="-160"/>
+        <effect shape="rayB" type="rotation" speed="160"/>
+        <effect shape="rayB" type="flip" axis="vertical"/>
     </event>
 
-    <event at="3.0">
+    <event at="4.0">
         <destroy shape="circle"/>
         <destroy shape="wobble"/>
         <destroy shape="spinner"/>
         <destroy shape="rayA"/>
         <destroy shape="rayB"/>
+    </event>
+
+    <event at="4.0">
+        <!-- the bubble pulses and flips between both sides of the frame -->
+        <create shape="bubble"/>
+        <effect shape="bubble" type="rotation" speed="160"/>
+        <effect shape="bubble" type="mirror" axis="vertical"/>
+    </event>
+
+    <event at="5.0">
+        <destroy shape="circle"/>
     </event>
 </animation>

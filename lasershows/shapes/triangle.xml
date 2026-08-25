@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: triangle
+
+    <shape name="..." type="triangle" x0 y0 x1 y1 x2 y2 npoints [blank] red green blue/>
+    (npoints points per edge; the outline gets 3*npoints-2 points)
+
+    Three triangles:
+    - spin:  an equilateral triangle spinning around the frame center
+    - wingL / wingR: a mirrored pair that "beats" by pulsing its scale
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="spin" type="triangle" x0="128" y0="173" x1="89" y1="106" x2="167" y2="106"
+           npoints="24" red="255" green="150" blue="40"/>
+    <shape name="wingL" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150"
+           npoints="24" red="120" green="200" blue="255"/>
+    <shape name="wingR" type="triangle" x0="158" y0="106" x1="212" y1="128" x2="158" y2="150"
+           npoints="24" red="120" green="200" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="spin"/>
+        <effect shape="spin" type="rotation" speed="75"/>
+        <create shape="wingL"/>
+        <effect shape="wingL" type="scale" min="0.85" max="1.15" frequency="0.5"/>
+        <create shape="wingR"/>
+        <effect shape="wingR" type="scale" min="0.85" max="1.15" frequency="0.5"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="spin"/>
+        <destroy shape="wingL"/>
+        <destroy shape="wingR"/>
+    </event>
+</animation>

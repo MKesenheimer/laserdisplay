@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: morph
+
+    <effect shape="NAME" type="morph" target=SHAPE duration bounce smooth/>
+    blends the shape into another *defined* (but not created) shape; both
+    outlines are resampled to a common number of points, so any two shape
+    types can morph into each other. bounce="1" oscillates back and forth
+    between source and target; smooth="1" (default) eases the transition.
+
+    - morph_src: a triangle oscillating between triangle and circle (bounce)
+    - morph_sq:  a square collapsing into a line, one-way
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="morph_src" type="triangle" x0="128" y0="173" x1="89" y1="106" x2="167" y2="106"
+           npoints="48" red="255" green="140" blue="30"/>
+    <shape name="morph_circ" type="circle" cx="128" cy="128" r="48"
+           npoints="48" red="80" green="220" blue="255"/>
+    <shape name="morph_sq" type="tetragon" x0="83" y0="83" x1="173" y1="83"
+           x2="173" y2="173" x3="83" y3="173"
+           npoints="48" red="255" green="220" blue="90"/>
+    <shape name="morph_line" type="line" x0="73" y0="128" x1="183" y1="128"
+           npoints="48" red="255" green="255" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="morph_src"/>
+        <effect shape="morph_src" type="morph" target="morph_circ"
+                duration="2" bounce="1" smooth="1"/>
+    </event>
+
+    <event at="6.0">
+        <destroy shape="morph_src"/>
+        <create shape="morph_sq"/>
+        <effect shape="morph_sq" type="morph" target="morph_line"
+                duration="1.5" smooth="1"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="morph_sq"/>
+    </event>
+</animation>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: tetragon (any four-cornered shape)
+
+    <shape name="..." type="tetragon" x0 y0 x1 y1 x2 y2 x3 y3 npoints [blank] red green blue/>
+    (npoints points per edge; the outline gets 4*npoints-3 points)
+
+    Three tetragons:
+    - square:  a square and a diamond rotating in opposite directions around
+               the frame center -> a slowly shifting eight-pointed star
+    - frame:   a dashed border (blank="4") pulsing almost imperceptibly
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="square" type="tetragon" x0="88" y0="88" x1="168" y1="88"
+           x2="168" y2="168" x3="88" y3="168"
+           npoints="24" red="255" green="210" blue="90"/>
+    <shape name="diamond" type="tetragon" x0="128" y0="80" x1="176" y1="128"
+           x2="128" y2="176" x3="80" y3="128"
+           npoints="24" red="140" green="220" blue="255"/>
+    <shape name="frame" type="tetragon" x0="30" y0="30" x1="226" y1="30"
+           x2="226" y2="226" x3="30" y3="226"
+           npoints="16" red="90" green="90" blue="90" blank="4"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="square"/>
+        <effect shape="square" type="rotation" speed="45"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="rotation" speed="-90"/>
+        <create shape="frame"/>
+        <effect shape="frame" type="scale" min="0.9" max="1.05" frequency="0.15"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="square"/>
+        <destroy shape="diamond"/>
+        <destroy shape="frame"/>
+    </event>
+</animation>

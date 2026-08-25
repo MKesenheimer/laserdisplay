@@ -35,10 +35,16 @@ y points up, times are seconds):
 Effect types: rotation, translation, scale, color_shift, blink, rainbow,
 warp, multi_color (colors="r,g,b;r,g,b;..."), move_points
 (points="3:7"/"-10:"/"0,5,9", moved by dx/dy or towards tx/ty), morph
-(blends the shape into the shape given with target=<shape name>) and
+(blends the shape into the shape given with target=<shape name>),
 translate_by_path (moves the shape along the outline of the path given
 with path=<shape name> at velocity units/second, starting at the fraction
-phase of the path's length; the path shape is defined but never created).
+phase of the path's length; the path shape is defined but never created),
+flip (mirrors the shape and its already applied effects in place at the
+middle vertical (axis="vertical", the default) or horizontal
+(axis="horizontal") frame axis; with period > 0 it flips between mirrored
+and original every period seconds, phase shifts the flip cycle) and mirror
+(adds an exactly mirrored copy of the shape, vertical or horizontal; the
+original shape is left untouched).
 """
 
 import heapq
@@ -50,7 +56,7 @@ import numpy
 
 from .Animate import (apply, Rotation, Translation, Scale, ColorShift, Blink,
                       Morph, MultiColor, Rainbow, Warp, MovePoints,
-                      TranslateByPath)
+                      TranslateByPath, Flip, Mirror)
 from .Geometry import Geometry
 
 MAX = 255 * 255
@@ -207,6 +213,10 @@ class Scheduler:
             return self.__move_points_factory(params, context)
         if type == 'translate_by_path':
             return self.__translate_by_path_factory(params, context)
+        if type == 'flip':
+            return self.__flip_factory(params, context)
+        if type == 'mirror':
+            return self.__mirror_factory(params, context)
         if type not in _EFFECT_PARAMS:
             raise ValueError("%s: unknown effect type '%s'" % (context, type))
         kwargs = {}
@@ -320,6 +330,29 @@ class Scheduler:
                                    phase=phase)
         return factory
 
+    def __flip_factory(self, params, context):
+        axis = params.pop('axis', 'vertical')
+        if axis not in ('vertical', 'horizontal'):
+            raise ValueError("%s: flip axis must be 'vertical' or "
+                             "'horizontal'" % context)
+        try:
+            period = float(params.pop('period', 0.0))
+            phase = float(params.pop('phase', 0.0))
+        except ValueError as e:
+            raise ValueError("%s: invalid flip parameter (%s)" % (context, e))
+        if params:
+            raise ValueError("%s: unknown parameter(s) %s" % (context, sorted(params)))
+        return lambda: Flip(axis=axis, period=period, phase=phase)
+
+    def __mirror_factory(self, params, context):
+        axis = params.pop('axis', 'vertical')
+        if axis not in ('vertical', 'horizontal'):
+            raise ValueError("%s: mirror axis must be 'vertical' or "
+                             "'horizontal'" % context)
+        if params:
+            raise ValueError("%s: unknown parameter(s) %s" % (context, sorted(params)))
+        return lambda: Mirror(axis=axis)
+
 # ----- main loop -----
 
     def run(self, duration=None, speed=1.0):
@@ -428,18 +461,21 @@ class Scheduler:
             Geometry.tetragon(x0, y0, x1, y1, x2, y2, x3, y3, npoints, *color), name, blank_n)
 
     def destroy(self, name):
-        """removes a shape from the animation"""
+        """removes a shape from the animation.  Silently skips shapes that are
+        not currently active (e.g. duplicates of destroy elements)."""
         with self._lock:
             if name not in self._active:
-                raise KeyError(f" no active shape with name '%s'" % name)
+                return
             del self._active[name]
 
     def add_effect(self, name, effect):
         """attaches a continuous effect (Rotation, Translation, ...) to an
-        active shape, starting now"""
+        active shape, starting now.  Silently skips shapes that are not
+        currently active (e.g. effects referencing a shape destroyed in a
+        previous event)."""
         with self._lock:
             if name not in self._active:
-                raise KeyError(f"no active shape with name '%s'" % name)
+                return
             self._active[name].effects.append((self._time, effect))
 
 # ----- internals -----

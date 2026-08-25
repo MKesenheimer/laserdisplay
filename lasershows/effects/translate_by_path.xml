@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: translate_by_path
+
+    <effect shape="NAME" type="translate_by_path" path=SHAPE velocity closed phase/>
+    the shape's center follows the outline of another *defined but never
+    created* shape (the path) with a constant velocity (units/second,
+    0-255 scale; negative = backwards). closed="1" (default) loops around
+    the path; phase starts the shape at that fraction (0-1) of the path's
+    length.
+
+    Paths (defined black, never shown): a ring, a rectangle and a diagonal.
+    Riders: two dots opposite each other on the ring, a ship around the
+    rectangle (backwards), a spark shuttling to and fro on the diagonal.
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <!-- paths (never shown) -->
+    <shape name="p_ring" type="circle" cx="128" cy="128" r="85"
+           npoints="96" red="0" green="0" blue="0"/>
+    <shape name="p_rect" type="tetragon" x0="28" y0="38" x1="228" y1="38"
+           x2="228" y2="218" x3="28" y3="218"
+           npoints="96" red="0" green="0" blue="0"/>
+    <shape name="p_diagonal" type="line" x0="20" y0="220" x1="236" y1="36"
+           npoints="2" red="0" green="0" blue="0"/>
+
+    <!-- riders -->
+    <shape name="ball" type="circle" cx="128" cy="128" r="9"
+           npoints="20" red="255" green="200" blue="80"/>
+    <shape name="ball2" type="circle" cx="128" cy="128" r="9"
+           npoints="20" red="80" green="220" blue="255"/>
+    <shape name="ship" type="triangle" x0="128" y0="145" x1="112" y1="118" x2="144" y2="118"
+           npoints="12" red="255" green="255" blue="255"/>
+    <shape name="spark" type="line" x0="116" y0="128" x1="140" y1="128"
+           npoints="8" red="255" green="120" blue="200"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="ball"/>
+        <effect shape="ball" type="translate_by_path" path="p_ring" velocity="90"/>
+        <create shape="ball2"/>
+        <!-- same ring, same speed, but starting half a lap behind -->
+        <effect shape="ball2" type="translate_by_path" path="p_ring" velocity="90" phase="0.5"/>
+        <create shape="ship"/>
+        <effect shape="ship" type="translate_by_path" path="p_rect" velocity="-70"/>
+        <create shape="spark"/>
+        <!-- open line path with closed="1": the spark runs to the end and
+             back, shuttling along the diagonal -->
+        <effect shape="spark" type="translate_by_path" path="p_diagonal" velocity="120"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="ball"/>
+        <destroy shape="ball2"/>
+        <destroy shape="ship"/>
+        <destroy shape="spark"/>
+    </event>
+</animation>

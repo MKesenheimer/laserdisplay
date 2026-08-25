@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: line
+
+    <shape name="..." type="line" x0 y0 x1 y1 npoints [blank] red green blue/>
+
+    Three lines:
+    - scan:   a full-width horizontal line sweeping up and down (translation
+              with sinusoidal wobble)
+    - hand:   a radial line rotating around the frame center, like a clock hand
+    - dashes: a dashed vertical line (blank="4" blanks every 4th point)
+              rotating slowly the other way
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="scan" type="line" x0="8" y0="128" x1="248" y1="128"
+           npoints="64" red="80" green="255" blue="200"/>
+    <shape name="hand" type="line" x0="128" y0="128" x1="128" y1="48"
+           npoints="24" red="255" green="220" blue="120"/>
+    <shape name="dashes" type="line" x0="128" y0="20" x1="128" y1="236"
+           npoints="48" red="255" green="120" blue="120" blank="4"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="scan"/>
+        <effect shape="scan" type="translation" ay="45" fy="0.2"/>
+        <create shape="hand"/>
+        <effect shape="hand" type="rotation" speed="60"/>
+        <create shape="dashes"/>
+        <effect shape="dashes" type="rotation" speed="-20"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="scan"/>
+        <destroy shape="hand"/>
+        <destroy shape="dashes"/>
+    </event>
+</animation>
