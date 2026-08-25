@@ -30,48 +30,48 @@
         <!-- upper-left lines move down-right -->
         <create shape="h1"/>
         <create shape="h3"/>
-        <effect shape="h1" type="translation" vx="50" vy="40"/>
-        <effect shape="h3" type="translation" vx="65" vy="55"/>
+        <effect shape="h1" type="translation" vx="200" vy="200"/>
+        <effect shape="h3" type="translation" vx="200" vy="200"/>
     </event>
 
     <event at="1.0">
         <!-- upper-right lines move down-left -->
         <create shape="h4"/>
         <create shape="h6"/>
-        <effect shape="h4" type="translation" vx="-55" vy="45"/>
-        <effect shape="h6" type="translation" vx="-40" vy="60"/>
+        <effect shape="h4" type="translation" vx="-200" vy="200"/>
+        <effect shape="h6" type="translation" vx="-200" vy="200"/>
     </event>
 
     <event at="2.5">
         <create shape="h2"/>
-        <effect shape="h2" type="translation" vx="70" vy="35"/>
+        <effect shape="h2" type="translation" vx="200" vy="200"/>
     </event>
 
     <event at="3.5">
         <create shape="h5"/>
-        <effect shape="h5" type="translation" vx="-60" vy="50"/>
+        <effect shape="h5" type="translation" vx="-200" vy="200"/>
     </event>
 
     <event at="5.0">
         <!-- second wave -->
         <create shape="h1"/>
         <create shape="h4"/>
-        <effect shape="h1" type="translation" vx="58" vy="48"/>
-        <effect shape="h4" type="translation" vx="-48" vy="55"/>
+        <effect shape="h1" type="translation" vx="200" vy="200"/>
+        <effect shape="h4" type="translation" vx="-200" vy="200"/>
     </event>
 
     <event at="6.5">
         <create shape="h2"/>
         <create shape="h5"/>
-        <effect shape="h2" type="translation" vx="62" vy="42"/>
-        <effect shape="h5" type="translation" vx="-52" vy="38"/>
+        <effect shape="h2" type="translation" vx="200" vy="200"/>
+        <effect shape="h5" type="translation" vx="-200" vy="200"/>
     </event>
 
     <event at="8.0">
         <create shape="h3"/>
         <create shape="h6"/>
-        <effect shape="h3" type="translation" vx="45" vy="60"/>
-        <effect shape="h6" type="translation" vx="-65" vy="43"/>
+        <effect shape="h3" type="translation" vx="200" vy="200"/>
+        <effect shape="h6" type="translation" vx="-200" vy="200"/>
     </event>
 
     <event at="9.5">

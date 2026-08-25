@@ -8,21 +8,21 @@
 -->
 <animation fps="25" duration="12">
     <!-- ==================== shape definitions ============================ -->
-    <shape name="r1" type="line" x0="15" y0="0" x1="45" y1="0"
+    <shape name="r1" type="line" x0="15" y0="255" x1="45" y1="255"
            npoints="12" red="100" green="180" blue="255"/>
-    <shape name="r2" type="line" x0="70" y0="0" x1="100" y1="0"
+    <shape name="r2" type="line" x0="70" y0="255" x1="100" y1="255"
            npoints="12" red="80"  green="220" blue="200"/>
-    <shape name="r3" type="line" x0="130" y0="0" x1="155" y1="0"
+    <shape name="r3" type="line" x0="130" y0="255" x1="155" y1="255"
            npoints="12" red="120" green="160" blue="255"/>
-    <shape name="r4" type="line" x0="185" y0="0" x1="215" y1="0"
+    <shape name="r4" type="line" x0="185" y0="255" x1="215" y1="255"
            npoints="12" red="90"  green="200" blue="230"/>
-    <shape name="r5" type="line" x0="50"  y0="0" x1="80"  y1="0"
+    <shape name="r5" type="line" x0="50"  y0="255" x1="80"  y1="255"
            npoints="12" red="110" green="190" blue="255"/>
-    <shape name="r6" type="line" x0="160" y0="0" x1="190" y1="0"
+    <shape name="r6" type="line" x0="160" y0="255" x1="190" y1="255"
            npoints="12" red="70"  green="210" blue="190"/>
-    <shape name="r7" type="line" x0="200" y0="0" x1="230" y1="0"
+    <shape name="r7" type="line" x0="200" y0="255" x1="230" y1="255"
            npoints="12" red="100" green="170" blue="240"/>
-    <shape name="r8" type="line" x0="105" y0="0" x1="135" y1="0"
+    <shape name="r8" type="line" x0="105" y0="255" x1="135" y1="255"
            npoints="12" red="85"  green="215" blue="210"/>
 
     <!-- ======================== timeline ========================= -->
@@ -31,28 +31,28 @@
         <create shape="r4"/>
         <create shape="r7"/>
         <!-- falling down with varying speeds -->
-        <effect shape="r1" type="translation" vy="50"/>
-        <effect shape="r4" type="translation" vy="70"/>
-        <effect shape="r7" type="translation" vy="40"/>
+        <effect shape="r1" type="translation" vy="-50"/>
+        <effect shape="r4" type="translation" vy="-70"/>
+        <effect shape="r7" type="translation" vy="-40"/>
     </event>
 
     <event at="1.5">
         <create shape="r2"/>
         <create shape="r5"/>
-        <effect shape="r2" type="translation" vy="60"/>
-        <effect shape="r5" type="translation" vy="55"/>
+        <effect shape="r2" type="translation" vy="-60"/>
+        <effect shape="r5" type="translation" vy="-55"/>
     </event>
 
     <event at="3.0">
         <create shape="r3"/>
         <create shape="r6"/>
-        <effect shape="r3" type="translation" vy="45"/>
-        <effect shape="r6" type="translation" vy="65"/>
+        <effect shape="r3" type="translation" vy="-45"/>
+        <effect shape="r6" type="translation" vy="-65"/>
     </event>
 
     <event at="4.5">
         <create shape="r8"/>
-        <effect shape="r8" type="translation" vy="58"/>
+        <effect shape="r8" type="translation" vy="-58"/>
     </event>
 
     <event at="6.0">
@@ -60,25 +60,25 @@
         <create shape="r1"/>
         <create shape="r4"/>
         <create shape="r7"/>
-        <effect shape="r1" type="translation" vy="62"/>
-        <effect shape="r4" type="translation" vy="48"/>
-        <effect shape="r7" type="translation" vy="72"/>
+        <effect shape="r1" type="translation" vy="-62"/>
+        <effect shape="r4" type="translation" vy="-48"/>
+        <effect shape="r7" type="translation" vy="-72"/>
     </event>
 
     <event at="7.5">
         <create shape="r2"/>
         <create shape="r5"/>
-        <effect shape="r2" type="translation" vy="52"/>
-        <effect shape="r5" type="translation" vy="68"/>
+        <effect shape="r2" type="translation" vy="-52"/>
+        <effect shape="r5" type="translation" vy="-68"/>
     </event>
 
     <event at="9.0">
         <create shape="r3"/>
         <create shape="r6"/>
         <create shape="r8"/>
-        <effect shape="r3" type="translation" vy="57"/>
-        <effect shape="r6" type="translation" vy="43"/>
-        <effect shape="r8" type="translation" vy="63"/>
+        <effect shape="r3" type="translation" vy="-57"/>
+        <effect shape="r6" type="translation" vy="-43"/>
+        <effect shape="r8" type="translation" vy="-63"/>
     </event>
 
     <event at="11.0">

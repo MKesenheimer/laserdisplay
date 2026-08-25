@@ -72,6 +72,7 @@ from .Animate import (apply, Rotation, Translation, Scale, ColorShift, Blink,
                       Morph, MultiColor, Rainbow, Warp, MovePoints,
                       TranslateByPath, Flip, Mirror)
 from .Geometry import Geometry
+from .Shape import Shape
 
 MAX = 255 * 255
 SCALE = 255
@@ -746,7 +747,9 @@ class Scheduler:
 
     def __update_shapes(self, now):
         # recomputes every active shape from its original points by piping it
-        # through all of its attached effects
+        # through all of its attached effects; points that leave the screen
+        # keep their true coordinates in the shape (they are only filtered
+        # when the shape is added to the output buffer, see __render())
         with self._lock:
             entries = list(self._active.values())
         for entry in entries:
@@ -754,13 +757,29 @@ class Scheduler:
             for (start, effect) in entry.effects:
                 if now >= start:
                     pts = effect.transform(pts, now - start)
-            entry.shape.points = numpy.clip(numpy.rint(pts), 0, MAX).astype('uint16')
-            entry.shape.npoints = len(entry.shape.points)
+            entry.shape.points = pts
+            entry.shape.npoints = len(pts)
 
     def __render(self):
         with self._lock:
-            shapes = [entry.shape for entry in self._active.values()]
+            shapes = [self.__visible_shape(entry.shape)
+                      for entry in self._active.values()]
         self.display.new_frame()
         for s in shapes:
-            self.display.add_shape_to_frame(s)
+            if s is not None:
+                self.display.add_shape_to_frame(s)
         self.display.show_frame()
+
+    @staticmethod
+    def __visible_shape(shape):
+        # returns a new shape holding only the points that lie on the screen
+        # (0 .. MAX), or None if the shape has no visible points; the given
+        # shape keeps all of its points
+        pts = shape.get_points()
+        if len(pts) == 0:
+            return None
+        mask = (pts[:, 0] >= 0) & (pts[:, 0] <= MAX) & \
+               (pts[:, 1] >= 0) & (pts[:, 1] <= MAX)
+        if not mask.any():
+            return None
+        return Shape(numpy.rint(pts[mask]).astype('uint16'))
