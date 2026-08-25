@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: warp (extracted from warp.xml)
+
+    <effect shape="NAME" type="warp" amplitude wavelength speed phase horizontal/>
+    displaces the points with a travelling sine wave; horizontal="1"
+    (default) drives the wave along x and displaces the points vertically
+    (a horizontal line becomes a sine wave), horizontal="0" does the
+    opposite. speed is in wavelengths/second.
+
+    - vine: a vertical line waving horizontally
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="vine" type="line" x0="128" y0="20" x1="128" y1="236"
+           npoints="64" red="200" green="120" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="vine"/>
+        <effect shape="vine" type="warp" horizontal="0" amplitude="18" wavelength="90" speed="0.4"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="vine"/>
+    </event>
+</animation>

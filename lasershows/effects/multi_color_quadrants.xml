@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: multi_color (extracted from multi_color.xml)
+
+    <effect shape="NAME" type="multi_color" colors="r,g,b;r,g,b;..."/>
+    splits the outline into as many consecutive parts as colors are given
+    and colors each part with the matching color (values 0-255). Unlike
+    rainbow the colors are fixed - use rainbow for a drifting spectrum.
+
+    - quadrant: a circle in four quarters
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="quadrant" type="circle" cx="128" cy="128" r="50"
+           npoints="40" red="255" green="255" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="quadrant"/>
+        <effect shape="quadrant" type="multi_color"
+                colors="255,220,80;255,120,200;80,220,220;120,160,255"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="quadrant"/>
+    </event>
+</animation>

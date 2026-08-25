@@ -32,6 +32,16 @@ y points up, times are seconds):
         </event>
     </animation>
 
+Other XML files can be referenced with <sequence name="NAME" file="PATH"/>
+elements: the referenced file's shapes are defined and its events form the
+sequence NAME, which is started with <create sequence="NAME"/> inside an
+event; the file's timeline (using its own absolute times) then plays
+relative to the time of the creating event.  PATH is resolved relative to
+the directory of the referencing file.  <effect sequence="NAME" .../>
+actions in the same event attach effects to all shapes the sequence
+creates (and to the shapes of nested sequences), starting at the time the
+sequence is created.
+
 Effect types: rotation, translation, scale, color_shift, blink, rainbow,
 warp, multi_color (colors="r,g,b;r,g,b;..."), move_points
 (points="3:7"/"-10:"/"0,5,9", moved by dx/dy or towards tx/ty), morph
@@ -48,6 +58,7 @@ original shape is left untouched).
 """
 
 import heapq
+import os
 import threading
 import time
 import xml.etree.ElementTree as ElementTree
@@ -117,6 +128,8 @@ class Scheduler:
         self.fps = fps
         self.duration = None             # seconds; None = run until stop()
         self._definitions = {}           # name -> (builder(), blank_n)
+        self._sequences = {}             # name -> list of (time, action spec)
+        self._loading_files = set()      # files currently being loaded (cycle check)
         self._active = {}                # name -> _ActiveShape
         self._events = []                # heap of (time, seq, function)
         self._seq = 0
@@ -127,24 +140,88 @@ class Scheduler:
 # ----- loading -----
 
     def load_xml(self, filename):
-        """reads the animation timeline from an XML file"""
-        root = ElementTree.parse(filename).getroot()
-        if root.tag != 'animation':
-            raise ValueError("expected an <animation> root element")
+        """reads the animation timeline from an XML file.
+
+        Besides <shape> and <event> elements, the file may contain
+        <sequence name="NAME" file="PATH"/> elements that reference other
+        XML files: the referenced file's shapes are defined and its events
+        form the sequence NAME, which can be started with
+        <create sequence="NAME"/> (see create_sequence()).  PATH is
+        resolved relative to the directory of the referencing file.
+        <effect sequence="NAME" .../> actions in the same event attach
+        effects to all shapes the sequence creates.
+        """
+        self._loading_files = set()
+        root, events = self.__load_file(filename)
         if root.get('fps'):
             self.fps = float(root.get('fps'))
         if root.get('duration'):
             self.duration = float(root.get('duration'))
+        for at, specs in events:
+            self.schedule(at, self.__make_event(specs, at))
 
-        for node in root:
-            if node.tag == 'shape':
-                self.__define_from_xml(node)
-            elif node.tag == 'event':
-                at = float(node.get('at'))
-                for action in node:
-                    function = self.__action_from_xml(action)
-                    if function is not None:
-                        self.schedule(at, function)
+    def __load_file(self, filename):
+        """parses the file and returns (root, events) where events is a
+        list of (at, [action specs]) pairs, one entry per <event>.
+        <shape> definitions are registered as a side effect and nested
+        <sequence> references are resolved relative to the file's
+        directory; circular references are rejected"""
+        path = os.path.abspath(filename)
+        if path in self._loading_files:
+            raise ValueError("circular <sequence> reference involving '%s'"
+                             % filename)
+        self._loading_files.add(path)
+        try:
+            root = ElementTree.parse(filename).getroot()
+        except ElementTree.ParseError as e:
+            raise ValueError("'%s' is not a valid XML file (%s)"
+                             % (filename, e))
+        except OSError as e:
+            raise ValueError("cannot read '%s' (%s)" % (filename, e))
+        if root.tag != 'animation':
+            raise ValueError("'%s' needs an <animation> root element" % filename)
+        events = []
+        try:
+            for node in root:
+                if node.tag == 'shape':
+                    self.__define_from_xml(node)
+                elif node.tag == 'sequence':
+                    self.__define_sequence(node, os.path.dirname(path))
+                elif node.tag == 'event':
+                    at = float(node.get('at'))
+                    specs = [self.__action_spec(action) for action in node]
+                    self.__check_event(specs)
+                    events.append((at, specs))
+        finally:
+            self._loading_files.discard(path)
+        return root, events
+
+    @staticmethod
+    def __check_event(specs):
+        # <effect sequence="X"/> is only valid together with a
+        # <create sequence="X"/> in the same event
+        created = {spec[1] for spec in specs if spec[0] == 'create_sequence'}
+        for spec in specs:
+            if spec[0] == 'effect_sequence' and spec[1] not in created:
+                raise ValueError("effect for sequence '%s' needs a "
+                                 "<create sequence=\"%s\"/> in the same "
+                                 "event" % (spec[1], spec[1]))
+
+    def __define_sequence(self, node, base_dir):
+        """registers the events of the file referenced by a <sequence>
+        element as a named sequence; the file is loaded right away (its
+        shapes become defined), its events are stored until the sequence
+        is created"""
+        name = node.get('name')
+        if not name:
+            raise ValueError("<sequence> element needs a name attribute")
+        path = node.get('file')
+        if not path:
+            raise ValueError("<sequence> element needs a file="
+                             "path-to-an-XML-file attribute")
+        _, events = self.__load_file(os.path.join(base_dir, path))
+        with self._lock:
+            self._sequences[name] = events
 
     def __define_from_xml(self, node):
         name = node.get('name')
@@ -181,22 +258,75 @@ class Scheduler:
         }
         return builders[type], blank_n
 
-    def __action_from_xml(self, action):
+    def __action_spec(self, action):
+        """parses an action element inside an <event> and returns a
+        description of the action; the actual function is created when the
+        event is scheduled (see __make_event()), so that <create sequence>
+        actions can be re-based when their containing timeline is shifted
+        and sequence effects can be paired with their creating event"""
         if action.tag == 'create':
             name = action.get('shape')
-            return lambda: self.create(name)
+            if name is not None:
+                return ('create', name)
+            name = action.get('sequence')
+            if name is not None:
+                return ('create_sequence', name)
+            raise ValueError("<create> element needs a shape= or "
+                             "sequence= attribute")
         if action.tag == 'destroy':
             name = action.get('shape')
-            return lambda: self.destroy(name)
+            if name is None:
+                raise ValueError("<destroy> element needs a shape= attribute")
+            return ('destroy', name)
         if action.tag == 'effect':
+            seq_name = action.get('sequence')
+            if seq_name is not None:
+                params = dict(action.attrib)
+                params.pop('sequence', None)
+                params.pop('type', None)
+                factory = self.__effect_builder(action.get('type'), params,
+                                                "effect for sequence '%s'" % seq_name)
+                return ('effect_sequence', seq_name, factory)
             name = action.get('shape')
             params = dict(action.attrib)
             params.pop('shape', None)
             params.pop('type', None)
             factory = self.__effect_builder(action.get('type'), params,
                                             "effect for shape '%s'" % name)
-            return lambda: self.add_effect(name, factory())
+            return ('effect', name, factory)
         raise ValueError("unknown action <%s> in event" % action.tag)
+
+    def __make_event(self, specs, at, seq_effects=None):
+        """creates the function that runs all actions of one event at time
+        `at`.  `seq_effects` is a list of (factory, start) pairs: the
+        effects of the enclosing sequence instance, applied to every shape
+        the event creates and inherited by nested sequences"""
+        # pair <create sequence="X"/> with the <effect sequence="X"/>
+        # actions of this event
+        paired = {}
+        for spec in specs:
+            if spec[0] == 'effect_sequence':
+                paired.setdefault(spec[1], []).append(spec[2])
+
+        def run():
+            for spec in specs:
+                kind = spec[0]
+                if kind == 'create':
+                    self.create(spec[1])
+                    if seq_effects:
+                        for factory, start in seq_effects:
+                            self.__attach_effect(spec[1], factory(), start)
+                elif kind == 'destroy':
+                    self.destroy(spec[1])
+                elif kind == 'effect':
+                    self.add_effect(spec[1], spec[2]())
+                elif kind == 'effect_sequence':
+                    pass    # already applied via the paired create_sequence
+                elif kind == 'create_sequence':
+                    self.create_sequence(spec[1], at,
+                                         effects=paired.get(spec[1], []),
+                                         inherited=seq_effects)
+        return run
 
     def __effect_builder(self, type, params, context):
         """returns a zero-argument factory that creates the effect object;
@@ -434,6 +564,31 @@ class Scheduler:
             builder, blank_n = self._definitions[name]
             self.__activate(name, builder(), blank_n)
 
+    def create_sequence(self, name, at=None, effects=None, inherited=None):
+        """starts a sequence referenced via <sequence>: all events of the
+        referenced file fire at their own timestamps shifted by `at`, so
+        the file's timeline (which uses absolute times) plays relative to
+        that moment; `at` defaults to the current animation time.
+
+        `effects` (effect objects or zero-argument factories) are applied
+        to every shape the sequence creates, starting at `at`; `inherited`
+        is the list of (factory, start) pairs of an enclosing sequence, so
+        that nested sequences keep moving in sync with the group they are
+        part of"""
+        with self._lock:
+            if name not in self._sequences:
+                raise KeyError("no sequence defined with name '%s'" % name)
+            timeline = list(self._sequences[name])
+            if at is None:
+                at = self._time
+        seq_effects = list(inherited or [])
+        for effect in (effects or []):
+            factory = effect if callable(effect) else (lambda e=effect: e)
+            seq_effects.append((factory, at))
+        for event_at, specs in timeline:
+            self.schedule(at + event_at,
+                          self.__make_event(specs, at + event_at, seq_effects))
+
     def create_triangle(self, name, x0, y0, x1, y1, x2, y2, npoints,
                         color=(MAX, MAX, MAX), blank_n=0):
         """creates a triangle immediately (internal coordinate/color units)"""
@@ -474,9 +629,16 @@ class Scheduler:
         currently active (e.g. effects referencing a shape destroyed in a
         previous event)."""
         with self._lock:
+            start = self._time
+        self.__attach_effect(name, effect, start)
+
+    def __attach_effect(self, name, effect, start):
+        # like add_effect(), but with an explicit start time (used for
+        # sequence effects, which start when the sequence is created)
+        with self._lock:
             if name not in self._active:
                 return
-            self._active[name].effects.append((self._time, effect))
+            self._active[name].effects.append((start, effect))
 
 # ----- internals -----
 

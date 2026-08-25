@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: color_shift (extracted from color_shift.xml)
+
+    <effect shape="NAME" type="color_shift" dr dg db/>
+    Color change per second for each channel (0-255 scale); negative
+    values fade a channel out, positive values raise it. Channels stop
+    at black/white, they never wrap.
+
+    - orb: red drifting through orange/yellow/green into cyan
+      (filename prefixed with the effect name; mirror.xml has its own "orb")
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="orb" type="circle" cx="128" cy="128" r="45"
+           npoints="56" red="255" green="80" blue="80"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="orb"/>
+        <effect shape="orb" type="color_shift" dr="-25" dg="35" db="35"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="orb"/>
+    </event>
+</animation>

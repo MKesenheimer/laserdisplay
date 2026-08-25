@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: translate_by_path (extracted from translate_by_path.xml)
+
+    <effect shape="NAME" type="translate_by_path" path=SHAPE velocity closed phase/>
+    the shape's center follows the outline of another *defined but never
+    created* shape (the path) with a constant velocity (units/second,
+    0-255 scale; negative = backwards). closed="1" (default) loops around
+    the path; phase starts the shape at that fraction (0-1) of the path's
+    length.
+
+    - ball2: a second dot riding the same ring as ball, same speed, but
+      starting half a lap behind (phase="0.5")
+
+    The path shape p_ring is included as a definition only - it is
+    never created and never shown.
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <!-- path (never shown) -->
+    <shape name="p_ring" type="circle" cx="128" cy="128" r="85"
+           npoints="96" red="0" green="0" blue="0"/>
+
+    <!-- rider -->
+    <shape name="ball" type="circle" cx="128" cy="128" r="9"
+           npoints="20" red="255" green="200" blue="80"/>
+
+    <!-- rider -->
+    <shape name="ball2" type="circle" cx="128" cy="128" r="9"
+           npoints="20" red="80" green="220" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="ball"/>
+        <effect shape="ball" type="translate_by_path" path="p_ring" velocity="90"/>
+        <create shape="ball2"/>
+        <!-- same ring, same speed, but starting half a lap behind -->
+        <effect shape="ball2" type="translate_by_path" path="p_ring" velocity="90" phase="0.5"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="ball"/>
+        <destroy shape="ball2"/>
+    </event>
+</animation>

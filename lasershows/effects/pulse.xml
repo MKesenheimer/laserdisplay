@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: scale (extracted from scale.xml)
+
+    <effect shape="NAME" type="scale" factor min max frequency center_x center_y/>
+    Static enlargement with factor; pulsing (breathing) when frequency > 0,
+    oscillating between the min and max factor. Scaling happens around
+    center_x/center_y (default: frame center).
+
+    - pulse: a circle breathing slowly around the frame center
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="pulse" type="circle" cx="128" cy="128" r="50"
+           npoints="64" red="90" green="200" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="pulse"/>
+        <effect shape="pulse" type="scale" min="0.5" max="1.5" frequency="0.3"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="pulse"/>
+    </event>
+</animation>

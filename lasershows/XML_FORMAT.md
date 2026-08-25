@@ -7,9 +7,10 @@ The root element is `<animation>`; it accepts the attributes
 | `fps`      | frame rate of the main loop (default 25)                     |
 | `duration` | total length in seconds; without it the loop runs until `stop()` |
 
-It contains two kinds of children: `<shape>` definitions and `<event>`
-entries. Events may appear in any order — they are executed when the
-animation time reaches their timestamp.
+It contains `<shape>` definitions, `<event>` entries and, optionally,
+`<sequence>` elements that reference other XML files. Events may appear in
+any order — they are executed when the animation time reaches their
+timestamp.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -102,6 +103,60 @@ The remaining attributes are the geometry coordinates:
 | `ellipse`   | `cx cy w h` (center, horizontal/vertical dimension) |
 | `tetragon`  | `x0 y0 x1 y1 x2 y2 x3 y3`              |
 
+## `<sequence>` — referencing other XML files
+
+```xml
+<sequence name="NAME" file="PATH"/>
+```
+
+References another XML file (which must have the same `<animation>`
+structure). When the show is loaded:
+
+- the file's `<shape>` definitions are registered as if they were part of
+  the referencing file, and
+- its `<event>` entries are stored as the named sequence `NAME`, which can
+  be started at any point of the timeline (see below).
+
+`PATH` is resolved relative to the directory of the referencing file.
+A referenced file may itself contain `<sequence>` elements — nested
+references are resolved relative to that file's directory, and circular
+references are rejected.  The referenced file's `fps` and `duration`
+attributes are ignored; only its shapes and events are used.
+
+Starting a sequence is a regular event action:
+
+```xml
+<event at="5.0">
+    <create sequence="NAME"/>
+</event>
+```
+
+The events of the referenced file use absolute times *within their own
+file*; when the sequence is started they are shifted so that the file's
+timeline plays **relative to the time of the creating event**.  An event
+at `at="3.0"` in the referenced file therefore fires at `5.0 + 3.0 = 8.0`
+of the show.  A sequence can be started multiple times — in parallel or
+overlapping.
+
+Effects can be attached to the sequence in the same event that starts it:
+
+```xml
+<event at="5.0">
+    <create sequence="NAME"/>
+    <effect sequence="NAME" type="rotation" speed="45"/>
+    <effect sequence="NAME" type="color_shift" dr="10" dg="0" db="-5"/>
+</event>
+```
+
+The effects are applied to **all shapes the sequence creates** and start
+at the time the sequence is created, so shapes that the file's timeline
+creates later are already in the same phase — the whole group moves as a
+unit.  The effects also apply to the shapes of nested sequences (they
+keep the start time of the sequence they come from, so everything stays
+in sync).  All effect types can be used and several can be combined.
+A complete example is `example-sequences.xml`, which stitches together
+files from `effects/` and adds a sequence-level effect to each of them.
+
 ## `<event>` — actions at a timestamp
 
 ```xml
@@ -118,8 +173,10 @@ animation time reaches `at`:
 | Action                                    | Meaning                                 |
 |-------------------------------------------|------------------------------------------|
 | `<create shape="NAME"/>`                  | activate a previously defined shape      |
+| `<create sequence="NAME"/>`               | start a referenced file's timeline, relative to this event (see `<sequence>`) |
 | `<destroy shape="NAME"/>`                 | remove a shape from the animation        |
 | `<effect shape="NAME" type="..." .../>`   | attach a continuous effect, starting now |
+| `<effect sequence="NAME" type="..." .../>`| attach an effect to a sequence started in this event — it applies to all shapes the sequence creates (see `<sequence>`) |
 
 ## `<effect>` — continuous effects
 

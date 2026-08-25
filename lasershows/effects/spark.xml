@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: translate_by_path (extracted from translate_by_path.xml)
+
+    <effect shape="NAME" type="translate_by_path" path=SHAPE velocity closed phase/>
+    the shape's center follows the outline of another *defined but never
+    created* shape (the path) with a constant velocity (units/second,
+    0-255 scale; negative = backwards). closed="1" (default) loops around
+    the path; phase starts the shape at that fraction (0-1) of the path's
+    length.
+
+    - spark: shuttling to and fro on the diagonal
+
+    The path shape p_diagonal is included as a definition only - it is
+    never created and never shown.
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <!-- path (never shown) -->
+    <shape name="p_diagonal" type="line" x0="20" y0="220" x1="236" y1="36"
+           npoints="2" red="0" green="0" blue="0"/>
+
+    <!-- rider -->
+    <shape name="spark" type="line" x0="116" y0="128" x1="140" y1="128"
+           npoints="8" red="255" green="120" blue="200"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="spark"/>
+        <!-- open line path with closed="1": the spark runs to the end and
+             back, shuttling along the diagonal -->
+        <effect shape="spark" type="translate_by_path" path="p_diagonal" velocity="120"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="spark"/>
+    </event>
+</animation>

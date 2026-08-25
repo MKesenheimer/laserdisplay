@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: translation (extracted from translation.xml)
+
+    <effect shape="NAME" type="translation" vx vy ax ay fx fy phase/>
+    vx/vy = constant velocity in units/second (0-255 scale);
+    ax/ay = sinusoidal wobble amplitude, fx/fy its frequency in Hz,
+    phase shifts the wobble (radians).
+
+    - bob: a triangle bobbing up and down (wobble only, no velocity)
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="bob" type="triangle" x0="128" y0="173" x1="89" y1="106" x2="167" y2="106"
+           npoints="24" red="80" green="255" blue="140"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="bob"/>
+        <effect shape="bob" type="translation" ay="35" fy="0.4"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="bob"/>
+    </event>
+</animation>

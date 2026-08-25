@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: ellipse (extracted from ellipse.xml)
+
+    <shape name="..." type="ellipse" cx cy w h npoints [blank] red green blue/>
+    (cx/cy = center, w/h = horizontal/vertical dimension)
+
+    - pond: a wide, flat ellipse at the bottom with a gentle ripple (warp)
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="pond" type="ellipse" cx="128" cy="55" w="150" h="34"
+           npoints="64" red="60" green="160" blue="220"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="pond"/>
+        <effect shape="pond" type="warp" amplitude="6" wavelength="140" speed="0.4"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="pond"/>
+    </event>
+</animation>

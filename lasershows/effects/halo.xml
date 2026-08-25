@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: circle (extracted from circle.xml)
+
+    <shape name="..." type="circle" cx cy r npoints [blank] red green blue/>
+
+    - halo: breathing (pulsing scale) with a slow color drift
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="halo" type="circle" cx="128" cy="128" r="58"
+           npoints="72" red="255" green="170" blue="60"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="halo"/>
+        <effect shape="halo" type="scale" min="0.75" max="1.2" frequency="0.2"/>
+        <effect shape="halo" type="color_shift" dr="-8" dg="-4" db="10"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="halo"/>
+    </event>
+</animation>

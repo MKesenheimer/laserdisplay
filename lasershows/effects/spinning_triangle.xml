@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: triangle (extracted from triangle.xml)
+
+    <shape name="..." type="triangle" x0 y0 x1 y1 x2 y2 npoints [blank] red green blue/>
+    (npoints points per edge; the outline gets 3*npoints-2 points)
+
+    - spin: an equilateral triangle spinning around the frame center
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="spin" type="triangle" x0="128" y0="173" x1="89" y1="106" x2="167" y2="106"
+           npoints="24" red="255" green="150" blue="40"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="spin"/>
+        <effect shape="spin" type="rotation" speed="75"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="spin"/>
+    </event>
+</animation>

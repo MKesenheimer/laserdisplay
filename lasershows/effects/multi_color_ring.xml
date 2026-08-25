@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: rainbow (extracted from rainbow.xml)
+
+    <effect shape="NAME" type="rainbow" cycles speed phase saturation brightness/>
+    colors the shape with a spectrum gradient along its outline; cycles =
+    number of full spectra along the shape, speed = drift in spectra/second.
+    (Note: rainbow overwrites the shape's color, so attach it before any
+    other color effect if you need both.)
+
+    - ring: one full spectrum around a circle, rotating through the
+      colors quickly
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="ring" type="circle" cx="128" cy="128" r="55"
+           npoints="72" red="255" green="255" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="ring"/>
+        <effect shape="ring" type="rainbow" cycles="1" speed="0.5"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="ring"/>
+    </event>
+</animation>

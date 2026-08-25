@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: rotation (extracted from rotation.xml)
+
+    <effect shape="NAME" type="rotation" pivot_x pivot_y speed phase/>
+    speed in degrees/second (positive = counter-clockwise, negative =
+    clockwise); pivot defaults to the frame center.
+
+    - cw: the mirrored triangle spinning the other way (clockwise)
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="cw" type="triangle" x0="128" y0="173" x1="167" y1="106" x2="89" y2="106"
+           npoints="24" red="255" green="80" blue="200"/>
+        <shape name="ccw" type="triangle" x0="128" y0="173" x1="89" y1="106" x2="167" y2="106"
+           npoints="24" red="255" green="140" blue="30"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="cw"/>
+        <effect shape="cw" type="rotation" speed="-120"/>
+        <create shape="ccw"/>
+        <effect shape="ccw" type="rotation" speed="60"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="cw"/>
+        <destroy shape="ccw"/>
+    </event>
+</animation>

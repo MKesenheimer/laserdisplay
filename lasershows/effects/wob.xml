@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: warp (extracted from warp.xml)
+
+    <effect shape="NAME" type="warp" amplitude wavelength speed phase horizontal/>
+    displaces the points with a travelling sine wave; horizontal="1"
+    (default) drives the wave along x and displaces the points vertically
+    (a horizontal line becomes a sine wave), horizontal="0" does the
+    opposite. speed is in wavelengths/second.
+
+    - wob: a circle with a wobbly, jelly-like outline
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="wob" type="circle" cx="128" cy="128" r="45"
+           npoints="64" red="255" green="160" blue="80"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="wob"/>
+        <effect shape="wob" type="warp" amplitude="10" wavelength="70" speed="0.8"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="wob"/>
+    </event>
+</animation>

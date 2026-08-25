@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: move_points (extracted from move_points.xml)
+
+    <effect shape="NAME" type="move_points" points="SEL" dx dy [duration]/>
+    or with tx/ty instead of dx/dy: move the selected points towards that
+    absolute position (both required together). points selects a slice
+    ("3:7", "-10:"), a list ("0,5,9") or a single index. duration > 0
+    animates the move.
+
+    A tetragon with npoints="10" has 37 outline points: bottom edge
+    0:9, right edge 9:18, top edge 18:27, left edge 27:36.
+
+    - flag: the top edge of a square lifts up, later the bottom edge
+      drops down (animated via duration)
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="flag" type="tetragon" x0="88" y0="88" x1="168" y1="88"
+           x2="168" y2="168" x3="88" y3="168"
+           npoints="10" red="255" green="200" blue="90"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="flag"/>
+        <effect shape="flag" type="move_points" points="18:27" dy="35" duration="1.5"/>
+    </event>
+
+    <event at="3.0">
+        <effect shape="flag" type="move_points" points="0:9" dy="-25" duration="1.5"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="flag"/>
+    </event>
+</animation>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: multi_color (extracted from multi_color.xml)
+
+    <effect shape="NAME" type="multi_color" colors="r,g,b;r,g,b;..."/>
+    splits the outline into as many consecutive parts as colors are given
+    and colors each part with the matching color (values 0-255). Unlike
+    rainbow the colors are fixed - use rainbow for a drifting spectrum.
+
+    - tricolor: a line in three equal color bands
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="tricolor" type="line" x0="16" y0="170" x1="240" y1="170"
+           npoints="60" red="255" green="255" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="tricolor"/>
+        <effect shape="tricolor" type="multi_color"
+                colors="255,60,60;60,255,120;80,140,255"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="tricolor"/>
+    </event>
+</animation>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: tetragon (any four-cornered shape; extracted from tetragon.xml)
+
+    <shape name="..." type="tetragon" x0 y0 x1 y1 x2 y2 x3 y3 npoints [blank] red green blue/>
+    (npoints points per edge; the outline gets 4*npoints-3 points)
+
+    - diamond: rotating around the frame center against square; together
+      they form a slowly shifting eight-pointed star
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="diamond" type="tetragon" x0="128" y0="80" x1="176" y1="128"
+           x2="128" y2="176" x3="80" y3="128"
+           npoints="24" red="140" green="220" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="diamond"/>
+        <effect shape="diamond" type="rotation" speed="-90"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="diamond"/>
+    </event>
+</animation>

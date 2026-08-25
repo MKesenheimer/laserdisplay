@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: translation (extracted from translation.xml)
+
+    <effect shape="NAME" type="translation" vx vy ax ay fx fy phase/>
+    vx/vy = constant velocity in units/second (0-255 scale);
+    ax/ay = sinusoidal wobble amplitude, fx/fy its frequency in Hz,
+    phase shifts the wobble (radians).
+
+    - sway: an ellipse swaying left and right, phase-shifted by half a
+      period against the usual wobble start
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="sway" type="ellipse" cx="128" cy="128" w="60" h="36"
+           npoints="48" red="200" green="120" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="sway"/>
+        <effect shape="sway" type="translation" ax="40" fx="0.25" phase="1.57"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="sway"/>
+    </event>
+</animation>

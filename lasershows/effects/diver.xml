@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: flip (extracted from flip.xml)
+
+    <effect shape="NAME" type="flip" axis period phase/>
+    flips the shape in place at the middle vertical (axis="vertical",
+    default, left/right) or horizontal (axis="horizontal", top/bottom)
+    axis of the frame. period=0 (default) = fixed flip; period > 0 = the
+    shape swings between original and mirrored position every period
+    seconds (easing through the axis); phase shifts the cycle. A flip
+    attached *after* other effects flips their combined result.
+
+    - diver: a dot swinging top/bottom
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="diver" type="circle" cx="128" cy="180" r="14"
+           npoints="28" red="120" green="220" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="diver"/>
+        <effect shape="diver" type="flip" axis="horizontal" period="3" phase="0.5"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="diver"/>
+    </event>
+</animation>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: rainbow (extracted from rainbow.xml)
+
+    <effect shape="NAME" type="rainbow" cycles speed phase saturation brightness/>
+    colors the shape with a spectrum gradient along its outline; cycles =
+    number of full spectra along the shape, speed = drift in spectra/second.
+    (Note: rainbow overwrites the shape's color, so attach it before any
+    other color effect if you need both.)
+
+    - soft: a desaturated (pastel) rainbow on a triangle
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="soft" type="triangle" x0="128" y0="173" x1="89" y1="106" x2="167" y2="106"
+           npoints="30" red="255" green="255" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="soft"/>
+        <effect shape="soft" type="rainbow" cycles="1" speed="0.1" saturation="0.45"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="soft"/>
+    </event>
+</animation>

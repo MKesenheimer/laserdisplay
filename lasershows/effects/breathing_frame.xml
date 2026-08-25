@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: tetragon (any four-cornered shape; extracted from tetragon.xml)
+
+    <shape name="..." type="tetragon" x0 y0 x1 y1 x2 y2 x3 y3 npoints [blank] red green blue/>
+    (npoints points per edge; the outline gets 4*npoints-3 points)
+
+    - frame: a dashed border (blank="4") pulsing almost imperceptibly
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="frame" type="tetragon" x0="30" y0="30" x1="226" y1="30"
+           x2="226" y2="226" x3="30" y3="226"
+           npoints="16" red="90" green="90" blue="90" blank="4"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="frame"/>
+        <effect shape="frame" type="scale" min="0.9" max="1.05" frequency="0.15"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="frame"/>
+    </event>
+</animation>

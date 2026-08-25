@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: color_shift (extracted from color_shift.xml)
+
+    <effect shape="NAME" type="color_shift" dr dg db/>
+    Color change per second for each channel (0-255 scale); negative
+    values fade a channel out, positive values raise it. Channels stop
+    at black/white, they never wrap.
+
+    - warm: warm white drifting towards blue
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="warm" type="line" x0="20" y0="180" x1="236" y1="180"
+           npoints="48" red="255" green="240" blue="180"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="warm"/>
+        <effect shape="warm" type="color_shift" dr="-15" dg="-30" db="25"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="warm"/>
+    </event>
+</animation>

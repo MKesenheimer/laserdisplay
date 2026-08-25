@@ -196,13 +196,14 @@ scheduler.run()                     # or run_in_background() for injection
 
 A ready-made timeline plus runner can be found in
 `examples/files/shapes.xml` and `examples/scheduler.py`. The complete XML format
-reference is in [SCHEDULER.md](SCHEDULER.md).
+reference is in [lasershows/XML_FORMAT.md](lasershows/XML_FORMAT.md).
 
 ### XML file format
 
 The root element `<animation>` accepts the attributes `fps` (frame rate) and
 `duration` (seconds; without it the timeline runs until `stop()` is called).
-It contains two kinds of children: `<shape>` definitions and `<event>` entries.
+It contains `<shape>` definitions, `<event>` entries and, optionally,
+`<sequence>` elements that reference other XML files.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -254,6 +255,48 @@ The remaining attributes are the geometry coordinates:
 | `ellipse`   | `cx cy w h` (center, horizontal/vertical dimension) |
 | `tetragon`  | `x0 y0 x1 y1 x2 y2 x3 y3`              |
 
+#### `<sequence>` — referencing other files
+
+A show file can pull shapes and event timelines in from other XML files:
+
+```xml
+<sequence name="NAME" file="PATH"/>
+```
+
+The referenced file (same `<animation>` structure) is loaded when the show
+is read: its shapes become available and its events form the named
+sequence.  `PATH` is resolved relative to the directory of the
+referencing file.  Starting the sequence plays its timeline relative to
+the time of the creating event — the file's own event times are shifted
+by that moment:
+
+```xml
+<event at="5.0">
+    <create sequence="NAME"/>
+</event>
+```
+
+An event at `at="3.0"` in the referenced file therefore fires at 8.0 s of
+the show.  A sequence can be started multiple times, in parallel or
+overlapping.  Referenced files may reference further files (paths resolve
+relative to their own directory); circular references are rejected.
+
+Effects can be attached to a sequence in the same event that starts it:
+they are applied to all shapes the sequence creates (and to the shapes of
+nested sequences), starting at the moment the sequence is created, so the
+group moves as a unit.  All effect types work:
+
+```xml
+<event at="5.0">
+    <create sequence="NAME"/>
+    <effect sequence="NAME" type="rotation" speed="45"/>
+</event>
+```
+
+A complete example that stitches together the files from
+`lasershows/effects/` (with a sequence-level effect on each) is
+`lasershows/example-sequences.xml`.
+
 #### `<event>` — actions at a timestamp
 
 An `<event at="SECONDS">` contains any number of actions:
@@ -261,8 +304,10 @@ An `<event at="SECONDS">` contains any number of actions:
 | Action                                   | Meaning                                    |
 |------------------------------------------|--------------------------------------------|
 | `<create shape="NAME"/>`                 | activate a defined shape                    |
+| `<create sequence="NAME"/>`              | start a referenced file's timeline          |
 | `<destroy shape="NAME"/>`                | remove a shape from the animation           |
 | `<effect shape="NAME" type="..." .../>`  | attach a continuous effect, starting now    |
+| `<effect sequence="NAME" type="..." .../>`| attach an effect to a sequence started in this event (applies to all shapes it creates) |
 
 #### `<effect>` — continuous effects
 

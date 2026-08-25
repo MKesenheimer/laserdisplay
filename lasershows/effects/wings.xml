@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Effect example: flip
+    Effect example: flip (extracted from flip.xml)
 
     <effect shape="NAME" type="flip" axis period phase/>
     flips the shape in place at the middle vertical (axis="vertical",
@@ -10,36 +10,23 @@
     seconds (easing through the axis); phase shifts the cycle. A flip
     attached *after* other effects flips their combined result.
 
-    - flapper: a triangle swinging left/right across the frame
-    - diver:   a dot swinging top/bottom
-    - wing/wing2: the same geometry created twice - one plain, one with a
-             fixed flip -> a symmetric wing pair
+    - wing2: same geometry as wing with a fixed flip -> a symmetric wing pair
 -->
 <animation fps="25" duration="10">
     <!-- ==================== shape definitions ============================ -->
-    <shape name="flapper" type="triangle" x0="36" y0="128" x1="84" y1="100" x2="84" y2="156"
-           npoints="24" red="255" green="180" blue="60"/>
-    <shape name="diver" type="circle" cx="70" cy="180" r="14"
-           npoints="28" red="120" green="220" blue="255"/>
-    <shape name="wing" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150"
-           npoints="24" red="255" green="255" blue="255"/>
     <shape name="wing2" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150"
+           npoints="24" red="255" green="255" blue="255"/>
+        <shape name="wing" type="triangle" x0="98" y0="106" x1="44" y1="128" x2="98" y2="150"
            npoints="24" red="255" green="255" blue="255"/>
 
     <!-- ======================== timeline ========================= -->
     <event at="0.0">
-        <create shape="flapper"/>
-        <effect shape="flapper" type="flip" axis="vertical" period="2"/>
-        <create shape="diver"/>
-        <effect shape="diver" type="flip" axis="horizontal" period="3" phase="0.5"/>
         <create shape="wing"/>
         <create shape="wing2"/>
         <effect shape="wing2" type="flip" axis="vertical"/>
     </event>
 
     <event at="10.0">
-        <destroy shape="flapper"/>
-        <destroy shape="diver"/>
         <destroy shape="wing"/>
         <destroy shape="wing2"/>
     </event>

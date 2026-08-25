@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: rotation (extracted from rotation.xml)
+
+    <effect shape="NAME" type="rotation" pivot_x pivot_y speed phase/>
+    speed in degrees/second (positive = counter-clockwise, negative =
+    clockwise); pivot defaults to the frame center.
+
+    - orbit: a dot circling the frame center (off-center shape + default
+      pivot = orbit)
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="orbit" type="circle" cx="128" cy="190" r="10"
+           npoints="24" red="80" green="220" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="orbit"/>
+        <effect shape="orbit" type="rotation" speed="90"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="orbit"/>
+    </event>
+</animation>

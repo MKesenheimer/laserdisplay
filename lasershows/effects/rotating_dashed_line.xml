@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: line (extracted from line.xml)
+
+    <shape name="..." type="line" x0 y0 x1 y1 npoints [blank] red green blue/>
+
+    - dashes: a dashed vertical line (blank="4" blanks every 4th point)
+      rotating slowly
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="dashes" type="line" x0="128" y0="20" x1="128" y1="236"
+           npoints="48" red="255" green="120" blue="120" blank="4"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="dashes"/>
+        <effect shape="dashes" type="rotation" speed="-20"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="dashes"/>
+    </event>
+</animation>

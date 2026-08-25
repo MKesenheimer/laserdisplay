@@ -1,40 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Effect example: multi_color
+    Effect example: multi_color (extracted from multi_color.xml)
 
     <effect shape="NAME" type="multi_color" colors="r,g,b;r,g,b;..."/>
     splits the outline into as many consecutive parts as colors are given
     and colors each part with the matching color (values 0-255). Unlike
     rainbow the colors are fixed - use rainbow for a drifting spectrum.
 
-    - tricolor: a line in three equal color bands
-    - quadrant: a circle in four quarters
-    - split:  a triangle in two halves
+    - split: a triangle in two halves
 -->
 <animation fps="25" duration="10">
     <!-- ==================== shape definitions ============================ -->
-    <shape name="tricolor" type="line" x0="16" y0="170" x1="240" y1="170"
-           npoints="60" red="255" green="255" blue="255"/>
-    <shape name="quadrant" type="circle" cx="128" cy="128" r="50"
-           npoints="40" red="255" green="255" blue="255"/>
     <shape name="split" type="triangle" x0="128" y0="173" x1="89" y1="106" x2="167" y2="106"
            npoints="30" red="255" green="255" blue="255"/>
 
     <!-- ======================== timeline ========================= -->
     <event at="0.0">
-        <create shape="tricolor"/>
-        <effect shape="tricolor" type="multi_color"
-                colors="255,60,60;60,255,120;80,140,255"/>
-        <create shape="quadrant"/>
-        <effect shape="quadrant" type="multi_color"
-                colors="255,220,80;255,120,200;80,220,220;120,160,255"/>
         <create shape="split"/>
         <effect shape="split" type="multi_color" colors="255,80,200;80,255,200"/>
     </event>
 
     <event at="10.0">
-        <destroy shape="tricolor"/>
-        <destroy shape="quadrant"/>
         <destroy shape="split"/>
     </event>
 </animation>

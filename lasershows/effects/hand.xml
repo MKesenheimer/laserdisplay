@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: line (extracted from line.xml)
+
+    <shape name="..." type="line" x0 y0 x1 y1 npoints [blank] red green blue/>
+
+    - hand: a radial line rotating around the frame center, like a clock hand
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="hand" type="line" x0="128" y0="128" x1="128" y1="48"
+           npoints="24" red="255" green="220" blue="120"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="hand"/>
+        <effect shape="hand" type="rotation" speed="60"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="hand"/>
+    </event>
+</animation>

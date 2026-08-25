@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: rainbow (extracted from rainbow.xml)
+
+    <effect shape="NAME" type="rainbow" cycles speed phase saturation brightness/>
+    colors the shape with a spectrum gradient along its outline; cycles =
+    number of full spectra along the shape, speed = drift in spectra/second.
+    (Note: rainbow overwrites the shape's color, so attach it before any
+    other color effect if you need both.)
+
+    - spectrum: two spectra along a long line, drifting slowly
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="spectrum" type="line" x0="10" y0="128" x1="246" y1="128"
+           npoints="96" red="255" green="255" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="spectrum"/>
+        <effect shape="spectrum" type="rainbow" cycles="2" speed="0.25"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="spectrum"/>
+    </event>
+</animation>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: line (extracted from line.xml)
+
+    <shape name="..." type="line" x0 y0 x1 y1 npoints [blank] red green blue/>
+
+    - scan: a full-width horizontal line sweeping up and down (translation
+      with sinusoidal wobble)
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="scan" type="line" x0="8" y0="128" x1="248" y1="128"
+           npoints="64" red="80" green="255" blue="200"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="scan"/>
+        <effect shape="scan" type="translation" ay="45" fy="0.2"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="scan"/>
+    </event>
+</animation>

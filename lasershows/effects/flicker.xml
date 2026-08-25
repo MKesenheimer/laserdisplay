@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: blink (extracted from blink.xml)
+
+    <effect shape="NAME" type="blink" period duty every/>
+    period = seconds per on/off cycle, duty = on-fraction (0-1);
+    every > 1 additionally blanks every n-th point while the shape is on
+    (with duty="1.0" the shape never goes fully off - just dashed).
+
+    - flicker: a fast 0.25 s flicker with short on-times
+-->
+<animation fps="25" duration="10">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="flicker" type="triangle" x0="128" y0="173" x1="89" y1="106" x2="167" y2="106"
+           npoints="24" red="255" green="200" blue="60"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="flicker"/>
+        <effect shape="flicker" type="blink" period="0.25" duty="0.3"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="flicker"/>
+    </event>
+</animation>

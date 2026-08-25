@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Shape example: pinwheel
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <!-- two rays through the centre; mirrored, spinning in opposite
+         directions -> the left/right symmetry is preserved at all times -->
+    <shape name="rayA" type="line" x0="48" y0="38" x1="208" y1="198"
+           npoints="80" red="255" green="255" blue="255"/>
+    <shape name="rayB" type="line" x0="48" y0="198" x1="208" y1="38"
+           npoints="80" red="255" green="255" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <!-- a quick pinwheel flick answers the building line -->
+        <create shape="rayA"/>
+        <effect shape="rayA" type="rotation" speed="160"/>
+        <create shape="rayB"/>
+        <effect shape="rayB" type="rotation" speed="-160"/>
+    </event>
+
+    <event at="10.0">
+        <destroy shape="rayA"/>
+        <destroy shape="rayB"/>
+    </event>
+</animation>
+

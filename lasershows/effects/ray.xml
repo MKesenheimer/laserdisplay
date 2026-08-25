@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Effect example: mirror
+    Effect example: mirror (extracted from mirror.xml)
 
     <effect shape="NAME" type="mirror" axis/>
     adds an exactly mirrored copy of the shape at the middle vertical
@@ -11,16 +11,13 @@
     the mirror act on the original and the copy alike; effects attached
     *before* are mirrored together with the shape.
 
-    - ray:  a rotating ray with its mirrored twin -> two rays sweeping in
-           symmetric opposite directions
-    - orb:  a waddling dot with its top/bottom mirror
+    - ray: a rotating ray with its mirrored twin -> two rays sweeping in
+      symmetric opposite directions
 -->
 <animation fps="25" duration="10">
     <!-- ==================== shape definitions ============================ -->
     <shape name="ray" type="line" x0="128" y0="128" x1="60" y1="196"
            npoints="32" red="255" green="255" blue="255"/>
-    <shape name="orb" type="circle" cx="128" cy="80" r="14"
-           npoints="28" red="120" green="220" blue="255"/>
 
     <!-- ======================== timeline ========================= -->
     <event at="0.0">
@@ -29,13 +26,9 @@
              rotated ray, so both sweep in perfect symmetry -->
         <effect shape="ray" type="rotation" speed="40"/>
         <effect shape="ray" type="mirror" axis="vertical"/>
-        <create shape="orb"/>
-        <effect shape="orb" type="translation" ax="30" fx="0.3"/>
-        <effect shape="orb" type="mirror" axis="horizontal"/>
     </event>
 
     <event at="10.0">
         <destroy shape="ray"/>
-        <destroy shape="orb"/>
     </event>
 </animation>

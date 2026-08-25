@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Example: referencing other XML files
+
+    A show file can pull shapes and event timelines in from other XML
+    files:
+
+        <sequence name="NAME" file="PATH"/>
+
+    registers the shapes of the file at PATH and stores its events as the
+    sequence NAME.  Starting the sequence with
+
+        <create sequence="NAME"/>
+
+    plays the file's timeline relative to the time of this event: the
+    file's own event times (which are absolute within the file) are added
+    to it.  PATH is resolved relative to the directory of this file.
+
+    Effects can be attached to a sequence in the same event that starts
+    it; they are applied to all shapes the sequence creates:
+
+        <effect sequence="NAME" type="..." .../>
+
+    This example stitches three of the effect examples from the effects/
+    directory into one 32 second show and adds a sequence-level effect
+    to each of them.
+-->
+<animation fps="25" duration="32">
+
+    <!-- ==================== referenced files ============================ -->
+
+    <sequence name="spinners" file="effects/rotation.xml"/>
+    <sequence name="blinker"  file="effects/blinking_line.xml"/>
+    <sequence name="translation" file="effects/translation.xml"/>
+
+    <!-- ======================== timeline ========================= -->
+
+    <!-- 0-8 s: the rotation example plays as-is, its colors drift
+         slowly (sequence-level color_shift) -->
+    <event at="0.0">
+        <create sequence="spinners"/>
+        <effect sequence="spinners" type="color_shift" dr="-10" dg="16" db="15"/>
+    </event>
+
+    <!-- 8-18 s: the blink example, shifted by 8 s (its own 0-10 s
+         timeline plays at 8-18 s of the show; it overlaps the spinners);
+         the whole group slowly rotates around the frame center -->
+    <event at="10.0">
+        <destroy sequence="spinners"/>
+        <create sequence="blinker"/>
+        <effect sequence="blinker" type="rotation" speed="20"/>
+    </event>
+
+    <!-- 10-15 s: the translation example, shifted by 10 s; the whole
+         group gently pulses its size -->
+    <event at="10.0">
+        <destroy sequence="blinker"/>
+        <create sequence="translation"/>
+        <effect sequence="translation" type="scale" min="0.85" max="1.15" frequency="0.3"/>
+    </event>
+
+    <event at="15.0">
+        <destroy sequence="translation"/>
+    </event>
+</animation>
