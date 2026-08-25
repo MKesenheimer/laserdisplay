@@ -40,7 +40,10 @@ relative to the time of the creating event.  PATH is resolved relative to
 the directory of the referencing file.  <effect sequence="NAME" .../>
 actions in the same event attach effects to all shapes the sequence
 creates (and to the shapes of nested sequences), starting at the time the
-sequence is created.
+sequence is created.  A running sequence is stopped with
+<destroy sequence="NAME"/> in a later event: the shapes it created
+(including those of nested sequences) are removed and its remaining
+timeline events no longer fire.
 
 Effect types: rotation, translation, scale, color_shift, blink, rainbow,
 warp, multi_color (colors="r,g,b;r,g,b;..."), move_points
@@ -121,6 +124,28 @@ class _ActiveShape:
         self.effects = []                # list of (start_time, effect)
 
 
+class _SequenceInstance:
+    # runtime state of one running sequence instance (created with
+    # <create sequence="NAME"/> or create_sequence()); remembers the
+    # shapes its timeline created (and those of the sequences nested in
+    # it) so destroy_sequence() can remove them all, and can be
+    # cancelled so the timeline's remaining events no longer fire
+    def __init__(self, name):
+        self.name = name
+        self.parent = None            # enclosing instance (nested sequence)
+        self.children = []            # instances of nested sequences
+        self.members = set()          # shape names this timeline created
+        self.cancelled = False
+
+    def add_member(self, name):
+        # the shape belongs to this instance and to all enclosing ones
+        # (caller must hold the scheduler lock)
+        node = self
+        while node is not None:
+            node.members.add(name)
+            node = node.parent
+
+
 class Scheduler:
 
     def __init__(self, laser_display, fps=25):
@@ -129,6 +154,7 @@ class Scheduler:
         self.duration = None             # seconds; None = run until stop()
         self._definitions = {}           # name -> (builder(), blank_n)
         self._sequences = {}             # name -> list of (time, action spec)
+        self._sequence_instances = {}    # name -> list of _SequenceInstance
         self._loading_files = set()      # files currently being loaded (cycle check)
         self._active = {}                # name -> _ActiveShape
         self._events = []                # heap of (time, seq, function)
@@ -149,7 +175,9 @@ class Scheduler:
         <create sequence="NAME"/> (see create_sequence()).  PATH is
         resolved relative to the directory of the referencing file.
         <effect sequence="NAME" .../> actions in the same event attach
-        effects to all shapes the sequence creates.
+        effects to all shapes the sequence creates, and
+        <destroy sequence="NAME"/> actions in a later event stop a
+        running sequence (see destroy_sequence()).
         """
         self._loading_files = set()
         root, events = self.__load_file(filename)
@@ -275,9 +303,13 @@ class Scheduler:
                              "sequence= attribute")
         if action.tag == 'destroy':
             name = action.get('shape')
-            if name is None:
-                raise ValueError("<destroy> element needs a shape= attribute")
-            return ('destroy', name)
+            if name is not None:
+                return ('destroy', name)
+            name = action.get('sequence')
+            if name is not None:
+                return ('destroy_sequence', name)
+            raise ValueError("<destroy> element needs a shape= or "
+                             "sequence= attribute")
         if action.tag == 'effect':
             seq_name = action.get('sequence')
             if seq_name is not None:
@@ -296,11 +328,15 @@ class Scheduler:
             return ('effect', name, factory)
         raise ValueError("unknown action <%s> in event" % action.tag)
 
-    def __make_event(self, specs, at, seq_effects=None):
+    def __make_event(self, specs, at, seq_effects=None, inst=None):
         """creates the function that runs all actions of one event at time
         `at`.  `seq_effects` is a list of (factory, start) pairs: the
         effects of the enclosing sequence instance, applied to every shape
-        the event creates and inherited by nested sequences"""
+        the event creates and inherited by nested sequences; `inst` is the
+        sequence instance whose timeline this event belongs to (None for
+        the main timeline): once the instance has been destroyed the event
+        is skipped, and the shapes it creates are registered as its
+        members"""
         # pair <create sequence="X"/> with the <effect sequence="X"/>
         # actions of this event
         paired = {}
@@ -309,23 +345,36 @@ class Scheduler:
                 paired.setdefault(spec[1], []).append(spec[2])
 
         def run():
+            if inst is not None:
+                with self._lock:
+                    if inst.cancelled:
+                        return
             for spec in specs:
                 kind = spec[0]
                 if kind == 'create':
                     self.create(spec[1])
+                    if inst is not None:
+                        with self._lock:
+                            inst.add_member(spec[1])
                     if seq_effects:
                         for factory, start in seq_effects:
                             self.__attach_effect(spec[1], factory(), start)
                 elif kind == 'destroy':
                     self.destroy(spec[1])
+                elif kind == 'destroy_sequence':
+                    self.destroy_sequence(spec[1])
                 elif kind == 'effect':
                     self.add_effect(spec[1], spec[2]())
                 elif kind == 'effect_sequence':
                     pass    # already applied via the paired create_sequence
                 elif kind == 'create_sequence':
-                    self.create_sequence(spec[1], at,
-                                         effects=paired.get(spec[1], []),
-                                         inherited=seq_effects)
+                    child = self.create_sequence(spec[1], at,
+                                                 effects=paired.get(spec[1], []),
+                                                 inherited=seq_effects)
+                    if inst is not None:
+                        with self._lock:
+                            child.parent = inst
+                            inst.children.append(child)
         return run
 
     def __effect_builder(self, type, params, context):
@@ -574,20 +623,28 @@ class Scheduler:
         to every shape the sequence creates, starting at `at`; `inherited`
         is the list of (factory, start) pairs of an enclosing sequence, so
         that nested sequences keep moving in sync with the group they are
-        part of"""
+        part of.
+
+        Returns the running instance; destroy_sequence() (or a
+        <destroy sequence="NAME"/> event) stops it and removes the shapes
+        it created."""
         with self._lock:
             if name not in self._sequences:
                 raise KeyError("no sequence defined with name '%s'" % name)
             timeline = list(self._sequences[name])
             if at is None:
                 at = self._time
+            instance = _SequenceInstance(name)
+            self._sequence_instances.setdefault(name, []).append(instance)
         seq_effects = list(inherited or [])
         for effect in (effects or []):
             factory = effect if callable(effect) else (lambda e=effect: e)
             seq_effects.append((factory, at))
         for event_at, specs in timeline:
             self.schedule(at + event_at,
-                          self.__make_event(specs, at + event_at, seq_effects))
+                          self.__make_event(specs, at + event_at, seq_effects,
+                                            instance))
+        return instance
 
     def create_triangle(self, name, x0, y0, x1, y1, x2, y2, npoints,
                         color=(MAX, MAX, MAX), blank_n=0):
@@ -622,6 +679,32 @@ class Scheduler:
             if name not in self._active:
                 return
             del self._active[name]
+
+    def destroy_sequence(self, name):
+        """stops the running instance(s) of a sequence (see
+        <destroy sequence="NAME"/>): their remaining timeline events no
+        longer fire and all shapes they created (including the shapes of
+        the sequences nested in them) are removed.  Silently skips names
+        that have no running instance."""
+        with self._lock:
+            instances = list(self._sequence_instances.get(name, ()))
+        for instance in instances:
+            self.__cancel_instance(instance)
+
+    def __cancel_instance(self, instance):
+        # cancels one sequence instance (and the instances of the
+        # sequences nested in it) and removes the shapes they created;
+        # idempotent
+        with self._lock:
+            if instance.cancelled:
+                return
+            instance.cancelled = True
+            children = list(instance.children)
+            members = set(instance.members)
+        for child in children:
+            self.__cancel_instance(child)
+        for member in members:
+            self.destroy(member)
 
     def add_effect(self, name, effect):
         """attaches a continuous effect (Rotation, Translation, ...) to an

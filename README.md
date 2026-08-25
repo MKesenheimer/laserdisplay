@@ -293,8 +293,14 @@ group moves as a unit.  All effect types work:
 </event>
 ```
 
+A running sequence is stopped with a `<destroy sequence="NAME"/>` action
+in a later event: it removes all shapes the sequence created (including
+the shapes of nested sequences) and cancels the sequence's remaining
+timeline events, so nothing further appears from it.
+
 A complete example that stitches together the files from
-`lasershows/effects/` (with a sequence-level effect on each) is
+`lasershows/effects/` (with a sequence-level effect on each and
+`<destroy sequence>` between them) is
 `lasershows/example-sequences.xml`.
 
 #### `<event>` — actions at a timestamp
@@ -306,6 +312,7 @@ An `<event at="SECONDS">` contains any number of actions:
 | `<create shape="NAME"/>`                 | activate a defined shape                    |
 | `<create sequence="NAME"/>`              | start a referenced file's timeline          |
 | `<destroy shape="NAME"/>`                | remove a shape from the animation           |
+| `<destroy sequence="NAME"/>`             | stop a running sequence (remove its shapes, cancel its remaining events) |
 | `<effect shape="NAME" type="..." .../>`  | attach a continuous effect, starting now    |
 | `<effect sequence="NAME" type="..." .../>`| attach an effect to a sequence started in this event (applies to all shapes it creates) |
 

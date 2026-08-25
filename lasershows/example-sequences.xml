@@ -53,13 +53,13 @@
 
     <!-- 10-15 s: the translation example, shifted by 10 s; the whole
          group gently pulses its size -->
-    <event at="10.0">
+    <event at="15.0">
         <destroy sequence="blinker"/>
         <create sequence="translation"/>
         <effect sequence="translation" type="scale" min="0.85" max="1.15" frequency="0.3"/>
     </event>
 
-    <event at="15.0">
+    <event at="20.0">
         <destroy sequence="translation"/>
     </event>
 </animation>

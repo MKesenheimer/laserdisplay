@@ -157,6 +157,22 @@ in sync).  All effect types can be used and several can be combined.
 A complete example is `example-sequences.xml`, which stitches together
 files from `effects/` and adds a sequence-level effect to each of them.
 
+A running sequence is stopped with a `<destroy sequence="NAME"/>` action
+in a later event:
+
+```xml
+<event at="12.0">
+    <destroy sequence="NAME"/>
+</event>
+```
+
+It removes all shapes the sequence created (including the shapes of
+nested sequences) and cancels the sequence's remaining timeline events,
+so nothing further appears from it — a sequence that is destroyed before
+one of its own events fires never runs that event.  Destroying a name
+that has no running instance is silently ignored, and the sequence can be
+started again later with a new `<create sequence="NAME"/>`.
+
 ## `<event>` — actions at a timestamp
 
 ```xml
@@ -175,6 +191,7 @@ animation time reaches `at`:
 | `<create shape="NAME"/>`                  | activate a previously defined shape      |
 | `<create sequence="NAME"/>`               | start a referenced file's timeline, relative to this event (see `<sequence>`) |
 | `<destroy shape="NAME"/>`                 | remove a shape from the animation        |
+| `<destroy sequence="NAME"/>`              | stop a running sequence: remove all shapes it created and cancel its remaining timeline events (see `<sequence>`) |
 | `<effect shape="NAME" type="..." .../>`   | attach a continuous effect, starting now |
 | `<effect sequence="NAME" type="..." .../>`| attach an effect to a sequence started in this event — it applies to all shapes the sequence creates (see `<sequence>`) |
 
