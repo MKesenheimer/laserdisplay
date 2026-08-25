@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Laser show: Shed My Skin - Within Temptation
+    Duration: 269s | BPM: 184.57
+
+    Color scheme: Gothic metal — Deep Crimson (#FF1020), Icy Cyan (#00D0FF),
+    Pure White (#FFFFFF), Rose (#FF6090)
+
+    Structure:
+      0-5s    Intro (very quiet, slow fade-in)
+      5-15s   Build-up 1
+      15-55s  Chorus 1 (40s — orbiting circles, diamond, ellipse, rainbow)
+      55-80s  Verse 1 (cyan/orb + crimson line)
+      80-90s  Build-up 2
+      90-130s Chorus 2 (40s — same pattern)
+      130-170s Verse 2 (rose + amber tetragon)
+      170-185s Build-up 3
+      185-195s Chorus 3 (10s — brief final chorus hit)
+      195-220s Bridge (atmospheric, large rainbow orb)
+      220-255s Crescendo (max energy, fast red tetragons)
+      255-269s Outro (fade to black)
+-->
+<animation fps="25" duration="269">
+
+    <!-- ==================== paths (never shown) ========================= -->
+    <!-- Circular orbit path -->
+    <shape name="p_ring" type="circle" cx="128" cy="128" r="85"
+           npoints="96" red="0" green="0" blue="0"/>
+    <!-- Figure-eight path -->
+    <shape name="p_eight" type="tetragon" x0="43" y0="43" x1="213" y1="213"
+           x2="43" y2="213" x3="213" y3="43"
+           npoints="96" red="0" green="0" blue="0"/>
+    <!-- Rectangular path -->
+    <shape name="p_rect" type="tetragon" x0="28" y0="38" x1="228" y1="38"
+           x2="228" y2="218" x3="28" y3="218"
+           npoints="96" red="0" green="0" blue="0"/>
+    <!-- Diagonal path -->
+    <shape name="p_diagonal" type="line" x0="20" y0="220" x1="236" y1="36"
+           npoints="96" red="0" green="0" blue="0"/>
+
+    <!-- ==================== main shapes ================================= -->
+    <!-- Orb — positioned top-left, translates toward center -->
+    <shape name="orb" type="circle" cx="50" cy="50" r="22"
+           npoints="40" red="0" green="208" blue="255"/>
+    <!-- Line — positioned top-right, angled diagonally -->
+    <shape name="line" type="line" x0="190" y0="30" x1="230" y1="70"
+           npoints="40" red="255" green="16" blue="32"/>
+    <!-- Triangle — positioned bottom-left -->
+    <shape name="tri" type="triangle" x0="40" y0="200" x1="10" y1="148" x2="72" y2="148"
+           npoints="24" red="255" green="255" blue="255"/>
+    <!-- Diamond — positioned top-right, below the line -->
+    <shape name="diamond" type="tetragon" x0="200" y0="140" x1="216" y1="124"
+           x2="232" y2="140" x3="216" y3="156"
+           npoints="16" red="255" green="255" blue="255"/>
+    <!-- Wide ellipse — positioned bottom-right -->
+    <shape name="ellipse" type="ellipse" cx="200" cy="190" w="80" h="45"
+           npoints="40" red="0" green="208" blue="255"/>
+    <!-- Continuous sweep line — fills chorus gaps -->
+    <shape name="cont" type="line" x0="50" y0="0" x1="200" y1="0"
+           npoints="36" red="255" green="255" blue="255"/>
+    <!-- Persistent chorus layer — cyan orb (top-right) -->
+    <shape name="c_orb" type="circle" cx="200" cy="60" r="24"
+           npoints="36" red="0" green="208" blue="255"/>
+    <!-- Persistent chorus layer — rose triangle (bottom-left) -->
+    <shape name="c_tri" type="triangle" x0="40" y0="190" x1="10" y1="140" x2="70" y2="140"
+           npoints="24" red="255" green="96" blue="144"/>
+    <!-- Persistent chorus layer — white dashed square (center, rotating) -->
+    <shape name="c_frame" type="tetragon" x0="50" y0="50" x1="206" y1="50"
+           x2="206" y2="206" x3="50" y3="206"
+           npoints="48" red="255" green="255" blue="255" blank="6"/>
+    <!-- Large screen-filling cyan square (verse 1 background) -->
+    <shape name="bg1" type="tetragon" x0="20" y0="20" x1="236" y1="20"
+           x2="236" y2="236" x3="20" y3="236"
+           npoints="48" red="0" green="208" blue="255" blank="8"/>
+    <!-- Large screen-filling rose square (verse 2 background) -->
+    <shape name="bg2" type="tetragon" x0="20" y0="20" x1="236" y1="20"
+           x2="236" y2="236" x3="20" y3="236"
+           npoints="48" red="255" green="96" blue="144" blank="8"/>
+    <!-- Wide white ellipse (bridge background) -->
+    <shape name="bg3" type="ellipse" cx="128" cy="128" w="236" h="216"
+           npoints="80" red="255" green="255" blue="255" blank="6"/>
+    <!-- Large cyan circle (outro background) -->
+    <shape name="bg4" type="circle" cx="128" cy="128" r="110"
+           npoints="80" red="0" green="208" blue="255" blank="10"/>
+    <!-- Crimson dashed frame (crescendo background) -->
+    <shape name="bg5" type="tetragon" x0="10" y0="10" x1="246" y1="10"
+           x2="246" y2="246" x3="10" y3="246"
+           npoints="64" red="255" green="16" blue="32" blank="12"/>
+
+    <!-- ======================== references ============================== -->
+    <sequence name="verse1" file="verse1.xml"/>
+    <sequence name="verse2" file="verse2.xml"/>
+    <sequence name="chorus" file="chorus.xml"/>
+    <sequence name="bridge" file="bridge.xml"/>
+    <sequence name="crescendo" file="crescendo.xml"/>
+
+    <!-- ======================== timeline ================================ -->
+
+    <!-- ==================== INTRO (0-5s) ================================= -->
+    <!-- Very quiet start — orb fades in at top-left, drifting slowly right -->
+    <event at="0.0">
+        <create shape="orb"/>
+        <effect shape="orb" type="color_shift" dr="-6" dg="0" db="8"/>
+        <effect shape="orb" type="translation" vx="5" vy="3" ax="10" fx="0.1"/>
+        <effect shape="orb" type="mirror" axis="vertical"/>
+    </event>
+
+    <!-- Large ellipse fades in at bottom-right, drifting slowly left -->
+    <event at="3.0">
+        <create shape="ellipse"/>
+        <effect shape="ellipse" type="color_shift" dr="-5" dg="2" db="5"/>
+        <effect shape="ellipse" type="translation" vx="-6" vy="-4" ax="8" fx="0.1"/>
+        <effect shape="ellipse" type="mirror" axis="vertical"/>
+    </event>
+
+    <!-- ==================== BUILD-UP 1 (5-15s) =========================== -->
+    <!-- Orb gains rotation and drifts toward center -->
+    <event at="5.0">
+        <effect shape="orb" type="color_shift" dr="10" dg="-8" db="-5"/>
+    </event>
+
+    <!-- Line enters from top-right, sweeps downward -->
+    <event at="7.0">
+        <create shape="line"/>
+        <effect shape="line" type="translation" vx="-10" vy="20" ax="20" fx="0.4"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+
+    <!-- Diamond drops in from top-right corner, spinning -->
+    <event at="9.0">
+        <create shape="diamond"/>
+        <effect shape="diamond" type="rotation" speed="60"/>
+        <effect shape="diamond" type="translation" vx="-8" vy="12" ax="15" fx="0.3"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+
+    <!-- Triangle slides in from bottom-left, spinning opposite -->
+    <event at="11.0">
+        <create shape="tri"/>
+        <effect shape="tri" type="rotation" speed="-80"/>
+        <effect shape="tri" type="translation" vx="12" vy="-15" ax="18" fx="0.35"/>
+        <effect shape="diamond" type="rotation" speed="90"/>
+    </event>
+
+    <!-- Speed everything up for chorus impact -->
+    <event at="13.0">
+        <effect shape="orb" type="speedup" factor="1.5"/>
+        <effect shape="line" type="speedup" factor="1.5"/>
+        <effect shape="diamond" type="speedup" factor="1.5"/>
+        <effect shape="tri" type="speedup" factor="1.5"/>
+    </event>
+
+    <!-- ==================== CHORUS 1 (15-55s) — 40 seconds ============ -->
+    <!-- Clear intro shapes, launch chorus sequence, create persistent layer -->
+    <event at="15.0">
+        <destroy shape="orb"/>
+        <destroy shape="ellipse"/>
+        <destroy shape="line"/>
+        <destroy shape="diamond"/>
+        <destroy shape="tri"/>
+        <create sequence="chorus"/>
+        <create shape="c_orb"/>
+        <effect shape="c_orb" type="rotation" speed="50"/>
+        <effect shape="c_orb" type="translation" vx="0" vy="0" ax="15" fx="0.2"/>
+        <create shape="c_tri"/>
+        <effect shape="c_tri" type="rotation" speed="-40"/>
+        <effect shape="c_tri" type="translation" vx="0" vy="0" ax="12" fx="0.15"/>
+        <create shape="c_frame"/>
+        <effect shape="c_frame" type="rotation" speed="20"/>
+    </event>
+
+    <!-- Chorus accents — every 2 beats (~1.3s) — cycle 1 (15-23s) -->
+    <event at="15.6">
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.25" duty="0.15"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="16.9">
+        <destroy shape="tri"/>
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="18.2">
+        <destroy shape="line"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.3" duty="0.2"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="19.5">
+        <destroy shape="diamond"/>
+    </event>
+
+    <!-- Continuous sweep line + triangle fill gap from 28-55s -->
+    <event at="27.4">
+        <destroy shape="line"/>
+        <create shape="cont"/>
+        <create shape="tri"/>
+        <effect shape="cont" type="translation" vx="0" vy="18" ax="20" fx="0.4"/>
+        <effect shape="tri" type="translation" vx="0" vy="0" ax="25" fx="0.3"/>
+    </event>
+
+    <!-- Cycle 2 (23-31s) -->
+    <event at="23.5">
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.22" duty="0.15"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="24.8">
+        <destroy shape="diamond"/>
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.18" duty="0.2"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="26.1">
+        <destroy shape="tri"/>
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.25" duty="0.1"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+
+    <!-- Cycle 3 (31-39s) -->
+    <event at="31.5">
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.2" duty="0.15"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="32.8">
+        <destroy shape="tri"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.28" duty="0.2"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="34.1">
+        <destroy shape="diamond"/>
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="35.4">
+        <destroy shape="line"/>
+    </event>
+
+    <!-- Cycle 4 (39-47s) -->
+    <event at="39.5">
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.15" duty="0.1"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="40.8">
+        <destroy shape="line"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.22" duty="0.15"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="42.1">
+        <destroy shape="diamond"/>
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.25" duty="0.2"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="43.4">
+        <destroy shape="tri"/>
+    </event>
+
+    <!-- Cycle 5 (47-55s) — final chorus cycle -->
+    <event at="47.5">
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.2" duty="0.15"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="48.8">
+        <destroy shape="tri"/>
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.22" duty="0.15"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="50.1">
+        <destroy shape="line"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.25" duty="0.2"/>
+    </event>
+    <event at="51.4">
+        <destroy shape="diamond"/>
+    </event>
+
+    <!-- ==================== VERSE 1 (55-80s) — 25 seconds ============= -->
+    <!-- Strip to slower, calmer shapes, large cyan background fill -->
+    <event at="55.0">
+        <destroy sequence="chorus"/>
+        <destroy shape="tri"/>
+        <destroy shape="cont"/>
+        <destroy shape="c_orb"/>
+        <destroy shape="c_tri"/>
+        <destroy shape="c_frame"/>
+        <create shape="bg1"/>
+        <effect shape="bg1" type="color_shift" dr="-5" dg="0" db="5"/>
+        <effect shape="bg1" type="rotation" speed="8"/>
+        <create sequence="verse1"/>
+    </event>
+
+    <!-- Subtle color drift during verse -->
+    <event at="60.0">
+        <effect shape="v_orb" type="color_shift" dr="-3" dg="5" db="-2"/>
+    </event>
+    <event at="65.0">
+        <effect shape="v_line" type="color_shift" dr="4" dg="-3" db="1"/>
+    </event>
+
+    <!-- ==================== BUILD-UP 2 (80-90s) ======================== -->
+    <!-- Ramp up energy for second chorus -->
+    <event at="80.0">
+        <destroy sequence="verse1"/>
+        <destroy shape="bg1"/>
+        <create shape="orb"/>
+        <create shape="diamond"/>
+        <create shape="tri"/>
+        <create shape="line"/>
+        <effect shape="orb" type="rotation" speed="40"/>
+        <effect shape="orb" type="translation" vx="0" vy="0" ax="20" fx="0.4"/>
+        <effect shape="diamond" type="rotation" speed="70"/>
+        <effect shape="diamond" type="translation" vx="-10" vy="15" ax="25" fx="0.5"/>
+        <effect shape="tri" type="rotation" speed="-90"/>
+        <effect shape="tri" type="translation" vx="0" vy="0" ax="22" fx="0.45"/>
+        <effect shape="line" type="translation" vx="0" vy="0" ax="30" fx="0.6"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+        <effect shape="orb" type="color_shift" dr="8" dg="-10" db="5"/>
+    </event>
+    <event at="83.0">
+        <effect shape="orb" type="rotation" speed="60"/>
+        <effect shape="diamond" type="rotation" speed="90"/>
+        <effect shape="tri" type="rotation" speed="-120"/>
+    </event>
+    <event at="86.0">
+        <effect shape="orb" type="speedup" factor="1.5"/>
+        <effect shape="diamond" type="speedup" factor="1.5"/>
+        <effect shape="tri" type="speedup" factor="1.5"/>
+        <effect shape="line" type="speedup" factor="1.5"/>
+    </event>
+    <!-- Transition shape fills 89-91s gap -->
+    <event at="89.0">
+        <create shape="cont"/>
+        <effect shape="cont" type="translation" vx="0" vy="12" ax="20" fx="0.4"/>
+    </event>
+
+    <!-- ==================== CHORUS 2 (90-130s) — 40 seconds =========== -->
+    <event at="90.0">
+        <destroy shape="orb"/>
+        <destroy shape="diamond"/>
+        <destroy shape="tri"/>
+        <destroy shape="line"/>
+        <destroy shape="cont"/>
+        <create sequence="chorus"/>
+        <create shape="c_orb"/>
+        <effect shape="c_orb" type="rotation" speed="50"/>
+        <effect shape="c_orb" type="translation" vx="0" vy="0" ax="15" fx="0.2"/>
+        <create shape="c_tri"/>
+        <effect shape="c_tri" type="rotation" speed="-40"/>
+        <effect shape="c_tri" type="translation" vx="0" vy="0" ax="12" fx="0.15"/>
+        <create shape="c_frame"/>
+        <effect shape="c_frame" type="rotation" speed="20"/>
+        <create shape="cont"/>
+        <effect shape="cont" type="translation" vx="0" vy="18" ax="20" fx="0.4"/>
+    </event>
+
+    <!-- Accents cycle 1 (90-98s) — with vertical mirror on all shapes -->
+    <event at="90.6">
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.25" duty="0.15"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="91.9">
+        <destroy shape="tri"/>
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="93.2">
+        <destroy shape="line"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.3" duty="0.2"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="94.5">
+        <destroy shape="diamond"/>
+    </event>
+
+    <!-- Accents cycle 2 (98-106s) — vertical + vertical mirrors -->
+    <event at="98.5">
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.22" duty="0.15"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="99.8">
+        <destroy shape="diamond"/>
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.18" duty="0.2"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="101.1">
+        <destroy shape="tri"/>
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.25" duty="0.1"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="102.4">
+        <destroy shape="line"/>
+        <create shape="cont"/>
+        <effect shape="cont" type="translation" vx="0" vy="-18" ax="28" fx="0.35"/>
+        <effect shape="cont" type="mirror" axis="vertical"/>
+    </event>
+
+    <!-- Accents cycle 3 (106-114s) -->
+    <event at="106.5">
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.2" duty="0.15"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="107.8">
+        <destroy shape="tri"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.28" duty="0.2"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="109.1">
+        <destroy shape="diamond"/>
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="110.4">
+        <destroy shape="line"/>
+    </event>
+    <!-- Fill gap after cycle 3 -->
+    <event at="111.0">
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.2" duty="0.15"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="112.3">
+        <destroy shape="diamond"/>
+    </event>
+
+    <!-- Accents cycle 4 (114-122s) -->
+    <event at="114.5">
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.15" duty="0.1"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="115.8">
+        <destroy shape="line"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.22" duty="0.15"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="117.1">
+        <destroy shape="diamond"/>
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.25" duty="0.2"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="118.4">
+        <destroy shape="tri"/>
+    </event>
+    <!-- Fill gap after cycle 4 -->
+    <event at="119.5">
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.18" duty="0.12"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="120.8">
+        <destroy shape="line"/>
+    </event>
+
+    <!-- Accents cycle 5 (122-130s) -->
+    <event at="122.5">
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.2" duty="0.15"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="123.8">
+        <destroy shape="tri"/>
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.22" duty="0.15"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="125.1">
+        <destroy shape="line"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.25" duty="0.2"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="126.4">
+        <destroy shape="diamond"/>
+        <create shape="cont"/>
+        <effect shape="cont" type="translation" vx="0" vy="-16" ax="25" fx="0.3"/>
+        <effect shape="cont" type="mirror" axis="vertical"/>
+    </event>
+    <!-- Fill gap before verse 2 -->
+    <event at="127.5">
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.2" duty="0.15"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="128.8">
+        <destroy shape="tri"/>
+    </event>
+
+    <!-- ==================== VERSE 2 (130-170s) — 40 seconds =========== -->
+    <!-- Different shapes — rose triangle + amber tetragon, slower feel -->
+    <event at="130.0">
+        <destroy sequence="chorus"/>
+        <destroy shape="cont"/>
+        <destroy shape="c_orb"/>
+        <destroy shape="c_tri"/>
+        <destroy shape="c_frame"/>
+        <create shape="bg2"/>
+        <effect shape="bg2" type="color_shift" dr="-5" dg="5" db="-3"/>
+        <effect shape="bg2" type="rotation" speed="-6"/>
+        <create sequence="verse2"/>
+    </event>
+
+    <!-- Gradual color warmth shift -->
+    <event at="138.0">
+        <effect shape="v2_tri" type="color_shift" dr="-2" dg="5" db="-3"/>
+    </event>
+    <event at="146.0">
+        <effect shape="v2_tet" type="color_shift" dr="3" dg="-4" db="2"/>
+    </event>
+
+    <!-- ==================== BUILD-UP 3 (170-185s) ====================== -->
+    <!-- Quick ramp to final chorus -->
+    <event at="170.0">
+        <destroy sequence="verse2"/>
+        <destroy shape="bg2"/>
+        <create shape="line"/>
+        <create shape="tri"/>
+        <create shape="diamond"/>
+        <create shape="ellipse"/>
+        <effect shape="line" type="rotation" speed="80"/>
+        <effect shape="line" type="translation" vx="0" vy="0" ax="30" fx="0.5"/>
+        <effect shape="tri" type="rotation" speed="-100"/>
+        <effect shape="tri" type="translation" vx="18" vy="-20" ax="35" fx="0.55"/>
+        <effect shape="diamond" type="translation" vx="0" vy="0" ax="30" fx="0.45"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+        <effect shape="ellipse" type="rotation" speed="50"/>
+        <effect shape="ellipse" type="translation" vx="0" vy="0" ax="25" fx="0.4"/>
+        <effect shape="line" type="color_shift" dr="5" dg="-8" db="5"/>
+    </event>
+    <event at="175.0">
+        <effect shape="line" type="rotation" speed="120"/>
+        <effect shape="tri" type="rotation" speed="-140"/>
+        <effect shape="diamond" type="translation" vx="-15" vy="22" ax="40" fx="0.7"/>
+        <effect shape="ellipse" type="rotation" speed="70"/>
+    </event>
+    <event at="179.0">
+        <create shape="cont"/>
+        <effect shape="cont" type="translation" vx="5" vy="-5" ax="10" fx="0.15"/>
+    </event>
+    <event at="180.0">
+        <effect shape="line" type="speedup" factor="1.5"/>
+        <effect shape="tri" type="speedup" factor="1.5"/>
+        <effect shape="diamond" type="speedup" factor="1.5"/>
+        <effect shape="ellipse" type="speedup" factor="1.5"/>
+    </event>
+
+    <!-- ==================== CHORUS 3 (185-195s) — 10 seconds =========== -->
+    <!-- Quick final chorus impact -->
+    <event at="185.0">
+        <create sequence="chorus"/>
+    </event>
+
+    <!-- Brief accent burst -->
+    <event at="185.6">
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.2" duty="0.15"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="186.9">
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.25" duty="0.2"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="203.0">
+        <destroy shape="line"/>
+        <destroy shape="tri"/>
+        <destroy shape="diamond"/>
+        <destroy shape="ellipse"/>
+        <destroy shape="tri"/>
+        <destroy shape="diamond"/>
+    </event>
+
+    <!-- ==================== BRIDGE (195-220s) — 25 seconds ============= -->
+    <!-- Atmospheric — single large orb, slow rainbow, minimal motion -->
+    <event at="203.0">
+        <destroy sequence="chorus"/>
+        <create shape="bg3"/>
+        <effect shape="bg3" type="color_shift" dr="-5" dg="5" db="-3"/>
+        <effect shape="bg3" type="rotation" speed="4"/>
+        <create sequence="bridge"/>
+    </event>
+
+    <!-- Slowly intensify the rainbow -->
+    <event at="205.0">
+        <effect shape="b_orb" type="rotation" speed="20"/>
+    </event>
+
+    <!-- ==================== CRESCENDO (220-255s) — 35 seconds ========== -->
+    <!-- Maximum energy — fast red shapes, rapid movement -->
+    <event at="223.0">
+        <destroy sequence="bridge"/>
+        <destroy shape="bg3"/>
+        <create shape="bg5"/>
+        <effect shape="bg5" type="rotation" speed="15"/>
+        <create sequence="crescendo"/>
+    </event>
+
+    <!-- Escalating accents — every ~1.3s, getting more intense -->
+    <!-- Phase 1 (220-232s) -->
+    <event at="223.6">
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.2" duty="0.1"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="224.9">
+        <destroy shape="tri"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.18" duty="0.1"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="225.2">
+        <destroy shape="diamond"/>
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.15" duty="0.1"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="225.5">
+        <destroy shape="line"/>
+    </event>
+
+    <!-- Phase 2 (232-244s) — faster blinking -->
+    <event at="232.5">
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.15" duty="0.1"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="233.8">
+        <destroy shape="tri"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.12" duty="0.1"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="235.1">
+        <destroy shape="diamond"/>
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.1" duty="0.08"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="236.4">
+        <destroy shape="line"/>
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.14" duty="0.1"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="237.7">
+        <destroy shape="tri"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.16" duty="0.1"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="239.0">
+        <destroy shape="diamond"/>
+    </event>
+
+    <!-- Phase 3 (244-255s) — maximum intensity -->
+    <event at="244.5">
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.12" duty="0.08"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="245.8">
+        <destroy shape="line"/>
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.1" duty="0.08"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="247.1">
+        <destroy shape="tri"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.12" duty="0.08"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="248.4">
+        <create shape="line"/>
+        <effect shape="line" type="blink" period="0.08" duty="0.06"/>
+        <effect shape="line" type="mirror" axis="vertical"/>
+    </event>
+    <event at="249.7">
+        <create shape="tri"/>
+        <effect shape="tri" type="blink" period="0.1" duty="0.08"/>
+        <effect shape="tri" type="mirror" axis="vertical"/>
+    </event>
+    <event at="251.0">
+        <create shape="diamond"/>
+        <effect shape="diamond" type="blink" period="0.12" duty="0.08"/>
+        <effect shape="diamond" type="mirror" axis="vertical"/>
+    </event>
+    <event at="264.0">
+        <destroy shape="line"/>
+        <destroy shape="tri"/>
+        <destroy shape="diamond"/>
+    </event>
+
+    <!-- ==================== OUTRO (255-269s) — fade to black ============ -->
+    <!-- Strip everything, leave a single fading shape -->
+    <event at="264.0">
+        <destroy sequence="crescendo"/>
+        <destroy shape="tri"/>
+        <destroy shape="line"/>
+        <destroy shape="diamond"/>
+        <destroy shape="bg5"/>
+        <create shape="bg4"/>
+        <effect shape="bg4" type="color_shift" dr="-10" dg="-10" db="-10"/>
+        <effect shape="bg4" type="rotation" speed="5"/>
+        <create shape="orb"/>
+        <effect shape="orb" type="color_shift" dr="-12" dg="-12" db="-12"/>
+    </event>
+    <event at="265.0">
+        <effect shape="orb" type="color_shift" dr="-8" dg="-8" db="-8"/>
+    </event>
+    <event at="269.0">
+        <destroy shape="bg4"/>
+        <destroy shape="orb"/>
+    </event>
+
+</animation>

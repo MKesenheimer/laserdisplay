@@ -18,6 +18,7 @@
     <event at="0.0">
         <create shape="warm"/>
         <effect shape="warm" type="color_shift" dr="-15" dg="-30" db="25"/>
+        <effect shape="warm" type="speedup" factor="2.0"/>
     </event>
 
     <event at="12.0">

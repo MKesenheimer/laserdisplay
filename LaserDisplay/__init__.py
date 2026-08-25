@@ -5,7 +5,7 @@ from .Shape import Shape
 from .Geometry import Geometry
 from .Animate import (apply, Rotation, Translation, Scale, ColorShift, Blink,
                       DeletePoints, AddPoints, Morph, MultiColor, Rainbow,
-                      Warp, MovePoints, TranslateByPath, Flip, Mirror)
+                      Warp, MovePoints, TranslateByPath, Flip, Mirror, SpeedUp)
 from .Scheduler import Scheduler
 
 def create(mode = os.getenv('LASER')):

@@ -408,6 +408,24 @@ class Mirror:
         return numpy.vstack([out, blank, m])
 
 
+class SpeedUp:
+    """changes the speed at which the animations of the shape run: with
+    factor=2.0 the effects on the shape run twice as fast, with factor=0.5
+    half as fast, and with a negative factor they run in reverse (the
+    animation plays back towards where it was when the speedup was
+    attached). It is not a point transformation itself — transform() is
+    the identity — but a marker effect: the scheduler applies it by
+    re-scaling the time the shape's effects are evaluated with, so it
+    affects every effect on the shape (or on all shapes of a sequence),
+    both the ones attached before and the ones attached after it."""
+
+    def __init__(self, factor=1.0):
+        self.factor = float(factor)
+
+    def transform(self, pts, dt):
+        return pts
+
+
 # ---------------------------------------------------------------------------
 # helper functions
 # ---------------------------------------------------------------------------

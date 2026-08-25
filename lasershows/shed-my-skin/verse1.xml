@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<animation fps="25" duration="35">
+    <shape name="v_orb" type="circle" cx="30" cy="40" r="18"
+           npoints="32" red="255" green="16" blue="32"/>
+    <shape name="v_line" type="line" x0="200" y0="30" x1="240" y1="70"
+           npoints="36" red="255" green="16" blue="32"/>
+    <event at="0.0">
+        <create shape="v_orb"/>
+        <effect shape="v_orb" type="translate_by_path" path="p_ring" velocity="55"/>
+        <create shape="v_line"/>
+        <effect shape="v_line" type="translate_by_path" path="p_diagonal" velocity="-70"/>
+        <effect shape="v_orb" type="color_shift" dr="-4" dg="0" db="3"/>
+    </event>
+    <event at="35.0">
+        <destroy shape="v_orb"/>
+        <destroy shape="v_line"/>
+    </event>
+</animation>

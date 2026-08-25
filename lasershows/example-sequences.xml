@@ -40,6 +40,7 @@
     <event at="0.0">
         <create sequence="spinners"/>
         <effect sequence="spinners" type="color_shift" dr="-10" dg="16" db="15"/>
+        <effect sequence="spinners" type="speedup" factor="-4.0"/>
     </event>
 
     <!-- 8-18 s: the blink example, shifted by 8 s (its own 0-10 s
@@ -49,6 +50,7 @@
         <destroy sequence="spinners"/>
         <create sequence="blinker"/>
         <effect sequence="blinker" type="rotation" speed="20"/>
+        <effect sequence="blinker" type="speedup" factor="2.0"/>
     </event>
 
     <!-- 10-15 s: the translation example, shifted by 10 s; the whole

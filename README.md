@@ -173,7 +173,9 @@ middle vertical or horizontal frame axis, optionally animated) and
 `Mirror` (add an exactly mirrored copy of the shape, vertical or
 horizontal; the original is left untouched) are
 evaluated from absolute time, so they are drift-free and can be combined
-freely.
+freely. `SpeedUp` changes the speed at which all of the shape's effects
+run (faster, slower or reversed); it is applied by the `Scheduler` rather
+than as a point transformation.
 
 ## Scheduler and XML animation timelines
 
@@ -338,6 +340,7 @@ degrees or units per second, frequencies in hertz.
 | `translate_by_path` | required `path` (name of another defined shape); the shape's center follows the path outline with `velocity` (units/s, default 50); `closed` (`1` = loop, default, `0` = stop at the end) |
 | `flip` | mirrors the shape and its already applied effects in place at the middle vertical (default, left/right) or horizontal (top/bottom) frame axis: `axis` (`vertical`/`horizontal`), `period` (s, default 0 = fixed flip, >0 = flip between mirrored and original), `phase` (s) |
 | `mirror` | adds an exactly mirrored copy of the shape (original untouched; a blanked point between both halves keeps the travel line invisible): `axis` (`vertical` default / `horizontal`) |
+| `speedup` | changes the speed of all animations of the shape (every effect attached before or after it; via `<effect sequence=.../>`: every shape of the sequence): `factor` (default 1.0) — >1 faster, <1 slower, negative = reverse |
 
 ### Runtime events
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<animation fps="25" duration="35">
+    <shape name="cr_tet1" type="tetragon" x0="10" y0="10" x1="70" y1="10"
+           x2="70" y2="70" x3="10" y3="70"
+           npoints="16" red="255" green="16" blue="32"/>
+    <shape name="cr_tet2" type="tetragon" x0="190" y0="180" x1="230" y1="180"
+           x2="230" y2="220" x3="190" y3="220"
+           npoints="16" red="255" green="48" blue="80"/>
+    <shape name="cr_ell" type="ellipse" cx="100" cy="180" w="80" h="40"
+           npoints="36" red="255" green="16" blue="32"/>
+    <event at="0.0">
+        <create shape="cr_tet1"/>
+        <effect shape="cr_tet1" type="translate_by_path" path="p_rect" velocity="120"/>
+        <effect shape="cr_tet1" type="rotation" speed="90"/>
+        <create shape="cr_tet2"/>
+        <effect shape="cr_tet2" type="translate_by_path" path="p_rect" velocity="-100" phase="0.5"/>
+        <effect shape="cr_tet2" type="rotation" speed="-110"/>
+        <create shape="cr_ell"/>
+        <effect shape="cr_ell" type="translate_by_path" path="p_ring" velocity="90"/>
+        <effect shape="cr_ell" type="scale" min="0.8" max="1.2" frequency="0.5"/>
+        <effect shape="cr_tet1" type="mirror" axis="vertical"/>
+    </event>
+    <event at="100.0">
+        <destroy shape="cr_tet1"/>
+        <destroy shape="cr_tet2"/>
+        <destroy shape="cr_ell"/>
+    </event>
+</animation>

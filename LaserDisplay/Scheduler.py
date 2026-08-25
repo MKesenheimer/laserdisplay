@@ -55,9 +55,12 @@ phase of the path's length; the path shape is defined but never created),
 flip (mirrors the shape and its already applied effects in place at the
 middle vertical (axis="vertical", the default) or horizontal
 (axis="horizontal") frame axis; with period > 0 it flips between mirrored
-and original every period seconds, phase shifts the flip cycle) and mirror
+and original every period seconds, phase shifts the flip cycle), mirror
 (adds an exactly mirrored copy of the shape, vertical or horizontal; the
-original shape is left untouched).
+original shape is left untouched) and speedup (changes the speed at which
+all animations of the shape run: factor > 1 faster, 0 < factor < 1 slower,
+negative = reverse; affects every effect on the shape, including effects
+attached later, and via <effect sequence=.../> every shape of a sequence).
 """
 
 import heapq
@@ -70,7 +73,7 @@ import numpy
 
 from .Animate import (apply, Rotation, Translation, Scale, ColorShift, Blink,
                       Morph, MultiColor, Rainbow, Warp, MovePoints,
-                      TranslateByPath, Flip, Mirror)
+                      TranslateByPath, Flip, Mirror, SpeedUp)
 from .Geometry import Geometry
 from .Shape import Shape
 
@@ -112,6 +115,7 @@ _EFFECT_PARAMS = {
                     'saturation': (1.0, 'raw'), 'brightness': (1.0, 'raw')},
     'warp':        {'amplitude': (15.0, 'coord'), 'wavelength': (100.0, 'coord'),
                     'speed': (1.0, 'raw'), 'phase': (0.0, 'raw'), 'horizontal': (1, 'raw')},
+    'speedup':     {'factor': (1.0, 'raw')},
 }
 
 CENTER = 128 * SCALE
@@ -122,7 +126,28 @@ class _ActiveShape:
     def __init__(self, shape):
         self.shape = shape
         self.base = shape.get_points().astype('float64')
-        self.effects = []                # list of (start_time, effect)
+        self.effects = []                # list of (start, anim_start, effect)
+        # animation time of the shape: the time its effects are evaluated
+        # with. Normally it equals the animation (wall) time; speedup
+        # effects re-base it so it flows at another rate.  It is piecewise
+        # linear: for wall times at/after the last change,
+        # anim_time(wall) = _speed_offset + _factor * (wall - _speed_change)
+        self._speed_change = 0.0         # wall time of the last speed change
+        self._speed_offset = 0.0         # animation time at that moment
+        self._factor = 1.0               # current animation speed
+
+    def anim_time(self, wall):
+        # the animation time that corresponds to the given wall time
+        return self._speed_offset + self._factor * (wall - self._speed_change)
+
+    def set_speed(self, factor, wall):
+        # changes the speed of the shape's animations to `factor` from the
+        # given wall time on; the animation time stays continuous, so the
+        # effects keep moving from their current state (a negative factor
+        # plays them back in reverse)
+        self._speed_offset = self.anim_time(wall)
+        self._speed_change = wall
+        self._factor = float(factor)
 
 
 class _SequenceInstance:
@@ -365,7 +390,10 @@ class Scheduler:
                 elif kind == 'destroy_sequence':
                     self.destroy_sequence(spec[1])
                 elif kind == 'effect':
-                    self.add_effect(spec[1], spec[2]())
+                    # start the effect at the event's own time (not the
+                    # current one), so that seeking (run(start=...)) finds
+                    # it already progressed like all other timeline state
+                    self.__attach_effect(spec[1], spec[2](), at)
                 elif kind == 'effect_sequence':
                     pass    # already applied via the paired create_sequence
                 elif kind == 'create_sequence':
@@ -416,7 +444,7 @@ class Scheduler:
         kwargs = {aliases.get(k, k): v for k, v in kwargs.items()}
         classes = {'rotation': Rotation, 'translation': Translation, 'scale': Scale,
                    'color_shift': ColorShift, 'blink': Blink,
-                   'rainbow': Rainbow, 'warp': Warp}
+                   'rainbow': Rainbow, 'warp': Warp, 'speedup': SpeedUp}
         return lambda: classes[type](**kwargs)
 
     def __morph_factory(self, params, context):
@@ -535,11 +563,16 @@ class Scheduler:
 
 # ----- main loop -----
 
-    def run(self, duration=None, speed=1.0):
+    def run(self, duration=None, speed=1.0, start=0.0):
         """runs the animation until its duration has passed or stop() is called;
         blocks the calling thread. speed scales animation time against the
         wall clock: 1.0 is real time, values above 1 run faster, and 0 runs
-        as fast as possible (no pacing; for validating timeline files)"""
+        as fast as possible (no pacing; for validating timeline files).
+        start shifts the virtual clock: the animation begins at the given
+        time instead of 0, as if it had already been running since the
+        beginning — all earlier events fire at once, so shapes created
+        earlier are already active and their effects are already
+        progressed to `start`"""
         if duration is None:
             duration = self.duration
         interval = 1.0 / self.fps
@@ -547,14 +580,14 @@ class Scheduler:
             self._running = True
         epoch = time.perf_counter()
         next_frame = epoch
-        virt = 0.0
+        virt = start
         try:
             while True:
                 with self._lock:
                     if not self._running:
                         break
                 if speed > 0:
-                    virt = (time.perf_counter() - epoch) * speed
+                    virt = (time.perf_counter() - epoch) * speed + start
                 with self._lock:
                     self._time = virt
                 self.__process_events(virt)
@@ -709,20 +742,27 @@ class Scheduler:
 
     def add_effect(self, name, effect):
         """attaches a continuous effect (Rotation, Translation, ...) to an
-        active shape, starting now.  Silently skips shapes that are not
-        currently active (e.g. effects referencing a shape destroyed in a
-        previous event)."""
+        active shape, starting now; a SpeedUp instead changes the speed of
+        the shape's animations from now on.  Silently skips shapes that
+        are not currently active (e.g. effects referencing a shape
+        destroyed in a previous event)."""
         with self._lock:
             start = self._time
         self.__attach_effect(name, effect, start)
 
     def __attach_effect(self, name, effect, start):
         # like add_effect(), but with an explicit start time (used for
-        # sequence effects, which start when the sequence is created)
+        # sequence effects, which start when the sequence is created);
+        # speedup effects re-scale the shape's animation time instead of
+        # being stored as a point transformation
         with self._lock:
             if name not in self._active:
                 return
-            self._active[name].effects.append((start, effect))
+            entry = self._active[name]
+            if isinstance(effect, SpeedUp):
+                entry.set_speed(effect.factor, start)
+            else:
+                entry.effects.append((start, entry.anim_time(start), effect))
 
 # ----- internals -----
 
@@ -754,9 +794,9 @@ class Scheduler:
             entries = list(self._active.values())
         for entry in entries:
             pts = entry.base.copy()
-            for (start, effect) in entry.effects:
+            for (start, anim_start, effect) in entry.effects:
                 if now >= start:
-                    pts = effect.transform(pts, now - start)
+                    pts = effect.transform(pts, entry.anim_time(now) - anim_start)
             entry.shape.points = pts
             entry.shape.npoints = len(pts)
 
