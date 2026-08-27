@@ -19,12 +19,19 @@ class LaserDisplaySimulator(LaserDisplay):
         except:
             raise IOError('Could not initialize pygame')
 
+    def __timestamp_ticks(self):
+        # elapsed time in 10 ms steps
+        return int((time.perf_counter() - self._timestamp_start) / self.TIMESTAMP_TICK)
+
     def __timestamp_text(self):
-        # elapsed time in 10 ms steps, formatted as M:SS.cc
-        ticks = int((time.perf_counter() - self._timestamp_start) / self.TIMESTAMP_TICK)
-        minutes, rest = divmod(ticks, 6000)
+        # elapsed time, formatted as M:SS.cc
+        minutes, rest = divmod(self.__timestamp_ticks(), 6000)
         seconds, centis = divmod(rest, 100)
         return '%d:%02d.%02d' % (minutes, seconds, centis)
+
+    def __timestamp_seconds(self):
+        # elapsed time as total seconds with 10 ms decimals
+        return '%d.%02d' % divmod(self.__timestamp_ticks(), 100)
 
     def set_time_offset(self, offset):
         # the counter reads `offset` + time since this call
@@ -39,6 +46,8 @@ class LaserDisplaySimulator(LaserDisplay):
     def flush_frame(self):
         stamp = self._timestamp_font.render(self.__timestamp_text(), True, (128,128,128))
         self.surface.blit(stamp, (4,4))
+        stamp = self._timestamp_font.render(self.__timestamp_seconds(), True, (128,128,128))
+        self.surface.blit(stamp, (4,4 + stamp.get_height()))
         pygame.display.flip()
         self.surface.fill( (0,0,0) )
 
