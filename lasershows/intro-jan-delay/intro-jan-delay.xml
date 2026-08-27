@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Earth Wind und Feiern - Laser Show
+    Song: Earth Wind und Feiern by Jan Delay
+    Duration: 173.174s | BPM: 161.5 (half-time reggae feel ~0.743s per felt beat)
+    JSON: lasershows/intro-jan-delay/intro-jan-delay.json
+
+    Color scheme (earth, wind & fire palette - constant throughout):
+      AMBER  (255,176,64)  - sunset, primary warm
+      EMBER  (255,112,48)  - fire accent
+      GOLD   (255,208,80)  - highlights
+      GREEN  ( 64,176, 96) - earth
+      TEAL   ( 48,192,176) - wind
+      CREAM  (240,232,208) - sky / voice
+      BLUE   ( 64, 96,192) - night, sparse
+
+    Pattern rules:
+      - max 4 shapes at once; sections cross-change at the exact timestamps
+      - no pattern lasts longer than ~6s; shapes/effects swap frequently
+      - left/right symmetry via mirror + opposite-phase dot pairs
+      - beat accents: blink period 0.743s (felt beat) / 0.372s (full beat)
+      - all movement via translate_by_path / translation / rotation;
+        slow and broad for quiet parts, fast and sharp for loud parts
+
+    Timeline:
+      0.00    -  11.88: Intro, instrumental, heavy melody (slow, broad)
+      11.88   -  23.90: Verse 1, rap groove
+      23.90   -  36.76: Verse 2, rap groove (variation)
+      36.76   -  49.50: Verse 3, rap groove (variation)
+      49.50   -  72.16: Middle, raggy beat, melodic (build)
+      72.16   -  83.98: Chorus 1, "Alles wird gut" (bright, symmetric)
+      83.98   -  90.02: Bridge, instrumental, heavy melody (calm, faded)
+      90.02   -  95.85: Verse 4, rap
+      95.85   - 108.65: Verse 5, rap (variation)
+      108.65  - 121.27: Verse 6, rap (build)
+      121.27  - 143.93: Middle 2, raggy, faster (build)
+      143.93  - 167.15: Chorus 2, "Alles wird gut" (full, varied)
+      167.15  - 173.17: Outro, driving, fade out
+-->
+<animation fps="25" duration="173.174">
+
+    <!-- ==================== referenced sequences ======================= -->
+    <sequence name="orbit_seq" file="../effects/orbit.xml"/>
+    <sequence name="wings_seq" file="../effects/wings.xml"/>
+    <sequence name="pulse_seq" file="../effects/pulse.xml"/>
+
+    <!-- ==================== shape definitions ========================== -->
+
+    <!-- Paths (never shown) -->
+    <shape name="p_ring"  type="circle" cx="128" cy="128" r="85"
+           npoints="96" red="0" green="0" blue="0"/>
+    <shape name="p_ring2" type="circle" cx="128" cy="128" r="55"
+           npoints="72" red="0" green="0" blue="0"/>
+    <shape name="p_rect"  type="tetragon"
+           x0="28" y0="38" x1="228" y1="38" x2="228" y2="218" x3="28" y3="218"
+           npoints="96" red="0" green="0" blue="0"/>
+    <shape name="p_diag1" type="line" x0="20" y0="220" x1="236" y1="36"
+           npoints="2" red="0" green="0" blue="0"/>
+    <shape name="p_diag2" type="line" x0="236" y0="220" x1="20" y1="36"
+           npoints="2" red="0" green="0" blue="0"/>
+    <shape name="p_hline" type="line" x0="20" y0="128" x1="236" y1="128"
+           npoints="2" red="0" green="0" blue="0"/>
+    <shape name="p_vline" type="line" x0="128" y0="20" x1="128" y1="236"
+           npoints="2" red="0" green="0" blue="0"/>
+    <shape name="p_ell"   type="ellipse" cx="128" cy="128" w="170" h="96"
+           npoints="96" red="0" green="0" blue="0"/>
+
+    <!-- ============ Intro: sun, ground, wind, ray, mote ============ -->
+    <shape name="sun"    type="circle" cx="128" cy="128" r="34"
+           npoints="48" red="255" green="176" blue="64"/>
+    <shape name="ground" type="line" x0="24" y0="64" x1="232" y1="64"
+           npoints="48" red="64" green="176" blue="96" blank="4"/>
+    <shape name="wind"   type="line" x0="24" y0="190" x1="232" y1="190"
+           npoints="64" red="48" green="192" blue="176"/>
+    <shape name="ray_in" type="line" x0="128" y0="128" x1="56" y1="200"
+           npoints="40" red="240" green="232" blue="208"/>
+    <shape name="mote"   type="circle" cx="128" cy="213" r="6"
+           npoints="16" red="48" green="192" blue="176"/>
+
+    <!-- ============ Groove dots (placed on paths) ============ -->
+    <shape name="dotA" type="circle" cx="128" cy="213" r="8"
+           npoints="20" red="255" green="176" blue="64"/>
+    <shape name="dotB" type="circle" cx="128" cy="213" r="8"
+           npoints="20" red="48" green="192" blue="176"/>
+    <shape name="dotC" type="circle" cx="128" cy="183" r="8"
+           npoints="20" red="64" green="176" blue="96"/>
+    <shape name="dotG" type="circle" cx="128" cy="38" r="7"
+           npoints="16" red="64" green="176" blue="96"/>
+    <shape name="orbE" type="circle" cx="128" cy="176" r="7"
+           npoints="16" red="64" green="176" blue="96"/>
+
+    <!-- ============ Wobbling / warped lines ============ -->
+    <shape name="skankA" type="line" x0="28" y0="100" x1="228" y1="100"
+           npoints="48" red="240" green="232" blue="208"/>
+    <shape name="waveA"  type="line" x0="8" y0="128" x1="248" y1="128"
+           npoints="96" red="255" green="176" blue="64"/>
+    <shape name="waveB"  type="line" x0="8" y0="128" x1="248" y1="128"
+           npoints="96" red="64" green="176" blue="96"/>
+    <shape name="sway"   type="line" x0="28" y0="128" x1="228" y1="128"
+           npoints="96" red="48" green="192" blue="176"/>
+    <shape name="sway2"  type="line" x0="28" y0="128" x1="228" y1="128"
+           npoints="96" red="255" green="176" blue="64"/>
+
+    <!-- ============ Shuttle / ship shapes ============ -->
+    <shape name="triL"   type="triangle" x0="128" y0="140" x1="112" y1="112"
+           x2="144" y2="112" npoints="16" red="255" green="112" blue="48"/>
+    <shape name="sparkH" type="line" x0="116" y0="128" x1="140" y1="128"
+           npoints="8" red="255" green="112" blue="48"/>
+    <shape name="sparkV" type="line" x0="128" y0="116" x1="128" y1="140"
+           npoints="8" red="48" green="192" blue="176"/>
+
+    <!-- ============ Rotating / pulsing centerpieces ============ -->
+    <shape name="tetra"    type="tetragon"
+             x0="90" y0="90" x1="166" y1="90" x2="166" y2="166" x3="90" y3="166"
+             npoints="24" red="255" green="208" blue="80"/>
+    <shape name="tetra2"   type="tetragon"
+             x0="90" y0="90" x1="166" y1="90" x2="166" y2="166" x3="90" y3="166"
+             npoints="24" red="240" green="232" blue="208"/>
+    <shape name="multi_sq" type="tetragon"
+             x0="88" y0="88" x1="168" y1="88" x2="168" y2="168" x3="88" y3="168"
+             npoints="24" red="240" green="232" blue="208"/>
+    <shape name="rayV"   type="line" x0="128" y0="38" x1="128" y1="218"
+           npoints="40" red="240" green="232" blue="208"/>
+    <shape name="bloom"  type="ellipse" cx="128" cy="128" w="120" h="80"
+           npoints="64" red="255" green="112" blue="48"/>
+    <shape name="orbitA" type="circle" cx="128" cy="213" r="9"
+           npoints="20" red="255" green="176" blue="64"/>
+    <shape name="orbitB" type="circle" cx="128" cy="213" r="9"
+           npoints="20" red="64" green="176" blue="96"/>
+
+    <!-- ============ Chorus ============ -->
+    <shape name="halo" type="circle" cx="128" cy="128" r="64"
+           npoints="72" red="240" green="232" blue="208"/>
+    <shape name="wA"   type="triangle" x0="98" y0="106" x1="44" y1="128"
+           x2="98" y2="150" npoints="24" red="255" green="208" blue="80"/>
+    <shape name="wB"   type="triangle" x0="98" y0="106" x1="44" y1="128"
+           x2="98" y2="150" npoints="24" red="255" green="208" blue="80"/>
+
+    <!-- ============ Bridge ============ -->
+    <shape name="moon"    type="ellipse" cx="128" cy="168" w="60" h="36"
+           npoints="40" red="64" green="96" blue="192"/>
+    <shape name="driftA"  type="circle" cx="30" cy="40" r="6"
+           npoints="16" red="48" green="192" blue="176"/>
+    <shape name="driftB"  type="circle" cx="225" cy="215" r="6"
+           npoints="16" red="255" green="176" blue="64"/>
+    <shape name="ground2" type="line" x0="24" y0="80" x1="232" y1="80"
+           npoints="48" red="64" green="176" blue="96" blank="5"/>
+
+    <!-- ============ Beat accents (reused across sections) ============ -->
+    <shape name="accL"   type="line" x0="30" y0="140" x1="54" y1="140"
+           npoints="8" red="255" green="208" blue="80"/>
+    <shape name="accLow" type="line" x0="30" y0="200" x1="54" y1="200"
+           npoints="8" red="255" green="176" blue="64"/>
+    <shape name="accC"   type="circle" cx="128" cy="128" r="5"
+           npoints="12" red="240" green="232" blue="208"/>
+    <shape name="accX"   type="line" x0="28" y0="28" x1="228" y1="228"
+           npoints="64" red="240" green="232" blue="208"/>
+
+    <!-- ============ Outro ============ -->
+    <shape name="cometA"    type="circle" cx="128" cy="213" r="6"
+           npoints="16" red="255" green="208" blue="80"/>
+    <shape name="cometB"    type="circle" cx="128" cy="213" r="6"
+           npoints="16" red="48" green="192" blue="176"/>
+    <shape name="final_orb" type="circle" cx="128" cy="128" r="20"
+           npoints="40" red="255" green="208" blue="80"/>
+
+
+    <!-- ====================================================================
+         TIMELINE
+         ==================================================================== -->
+
+
+    <!-- ==================== INTRO (0 - 11.88s) ========================= -->
+    <!-- Instrumental, heavy melody. Slow, broad, atmospheric: a rising
+         sun over the ground, wind lines and slowly sweeping rays. -->
+
+    <event at="0.0">
+        <create shape="sun"/>
+        <effect shape="sun" type="scale" min="0.9" max="1.1" frequency="0.25"/>
+        <effect shape="sun" type="rotation" speed="12"/>
+        <effect shape="sun" type="color_shift" dr="8" dg="2" db="-6"/>
+        <create shape="ground"/>
+        <effect shape="ground" type="translation" ay="10" fy="0.12"/>
+        <effect shape="ground" type="color_shift" dr="-6" dg="6" db="4"/>
+    </event>
+
+    <event at="2.5">
+        <!-- a teal wind line slides in, gently warped -->
+        <create shape="wind"/>
+        <effect shape="wind" type="warp" amplitude="8" wavelength="140" speed="0.25"/>
+        <effect shape="wind" type="translation" ay="6" fy="0.1"/>
+    </event>
+
+    <event at="5.0">
+        <!-- two symmetric rays sweep out of the sun -->
+        <create shape="ray_in"/>
+        <effect shape="ray_in" type="rotation" speed="25"/>
+        <effect shape="ray_in" type="mirror" axis="vertical"/>
+    </event>
+
+    <event at="7.5">
+        <destroy shape="wind"/>
+        <!-- a small mote starts orbiting - the melody gets a partner -->
+        <create shape="mote"/>
+        <effect shape="mote" type="translate_by_path" path="p_ring" velocity="55"/>
+    </event>
+
+    <event at="10.0">
+        <!-- the rays speed up, pushing into the first verse -->
+        <destroy shape="ray_in"/>
+        <create shape="ray_in"/>
+        <effect shape="ray_in" type="rotation" speed="40"/>
+        <effect shape="ray_in" type="mirror" axis="vertical"/>
+    </event>
+
+
+    <!-- ==================== VERSE 1 (11.88 - 23.90s) =================== -->
+    <!-- Rap groove: two dots run the ring in opposite directions,
+         a warped skank line rides the beat, mirrored accents flash. -->
+
+    <event at="11.88">
+        <create shape="dotA"/>
+        <effect shape="dotA" type="translate_by_path" path="p_ring" velocity="85"/>
+        <create shape="dotB"/>
+        <effect shape="dotB" type="translate_by_path" path="p_ring" velocity="-85" phase="0.5"/>
+        <create shape="skankA"/>
+        <effect shape="skankA" type="warp" amplitude="6" wavelength="90" speed="0.5"/>
+        <effect shape="skankA" type="translation" ay="12" fy="0.5"/>
+        <create shape="accL"/>
+        <effect shape="accL" type="blink" period="0.743" duty="0.25"/>
+        <effect shape="accL" type="mirror" axis="vertical"/>
+        <destroy shape="sun"/>
+        <destroy shape="ground"/>
+        <destroy shape="mote"/>
+        <destroy shape="ray_in"/>
+    </event>
+
+    <event at="17.86">
+        <!-- variation: inner green dot joins, accents go to the full beat -->
+        <destroy shape="dotB"/>
+        <create shape="dotC"/>
+        <effect shape="dotC" type="translate_by_path" path="p_ring2" velocity="110" phase="0.25"/>
+        <destroy shape="accL"/>
+        <create shape="accL"/>
+        <effect shape="accL" type="blink" period="0.372" duty="0.2"/>
+        <effect shape="accL" type="mirror" axis="vertical"/>
+    </event>
+
+
+    <!-- ==================== VERSE 2 (23.90 - 36.76s) =================== -->
+    <!-- Rap groove variation: a ship shuttles both diagonals (mirrored),
+         a full-width wave line flips on every felt beat. -->
+
+    <event at="23.90">
+        <create shape="triL"/>
+        <effect shape="triL" type="translate_by_path" path="p_diag1" velocity="115"/>
+        <effect shape="triL" type="mirror" axis="vertical"/>
+        <create shape="waveA"/>
+        <effect shape="waveA" type="warp" amplitude="12" wavelength="100" speed="0.7"/>
+        <effect shape="waveA" type="flip" axis="horizontal" period="1.486"/>
+        <create shape="accC"/>
+        <effect shape="accC" type="blink" period="0.743" duty="0.2"/>
+        <create sequence="orbit_seq"/>
+        <destroy shape="dotA"/>
+        <destroy shape="dotC"/>
+        <destroy shape="skankA"/>
+        <destroy shape="accL"/>
+    </event>
+
+    <event at="30.21">
+        <!-- sharper wave, faster center pulse -->
+        <destroy shape="waveA"/>
+        <create shape="waveB"/>
+        <effect shape="waveB" type="warp" amplitude="16" wavelength="70" speed="1.0"/>
+        <effect shape="waveB" type="flip" axis="horizontal" period="0.743"/>
+        <destroy shape="accC"/>
+        <create shape="accC"/>
+        <effect shape="accC" type="blink" period="0.372" duty="0.15"/>
+    </event>
+
+
+    <!-- ==================== VERSE 3 (36.76 - 49.50s) =================== -->
+    <!-- Rap groove variation: rotating tetragon, mirrored cross of
+         sweeping rays, a corner-hugging dot and a horizontal spark. -->
+
+    <event at="36.76">
+        <create shape="tetra"/>
+        <effect shape="tetra" type="rotation" speed="45"/>
+        <effect shape="tetra" type="scale" min="0.9" max="1.1" frequency="0.67"/>
+        <create shape="rayV"/>
+        <effect shape="rayV" type="rotation" speed="60"/>
+        <effect shape="rayV" type="mirror" axis="vertical"/>
+        <create shape="dotG"/>
+        <effect shape="dotG" type="translate_by_path" path="p_rect" velocity="-95"/>
+        <create shape="sparkH"/>
+        <effect shape="sparkH" type="translate_by_path" path="p_hline" velocity="150"/>
+        <destroy shape="triL"/>
+        <destroy shape="waveB"/>
+        <destroy shape="accC"/>
+        <destroy sequence="orbit_seq"/>
+    </event>
+
+    <event at="42.96">
+        <!-- multicolor tetragon takes over, vertical twin sparks -->
+        <destroy shape="tetra"/>
+        <create shape="tetra2"/>
+        <effect shape="tetra2" type="rotation" speed="-60"/>
+        <effect shape="tetra2" type="multi_color"
+                colors="255,176,64;48,192,176;240,232,208;255,112,48"/>
+        <destroy shape="sparkH"/>
+        <create shape="sparkV"/>
+        <effect shape="sparkV" type="translate_by_path" path="p_vline" velocity="150"/>
+        <effect shape="sparkV" type="mirror" axis="vertical"/>
+    </event>
+
+
+    <!-- ==================== MIDDLE (49.50 - 72.16s) ==================== -->
+    <!-- Raggy beat, melodic: broad slow swaying lines and a breathing
+         bloom; the dots slow down with the reggae feel, then pick up. -->
+
+    <event at="49.50">
+        <create shape="sway"/>
+        <effect shape="sway" type="translation" ay="18" fy="0.25"/>
+        <effect shape="sway" type="warp" amplitude="10" wavelength="160" speed="0.2"/>
+        <create shape="bloom"/>
+        <effect shape="bloom" type="scale" min="0.8" max="1.2" frequency="0.34"/>
+        <effect shape="bloom" type="color_shift" dr="10" dg="-18" db="-10"/>
+        <create shape="orbitA"/>
+        <effect shape="orbitA" type="translate_by_path" path="p_ring" velocity="60"/>
+        <create shape="orbitB"/>
+        <effect shape="orbitB" type="translate_by_path" path="p_ring" velocity="60" phase="0.5"/>
+        <destroy shape="tetra2"/>
+        <destroy shape="rayV"/>
+        <destroy shape="dotG"/>
+        <destroy shape="sparkV"/>
+    </event>
+
+    <event at="56.10">
+        <destroy shape="orbitB"/>
+        <create sequence="orbit_seq"/>
+        <effect sequence="orbit_seq" type="color_shift" dr="0" dg="20" db="-30"/>
+    </event>
+
+    <event at="62.11">
+        <!-- the sway gets a faster skank rhythm -->
+        <destroy shape="sway"/>
+        <create shape="sway2"/>
+        <effect shape="sway2" type="translation" ay="22" fy="0.4"/>
+        <effect shape="sway2" type="warp" amplitude="8" wavelength="120" speed="0.5"/>
+    </event>
+
+    <event at="68.10">
+        <!-- building: mirrored low accents join on the felt beat -->
+        <destroy shape="orbitA"/>
+        <create shape="accLow"/>
+        <effect shape="accLow" type="blink" period="0.743" duty="0.3"/>
+        <effect shape="accLow" type="mirror" axis="vertical"/>
+    </event>
+
+    <event at="69.98">
+        <destroy shape="bloom"/>
+        <create shape="bloom"/>
+        <effect shape="bloom" type="scale" min="0.7" max="1.3" frequency="0.67"/>
+        <effect shape="bloom" type="color_shift" dr="12" dg="-16" db="-8"/>
+    </event>
+
+
+    <!-- ==================== CHORUS 1 (72.16 - 83.98s) ================== -->
+    <!-- "Alles wird gut": bright and symmetric. A rainbow halo breathes
+         on the felt beat, golden wings pulse, mirrored accents flash. -->
+
+    <event at="72.16">
+        <destroy shape="accLow"/>
+        <create shape="halo"/>
+        <effect shape="halo" type="rainbow" cycles="1" speed="0.15"/>
+        <effect shape="halo" type="scale" min="0.92" max="1.08" frequency="0.67"/>
+        <effect shape="halo" type="rotation" speed="10"/>
+        <create shape="wA"/>
+        <effect shape="wA" type="scale" min="0.9" max="1.1" frequency="0.34"/>
+        <effect shape="wA" type="color_shift" dr="0" dg="8" db="-10"/>
+        <create shape="wB"/>
+        <effect shape="wB" type="flip" axis="vertical"/>
+        <effect shape="wB" type="scale" min="0.9" max="1.1" frequency="0.34"/>
+        <effect shape="wB" type="color_shift" dr="0" dg="8" db="-10"/>
+        <create shape="accLow"/>
+        <effect shape="accLow" type="blink" period="0.743" duty="0.3"/>
+        <effect shape="accLow" type="mirror" axis="vertical"/>
+        <destroy shape="sway2"/>
+        <destroy shape="bloom"/>
+        <destroy sequence="orbit_seq"/>
+    </event>
+
+    <event at="78.25">
+        <!-- the accents lift to the full beat for the hook -->
+        <destroy shape="accLow"/>
+        <create shape="accLow"/>
+        <effect shape="accLow" type="blink" period="0.372" duty="0.35"/>
+        <effect shape="accLow" type="mirror" axis="vertical"/>
+    </event>
+
+    <event at="83.10">
+        <!-- the halo fades out as the song drops into the bridge -->
+        <effect shape="halo" type="color_shift" dr="-220" dg="-200" db="-180"/>
+    </event>
+
+
+    <!-- ==================== BRIDGE (83.98 - 90.02s) ==================== -->
+    <!-- Instrumental, heavy melody: calm night scene - a tumbling moon,
+         slow drifting dots and a softly breathing orb. -->
+
+    <event at="83.98">
+        <create shape="moon"/>
+        <effect shape="moon" type="rotation" pivot_x="128" pivot_y="168" speed="25"/>
+        <create shape="driftA"/>
+        <effect shape="driftA" type="translation" vx="25"/>
+        <create sequence="pulse_seq"/>
+        <effect sequence="pulse_seq" type="speedup" factor="0.7"/>
+        <destroy shape="halo"/>
+        <destroy shape="wA"/>
+        <destroy shape="wB"/>
+        <destroy shape="accLow"/>
+    </event>
+
+    <event at="86.91">
+        <destroy shape="driftA"/>
+        <create shape="ground2"/>
+        <effect shape="ground2" type="translation" ay="8" fy="0.12"/>
+        <create shape="driftB"/>
+        <effect shape="driftB" type="translation" vx="-25"/>
+    </event>
+
+
+    <!-- ==================== VERSE 4 (90.02 - 95.85s) =================== -->
+    <!-- Short rap verse: quick pattern - ring dot, mirrored diagonal
+         ship, fast accents and a warping line. -->
+
+    <event at="90.02">
+        <create shape="dotA"/>
+        <effect shape="dotA" type="translate_by_path" path="p_ring" velocity="105"/>
+        <create shape="triL"/>
+        <effect shape="triL" type="translate_by_path" path="p_diag2" velocity="160"/>
+        <effect shape="triL" type="mirror" axis="vertical"/>
+        <create shape="accL"/>
+        <effect shape="accL" type="blink" period="0.372" duty="0.2"/>
+        <effect shape="accL" type="mirror" axis="vertical"/>
+        <create shape="waveA"/>
+        <effect shape="waveA" type="warp" amplitude="10" wavelength="90" speed="0.8"/>
+        <destroy shape="moon"/>
+        <destroy shape="ground2"/>
+        <destroy shape="driftB"/>
+        <destroy sequence="pulse_seq"/>
+    </event>
+
+
+    <!-- ==================== VERSE 5 (95.85 - 108.65s) ================== -->
+    <!-- Rap variation: the ship hugs the frame border, a dot rides the
+         ellipse, a multicolor tetragon spins, center pulse on the beat. -->
+
+    <event at="95.85">
+        <destroy shape="dotA"/>
+        <destroy shape="triL"/>
+        <destroy shape="accL"/>
+        <destroy shape="waveA"/>
+        <create shape="triL"/>
+        <effect shape="triL" type="translate_by_path" path="p_rect" velocity="-120"/>
+        <create shape="orbE"/>
+        <effect shape="orbE" type="translate_by_path" path="p_ell" velocity="90"/>
+        <create shape="tetra2"/>
+        <effect shape="tetra2" type="rotation" speed="-60"/>
+        <effect shape="tetra2" type="multi_color"
+                colors="255,176,64;48,192,176;240,232,208;255,112,48"/>
+        <create shape="accC"/>
+        <effect shape="accC" type="blink" period="0.743" duty="0.2"/>
+    </event>
+
+    <event at="102.21">
+        <!-- gold tetragon spins faster, mirrored side accents -->
+        <destroy shape="tetra2"/>
+        <create shape="tetra"/>
+        <effect shape="tetra" type="rotation" speed="90"/>
+        <effect shape="tetra" type="scale" min="0.85" max="1.15" frequency="0.67"/>
+        <destroy shape="accC"/>
+        <create shape="accL"/>
+        <effect shape="accL" type="blink" period="0.743" duty="0.25"/>
+        <effect shape="accL" type="mirror" axis="vertical"/>
+    </event>
+
+
+    <!-- ==================== VERSE 6 (108.65 - 121.27s) ================= -->
+    <!-- Rap, building: fast vertical twin sparks, border dot, aggressive
+         flipping wave; then the groove dots return for the build. -->
+
+    <event at="108.65">
+        <destroy shape="triL"/>
+        <destroy shape="orbE"/>
+        <destroy shape="tetra"/>
+        <destroy shape="accL"/>
+        <create shape="sparkV"/>
+        <effect shape="sparkV" type="translate_by_path" path="p_vline" velocity="170"/>
+        <effect shape="sparkV" type="mirror" axis="vertical"/>
+        <create shape="dotG"/>
+        <effect shape="dotG" type="translate_by_path" path="p_rect" velocity="120"/>
+        <create shape="waveB"/>
+        <effect shape="waveB" type="warp" amplitude="14" wavelength="80" speed="1.2"/>
+        <effect shape="waveB" type="flip" axis="horizontal" period="0.743"/>
+        <create shape="accL"/>
+        <effect shape="accL" type="blink" period="0.372" duty="0.2"/>
+        <effect shape="accL" type="mirror" axis="vertical"/>
+    </event>
+
+    <event at="115.33">
+        <!-- the build starts: ring dot and a fast skank line -->
+        <destroy shape="dotG"/>
+        <create shape="orbitA"/>
+        <effect shape="orbitA" type="translate_by_path" path="p_ring" velocity="100"/>
+        <destroy shape="waveB"/>
+        <create shape="sway"/>
+        <effect shape="sway" type="translation" ay="16" fy="0.4"/>
+        <effect shape="sway" type="warp" amplitude="8" wavelength="120" speed="0.6"/>
+    </event>
+
+
+    <!-- ==================== MIDDLE 2 (121.27 - 143.93s) ================ -->
+    <!-- Raggy again, but faster than the first middle: quick sways,
+         quick orbits, fast sparks - everything pushing to chorus 2. -->
+
+    <event at="121.27">
+        <create shape="sway2"/>
+        <effect shape="sway2" type="translation" ay="24" fy="0.5"/>
+        <effect shape="sway2" type="warp" amplitude="10" wavelength="100" speed="0.8"/>
+        <create shape="bloom"/>
+        <effect shape="bloom" type="scale" min="0.7" max="1.25" frequency="0.67"/>
+        <effect shape="bloom" type="color_shift" dr="12" dg="-16" db="-8"/>
+        <create shape="orbitB"/>
+        <effect shape="orbitB" type="translate_by_path" path="p_ring" velocity="90" phase="0.5"/>
+        <destroy shape="sparkV"/>
+        <destroy shape="sway"/>
+        <destroy shape="accL"/>
+    </event>
+
+    <event at="128.10">
+        <destroy shape="orbitB"/>
+        <create sequence="orbit_seq"/>
+        <effect sequence="orbit_seq" type="speedup" factor="1.6"/>
+    </event>
+
+    <event at="134.12">
+        <destroy shape="sway2"/>
+        <create shape="sway"/>
+        <effect shape="sway" type="translation" ay="20" fy="0.6"/>
+        <effect shape="sway" type="warp" amplitude="12" wavelength="90" speed="1.0"/>
+        <destroy shape="orbitA"/>
+        <create shape="sparkH"/>
+        <effect shape="sparkH" type="translate_by_path" path="p_hline" velocity="200"/>
+    </event>
+
+    <event at="140.11">
+        <destroy shape="bloom"/>
+        <create shape="bloom"/>
+        <effect shape="bloom" type="scale" min="0.6" max="1.3" frequency="1.0"/>
+        <effect shape="bloom" type="color_shift" dr="15" dg="-18" db="-10"/>
+    </event>
+
+    <event at="141.99">
+        <!-- final push: fast mirrored accents -->
+        <destroy sequence="orbit_seq"/>
+        <create shape="accLow"/>
+        <effect shape="accLow" type="blink" period="0.372" duty="0.35"/>
+        <effect shape="accLow" type="mirror" axis="vertical"/>
+    </event>
+
+
+    <!-- ==================== CHORUS 2 (143.93 - 167.15s) ================ -->
+    <!-- "Alles wird gut" again, bigger and varied: rainbow halo with
+         white wings, then a multicolor square, then racing comets. -->
+
+    <event at="143.93">
+        <destroy shape="accLow"/>
+        <create shape="halo"/>
+        <effect shape="halo" type="rainbow" cycles="1" speed="0.3"/>
+        <effect shape="halo" type="scale" min="0.9" max="1.1" frequency="0.67"/>
+        <effect shape="halo" type="rotation" speed="25"/>
+        <create sequence="wings_seq"/>
+        <effect sequence="wings_seq" type="scale" min="0.88" max="1.12" frequency="0.34"/>
+        <create shape="accLow"/>
+        <effect shape="accLow" type="blink" period="0.372" duty="0.4"/>
+        <effect shape="accLow" type="mirror" axis="vertical"/>
+        <destroy shape="sway"/>
+        <destroy shape="sparkH"/>
+        <destroy shape="bloom"/>
+    </event>
+
+    <event at="150.21">
+        <destroy shape="accLow"/>
+        <create shape="multi_sq"/>
+        <effect shape="multi_sq" type="rotation" speed="30"/>
+        <effect shape="multi_sq" type="multi_color"
+                colors="255,176,64;48,192,176;240,232,208;255,112,48"/>
+        <effect shape="multi_sq" type="scale" min="0.9" max="1.1" frequency="0.67"/>
+    </event>
+
+    <event at="156.20">
+        <!-- the wings bow out; two comets race the ring in opposite
+             directions for the second hook -->
+        <destroy sequence="wings_seq"/>
+        <destroy shape="multi_sq"/>
+        <create shape="cometA"/>
+        <effect shape="cometA" type="translate_by_path" path="p_ring" velocity="160"/>
+        <create shape="cometB"/>
+        <effect shape="cometB" type="translate_by_path" path="p_ring" velocity="-160" phase="0.5"/>
+    </event>
+
+    <event at="162.21">
+        <create shape="accLow"/>
+        <effect shape="accLow" type="blink" period="0.372" duty="0.4"/>
+        <effect shape="accLow" type="mirror" axis="vertical"/>
+    </event>
+
+
+    <!-- ==================== OUTRO (167.15 - end) ======================= -->
+    <!-- Driving instrumentals: the comets speed up, a flashing X cuts
+         through on every beat - then everything collapses into one
+         fading orb. -->
+
+    <event at="167.15">
+        <destroy shape="halo"/>
+        <destroy shape="accLow"/>
+        <destroy shape="cometA"/>
+        <destroy shape="cometB"/>
+        <create shape="cometA"/>
+        <effect shape="cometA" type="translate_by_path" path="p_ring" velocity="190"/>
+        <create shape="cometB"/>
+        <effect shape="cometB" type="translate_by_path" path="p_ring" velocity="-190" phase="0.5"/>
+        <create shape="accX"/>
+        <effect shape="accX" type="blink" period="0.372" duty="0.3"/>
+        <effect shape="accX" type="mirror" axis="vertical"/>
+    </event>
+
+    <event at="170.5">
+        <destroy shape="cometA"/>
+        <destroy shape="cometB"/>
+        <destroy shape="accX"/>
+        <create shape="final_orb"/>
+        <effect shape="final_orb" type="scale" min="0.8" max="1.2" frequency="0.67"/>
+        <effect shape="final_orb" type="color_shift" dr="-110" dg="-90" db="-60"/>
+    </event>
+
+    <event at="172.9">
+        <destroy shape="final_orb"/>
+    </event>
+</animation>

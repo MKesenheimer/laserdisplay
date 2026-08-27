@@ -95,7 +95,7 @@ def main():
 
     LD = LaserDisplay.create()
     LD.set_zoom(0.3)
-    LD.set_scan_rate(5000)
+    LD.set_scan_rate(7000)
     LD.set_blanking_delay(1)
 
     scheduler = Scheduler(LD, fps=25)
