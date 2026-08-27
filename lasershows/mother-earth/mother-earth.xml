@@ -75,7 +75,6 @@
     <!-- ============ Chorus shapes ============ -->
     <shape name="rainbow_c1"  type="circle" cx="128" cy="128" r="52" npoints="48" red="255" green="255" blue="255"/>
     <shape name="rainbow_c2"  type="circle" cx="128" cy="128" r="52" npoints="48" red="255" green="255" blue="255"/>
-    <shape name="rainbow_wave" type="line" x0="8" y0="128" x1="248" y1="128" npoints="96" red="40" green="200" blue="220"/>
     <shape name="blink_tri_L" type="triangle" x0="68" y0="48" x1="52" y1="48" x2="60" y2="64" npoints="12" red="255" green="255" blue="80"/>
     <shape name="blink_tri_R" type="triangle" x0="188" y0="48" x1="204" y1="48" x2="196" y2="64" npoints="12" red="255" green="255" blue="80"/>
     <shape name="multi_sq"    type="tetragon" x0="88" y0="88" x1="168" y1="88" x2="168" y2="168" x3="88" y3="168" npoints="24" red="255" green="255" blue="255"/>
@@ -86,8 +85,7 @@
     <shape name="acc_R1"      type="line" x0="198" y0="118" x1="218" y1="118" npoints="8" red="255" green="255" blue="100"/>
     <shape name="acc_L2"      type="line" x0="38" y0="138" x1="58" y1="138" npoints="8" red="100" green="255" blue="255"/>
     <shape name="acc_R2"      type="line" x0="198" y0="138" x1="218" y1="138" npoints="8" red="100" green="255" blue="255"/>
-    <shape name="acc_center"  type="circle" cx="128" cy="128" r="5" npoints="12" red="255" green="255" blue="255"/>
-
+    
     <!-- ============ Choir / Bridge shapes ============ -->
     <shape name="spiral1"     type="triangle" x0="128" y0="168" x1="108" y1="108" x2="148" y2="108" npoints="24" red="255" green="255" blue="255"/>
     <shape name="spiral2"     type="triangle" x0="128" y0="88" x1="108" y1="148" x2="148" y2="148" npoints="24" red="255" green="255" blue="255"/>
@@ -463,13 +461,6 @@
         <effect shape="rainbow_c2" type="rainbow" cycles="2" speed="0.4"/>
     </event>
 
-    <event at="124.0">
-        <!-- Rippling rainbow wave -->
-        <create shape="rainbow_wave"/>
-        <effect shape="rainbow_wave" type="warp" amplitude="30" wavelength="100" speed="0.6"/>
-        <effect shape="rainbow_wave" type="rainbow" cycles="3" speed="0.3"/>
-    </event>
-
     <event at="125.0">
         <!-- Beat-synced blink triangles (symmetrical) -->
         <create shape="blink_tri_L"/>
@@ -503,13 +494,10 @@
         <effect shape="acc_L2" type="blink" period="0.43" duty="0.3"/>
         <create shape="acc_R2"/>
         <effect shape="acc_R2" type="blink" period="0.43" duty="0.3"/>
-        <create shape="acc_center"/>
-        <effect shape="acc_center" type="blink" period="0.86" duty="0.4"/>
     </event>
 
     <event at="131.0">
         <!-- Ramp up wave speed -->
-        <effect shape="rainbow_wave" type="warp" amplitude="35" wavelength="80" speed="0.8"/>
         <effect shape="rainbow_star" type="rotation" speed="60"/>
     </event>
 
@@ -523,7 +511,6 @@
 
     <event at="137.0">
         <effect shape="multi_sq" type="scale" min="0.6" max="1.3" frequency="0.8"/>
-        <effect shape="rainbow_wave" type="warp" amplitude="40" wavelength="70" speed="1.0"/>
     </event>
 
     <event at="141.0">
@@ -541,14 +528,12 @@
 
     <event at="145.0">
         <effect shape="multi_sq" type="rotation" speed="70"/>
-        <effect shape="rainbow_wave" type="warp" amplitude="45" wavelength="60" speed="1.2"/>
     </event>
 
     <event at="147.0">
         <!-- Peak chorus: max intensity -->
         <effect shape="blink_tri_L" type="blink" period="0.215" duty="0.5"/>
         <effect shape="blink_tri_R" type="blink" period="0.215" duty="0.5"/>
-        <effect shape="acc_center" type="blink" period="0.43" duty="0.6"/>
     </event>
 
     <event at="149.0">
@@ -559,7 +544,6 @@
     <event at="150.64">
         <destroy shape="rainbow_c1"/>
         <destroy shape="rainbow_c2"/>
-        <destroy shape="rainbow_wave"/>
         <destroy shape="blink_tri_L"/>
         <destroy shape="blink_tri_R"/>
         <destroy shape="rainbow_star"/>
@@ -568,7 +552,6 @@
         <destroy shape="acc_R1"/>
         <destroy shape="acc_L2"/>
         <destroy shape="acc_R2"/>
-        <destroy shape="acc_center"/>
     </event>
 
 
@@ -718,12 +701,6 @@
         <effect shape="rainbow_c2" type="rainbow" cycles="2" speed="0.5"/>
     </event>
 
-    <event at="179.5">
-        <create shape="rainbow_wave"/>
-        <effect shape="rainbow_wave" type="warp" amplitude="35" wavelength="90" speed="0.7"/>
-        <effect shape="rainbow_wave" type="rainbow" cycles="3" speed="0.35"/>
-    </event>
-
     <event at="180.5">
         <create shape="blink_tri_L"/>
         <effect shape="blink_tri_L" type="blink" period="0.43" duty="0.5"/>
@@ -753,14 +730,11 @@
         <effect shape="acc_L2" type="blink" period="0.43" duty="0.3"/>
         <create shape="acc_R2"/>
         <effect shape="acc_R2" type="blink" period="0.43" duty="0.3"/>
-        <create shape="acc_center"/>
-        <effect shape="acc_center" type="blink" period="0.43" duty="0.5"/>
     </event>
 
     <event at="189.0">
         <effect shape="rainbow_c1" type="speedup" factor="1.6"/>
         <effect shape="rainbow_c2" type="speedup" factor="1.6"/>
-        <effect shape="rainbow_wave" type="warp" amplitude="40" wavelength="70" speed="0.9"/>
     </event>
 
     <event at="193.0">
@@ -771,7 +745,6 @@
     <event at="195.0">
         <effect shape="blink_tri_L" type="blink" period="0.215" duty="0.5"/>
         <effect shape="blink_tri_R" type="blink" period="0.215" duty="0.5"/>
-        <effect shape="rainbow_wave" type="warp" amplitude="45" wavelength="60" speed="1.1"/>
     </event>
 
     <event at="197.0">
@@ -794,13 +767,11 @@
     <event at="203.0">
         <effect shape="rainbow_c1" type="color_shift" dr="-30" dg="-30" db="-30"/>
         <effect shape="rainbow_c2" type="color_shift" dr="-30" dg="-30" db="-30"/>
-        <effect shape="rainbow_wave" type="color_shift" dr="-30" dg="-30" db="-30"/>
     </event>
 
     <event at="205.49">
         <destroy shape="rainbow_c1"/>
         <destroy shape="rainbow_c2"/>
-        <destroy shape="rainbow_wave"/>
         <destroy shape="blink_tri_L"/>
         <destroy shape="blink_tri_R"/>
         <destroy shape="rainbow_star"/>
@@ -809,7 +780,6 @@
         <destroy shape="acc_R1"/>
         <destroy shape="acc_L2"/>
         <destroy shape="acc_R2"/>
-        <destroy shape="acc_center"/>
     </event>
 
 
@@ -879,13 +849,6 @@
         <effect shape="halo" type="color_shift" dr="10" dg="5" db="-10"/>
     </event>
 
-    <event at="235.0">
-        <!-- Center dot -->
-        <create shape="acc_center"/>
-        <effect shape="acc_center" type="translate_by_path" path="p_ring3" velocity="15" phase="0.5"/>
-        <effect shape="acc_center" type="rainbow" cycles="1" speed="0.1"/>
-    </event>
-
     <event at="243.0">
         <effect shape="spiral1" type="speedup" factor="1.4"/>
         <effect shape="spiral2" type="speedup" factor="1.4"/>
@@ -907,7 +870,6 @@
 
     <event at="275.0">
         <effect shape="halo" type="color_shift" dr="-20" dg="-20" db="-20"/>
-        <effect shape="acc_center" type="color_shift" dr="-20" dg="-20" db="-20"/>
     </event>
 
     <event at="279.19">
@@ -916,7 +878,6 @@
         <destroy shape="spiral2"/>
         <destroy shape="spiral3"/>
         <destroy shape="spiral4"/>
-        <destroy shape="acc_center"/>
     </event>
 
 
@@ -1013,12 +974,6 @@
         <effect shape="rainbow_c2" type="rainbow" cycles="3" speed="0.5"/>
     </event>
 
-    <event at="307.5">
-        <create shape="rainbow_wave"/>
-        <effect shape="rainbow_wave" type="warp" amplitude="40" wavelength="80" speed="0.8"/>
-        <effect shape="rainbow_wave" type="rainbow" cycles="3" speed="0.4"/>
-    </event>
-
     <event at="308.5">
         <create shape="blink_tri_L"/>
         <effect shape="blink_tri_L" type="blink" period="0.43" duty="0.5"/>
@@ -1048,14 +1003,11 @@
         <effect shape="acc_L2" type="blink" period="0.43" duty="0.3"/>
         <create shape="acc_R2"/>
         <effect shape="acc_R2" type="blink" period="0.43" duty="0.3"/>
-        <create shape="acc_center"/>
-        <effect shape="acc_center" type="blink" period="0.43" duty="0.5"/>
     </event>
 
     <event at="319.0">
         <effect shape="rainbow_c1" type="speedup" factor="1.8"/>
         <effect shape="rainbow_c2" type="speedup" factor="1.8"/>
-        <effect shape="rainbow_wave" type="warp" amplitude="50" wavelength="60" speed="1.2"/>
         <effect shape="blink_tri_L" type="blink" period="0.215" duty="0.5"/>
         <effect shape="blink_tri_R" type="blink" period="0.215" duty="0.5"/>
     </event>
@@ -1070,25 +1022,21 @@
         <effect shape="acc_R1" type="blink" period="0.215" duty="0.4"/>
         <effect shape="acc_L2" type="blink" period="0.215" duty="0.4"/>
         <effect shape="acc_R2" type="blink" period="0.215" duty="0.4"/>
-        <effect shape="acc_center" type="blink" period="0.215" duty="0.6"/>
     </event>
 
     <event at="325.0">
         <effect shape="rainbow_c1" type="speedup" factor="2.2"/>
         <effect shape="rainbow_c2" type="speedup" factor="2.2"/>
-        <effect shape="rainbow_wave" type="warp" amplitude="55" wavelength="50" speed="1.5"/>
     </event>
 
     <event at="327.0">
         <effect shape="rainbow_c1" type="color_shift" dr="-40" dg="-40" db="-40"/>
         <effect shape="rainbow_c2" type="color_shift" dr="-40" dg="-40" db="-40"/>
-        <effect shape="rainbow_wave" type="color_shift" dr="-40" dg="-40" db="-40"/>
     </event>
 
     <event at="328.52">
         <destroy shape="rainbow_c1"/>
         <destroy shape="rainbow_c2"/>
-        <destroy shape="rainbow_wave"/>
         <destroy shape="blink_tri_L"/>
         <destroy shape="blink_tri_R"/>
         <destroy shape="rainbow_star"/>
@@ -1097,7 +1045,6 @@
         <destroy shape="acc_R1"/>
         <destroy shape="acc_L2"/>
         <destroy shape="acc_R2"/>
-        <destroy shape="acc_center"/>
     </event>
 
 
@@ -1136,13 +1083,6 @@
         <effect shape="clash2" type="rotation" speed="-65"/>
         <effect shape="clash3" type="rotation" speed="80"/>
         <effect shape="clash4" type="rotation" speed="-80"/>
-    </event>
-
-    <event at="336.0">
-        <!-- Accent dots -->
-        <create shape="acc_center"/>
-        <effect shape="acc_center" type="blink" period="0.215" duty="0.5"/>
-        <effect shape="acc_center" type="scale" min="1.0" max="2.0" frequency="2.0"/>
     </event>
 
     <event at="338.0">
@@ -1198,7 +1138,6 @@
         <destroy shape="clash3"/>
         <destroy shape="clash4"/>
         <destroy shape="flash_line"/>
-        <destroy shape="acc_center"/>
         <destroy shape="blink_tri_L"/>
         <destroy shape="blink_tri_R"/>
     </event>

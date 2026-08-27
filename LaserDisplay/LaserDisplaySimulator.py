@@ -5,6 +5,7 @@ from .LaserDisplay import LaserDisplay
 class LaserDisplaySimulator(LaserDisplay):
 
     SCALE = 2
+    TIMESTAMP_TICK = 0.01   # 10 ms
 
     def __init__(self):
         LaserDisplay.__init__(self)
@@ -13,8 +14,21 @@ class LaserDisplaySimulator(LaserDisplay):
             self.surface = pygame.display.set_mode((self.SIZE*self.SCALE, self.SIZE*self.SCALE))
             self.surface.fill( (0,0,0) )
             pygame.display.set_caption('Laser Display Simulator')
+            self._timestamp_font = pygame.font.Font(None, 20)
+            self._timestamp_start = time.perf_counter()
         except:
             raise IOError('Could not initialize pygame')
+
+    def __timestamp_text(self):
+        # elapsed time in 10 ms steps, formatted as M:SS.cc
+        ticks = int((time.perf_counter() - self._timestamp_start) / self.TIMESTAMP_TICK)
+        minutes, rest = divmod(ticks, 6000)
+        seconds, centis = divmod(rest, 100)
+        return '%d:%02d.%02d' % (minutes, seconds, centis)
+
+    def set_time_offset(self, offset):
+        # the counter reads `offset` + time since this call
+        self._timestamp_start = time.perf_counter() - offset
 
     def __color(self):
         return pygame.Color(self.color['R'], self.color['G'], self.color['B'])
@@ -23,6 +37,8 @@ class LaserDisplaySimulator(LaserDisplay):
         pass
 
     def flush_frame(self):
+        stamp = self._timestamp_font.render(self.__timestamp_text(), True, (128,128,128))
+        self.surface.blit(stamp, (4,4))
         pygame.display.flip()
         self.surface.fill( (0,0,0) )
 

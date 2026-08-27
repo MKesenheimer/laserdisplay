@@ -112,6 +112,12 @@ class LaserDisplay():
     def set_laser_configuration(self):
         raise NotImplementedError
 
+    def set_time_offset(self, offset):
+        # shifts the reference point of the display's time: the simulator's
+        # on-screen counter starts at `offset` instead of at zero (used
+        # together with --start-at when seeking into a show)
+        pass
+
 # routines that deal with frames consisting of shapes:
 #
 #   t1 = geometry.triangle(x0, y0, x1, y1, x2, y2, npoints, rd, gr, bl)

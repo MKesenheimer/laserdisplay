@@ -94,6 +94,7 @@ def main():
         sys.exit(1)
 
     LD = LaserDisplay.create()
+    LD.set_time_offset(start)
     LD.set_zoom(0.3)
     LD.set_scan_rate(7000)
     LD.set_blanking_delay(1)
