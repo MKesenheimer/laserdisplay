@@ -88,11 +88,12 @@ SCALE = 255
 # geometry types understood by the XML format:
 #   required parameters, parameters that are scaled from 0..255 to 16 bit
 _GEOMETRY_PARAMS = {
-    'line':     (('x0', 'y0', 'x1', 'y1'), ('npoints',)),
-    'triangle': (('x0', 'y0', 'x1', 'y1', 'x2', 'y2'), ('npoints',)),
-    'circle':   (('cx', 'cy', 'r'), ('npoints',)),
-    'ellipse':  (('cx', 'cy', 'w', 'h'), ('npoints',)),
-    'tetragon': (('x0', 'y0', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3'), ('npoints',)),
+    'line':        (('x0', 'y0', 'x1', 'y1'), ('npoints',)),
+    'line_points': (('x0', 'y0', 'spacing'), ('npoints',)),
+    'triangle':    (('x0', 'y0', 'x1', 'y1', 'x2', 'y2'), ('npoints',)),
+    'circle':      (('cx', 'cy', 'r'), ('npoints',)),
+    'ellipse':     (('cx', 'cy', 'w', 'h'), ('npoints',)),
+    'tetragon':    (('x0', 'y0', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3'), ('npoints',)),
 }
 
 # effects understood by the XML format:
@@ -305,11 +306,12 @@ class Scheduler:
             raise ValueError("%s: invalid parameter (%s)" % (context, e))
 
         builders = {
-            'line':     lambda: Geometry.line(*args[:4], args[4], *color),
-            'triangle': lambda: Geometry.triangle(*args[:6], args[6], *color),
-            'circle':   lambda: Geometry.circle(*args[:3], args[3], *color),
-            'ellipse':  lambda: Geometry.ellipse(*args[:4], args[4], *color),
-            'tetragon': lambda: Geometry.tetragon(*args[:8], args[8], *color),
+            'line':        lambda: Geometry.line(*args[:4], args[4], *color),
+            'line_points': lambda: Geometry.line_points(args[0], args[1], args[3], args[2], *color),
+            'triangle':    lambda: Geometry.triangle(*args[:6], args[6], *color),
+            'circle':      lambda: Geometry.circle(*args[:3], args[3], *color),
+            'ellipse':     lambda: Geometry.ellipse(*args[:4], args[4], *color),
+            'tetragon':    lambda: Geometry.tetragon(*args[:8], args[8], *color),
         }
         return builders[type], blank_n
 
@@ -690,6 +692,13 @@ class Scheduler:
                     color=(MAX, MAX, MAX), blank_n=0):
         """creates a line immediately (internal coordinate/color units)"""
         self.__create_now(Geometry.line(x0, y0, x1, y1, npoints, *color), name, blank_n)
+
+    def create_line_points(self, name, x0, y0, npoints, spacing,
+                           color=(MAX, MAX, MAX), blank_n=0):
+        """creates a horizontal line of points immediately (internal
+        coordinate/color units); (x0, y0) is the middle of the line"""
+        self.__create_now(
+            Geometry.line_points(x0, y0, npoints, spacing, *color), name, blank_n)
 
     def create_circle(self, name, cx, cy, r, npoints,
                       color=(MAX, MAX, MAX), blank_n=0):

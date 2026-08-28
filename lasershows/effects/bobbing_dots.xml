@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect: ten dots in a horizontal line bobbing up and down
+
+    <effect shape="NAME" type="translation" ax ay fx fy phase/>
+    ay = sinusoidal wobble amplitude, fy = its frequency in Hz.  All ten
+    dots carry the same wobble with the same (default) phase, so they
+    stay in a straight line while the whole row bobs up and down.
+
+    - dot_1 .. dot_10: ten small circles evenly spaced (22 units apart)
+      along a horizontal line through the middle of the frame, from
+      x=29 to x=227 -> the row is symmetric around the frame center;
+      colored in a cool cyan-to-violet gradient from left to right
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ==================== -->
+    <shape name="dot_1"  type="circle" cx="29"  cy="128" r="4"
+           npoints="12" red="0"   green="255" blue="255"/>
+    <shape name="dot_2"  type="circle" cx="51"  cy="128" r="4"
+           npoints="12" red="20"  green="227" blue="255"/>
+    <shape name="dot_3"  type="circle" cx="73"  cy="128" r="4"
+           npoints="12" red="40"  green="198" blue="255"/>
+    <shape name="dot_4"  type="circle" cx="95"  cy="128" r="4"
+           npoints="12" red="60"  green="170" blue="255"/>
+    <shape name="dot_5"  type="circle" cx="117" cy="128" r="4"
+           npoints="12" red="80"  green="141" blue="255"/>
+    <shape name="dot_6"  type="circle" cx="139" cy="128" r="4"
+           npoints="12" red="100" green="113" blue="255"/>
+    <shape name="dot_7"  type="circle" cx="161" cy="128" r="4"
+           npoints="12" red="120" green="85"  blue="255"/>
+    <shape name="dot_8"  type="circle" cx="183" cy="128" r="4"
+           npoints="12" red="140" green="56"  blue="255"/>
+    <shape name="dot_9"  type="circle" cx="205" cy="128" r="4"
+           npoints="12" red="160" green="28"  blue="255"/>
+    <shape name="dot_10" type="circle" cx="227" cy="128" r="4"
+           npoints="12" red="180" green="0"   blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="dot_1"/>
+        <effect shape="dot_1" type="translation" ay="40" fy="0.3"/>
+        <create shape="dot_2"/>
+        <effect shape="dot_2" type="translation" ay="40" fy="0.3"/>
+        <create shape="dot_3"/>
+        <effect shape="dot_3" type="translation" ay="40" fy="0.3"/>
+        <create shape="dot_4"/>
+        <effect shape="dot_4" type="translation" ay="40" fy="0.3"/>
+        <create shape="dot_5"/>
+        <effect shape="dot_5" type="translation" ay="40" fy="0.3"/>
+        <create shape="dot_6"/>
+        <effect shape="dot_6" type="translation" ay="40" fy="0.3"/>
+        <create shape="dot_7"/>
+        <effect shape="dot_7" type="translation" ay="40" fy="0.3"/>
+        <create shape="dot_8"/>
+        <effect shape="dot_8" type="translation" ay="40" fy="0.3"/>
+        <create shape="dot_9"/>
+        <effect shape="dot_9" type="translation" ay="40" fy="0.3"/>
+        <create shape="dot_10"/>
+        <effect shape="dot_10" type="translation" ay="40" fy="0.3"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="dot_1"/>
+        <destroy shape="dot_2"/>
+        <destroy shape="dot_3"/>
+        <destroy shape="dot_4"/>
+        <destroy shape="dot_5"/>
+        <destroy shape="dot_6"/>
+        <destroy shape="dot_7"/>
+        <destroy shape="dot_8"/>
+        <destroy shape="dot_9"/>
+        <destroy shape="dot_10"/>
+    </event>
+</animation>

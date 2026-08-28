@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect: a row of dots sliding left and right across the frame
+
+    One line_points shape: 15 dots, 12 units apart, centered on the middle
+    of the frame (x=128, y=128) -> the row spans x=44 to x=212.
+    <effect shape="NAME" type="translation" ax fx/> adds a sinusoidal
+    horizontal wobble (amplitude ax, frequency fx in Hz), so the whole row
+    glides back and forth as a single shape.
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ==================== -->
+    <shape name="dot_row" type="line_points" x0="128" y0="128"
+           npoints="15" spacing="12" red="0" green="255" blue="128"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="dot_row"/>
+        <effect shape="dot_row" type="translation" ax="60" fx="0.25"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="dot_row"/>
+    </event>
+</animation>

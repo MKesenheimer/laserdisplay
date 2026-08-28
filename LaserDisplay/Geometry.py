@@ -51,6 +51,35 @@ class Geometry:
         return Shape(points)
 
     @staticmethod
+    def line_points(x0, y0, npoints, spacing, rd, gr, bl):
+        # a row of single dots: a blanked (color zero) point at each dot's
+        # position keeps the beam off while the scanner travels from the
+        # previous dot, so no line is drawn between the dots (same
+        # convention as the Mirror effect)
+        if npoints < 1:
+            npoints = 1
+        points = numpy.empty((2 * npoints - 1, 5), dtype='uint16')
+        offset = (npoints - 1) / 2.0
+        index = 0
+        for i in range(0, npoints):
+            x = int((i - offset) * spacing + x0)
+            y = int(y0)
+            if i > 0:
+                points[index, 0] = x
+                points[index, 1] = y
+                points[index, 2] = 0
+                points[index, 3] = 0
+                points[index, 4] = 0
+                index += 1
+            points[index, 0] = x
+            points[index, 1] = y
+            points[index, 2] = rd
+            points[index, 3] = gr
+            points[index, 4] = bl
+            index += 1
+        return Shape(points)
+
+    @staticmethod
     def triangle(x0, y0, x1, y1, x2, y2, npoints, rd, gr, bl):
         if npoints < 2:
             npoints = 2

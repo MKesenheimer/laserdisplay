@@ -88,7 +88,7 @@ its name.
 | Attribute               | Meaning                                              |
 |-------------------------|------------------------------------------------------|
 | `name`                  | unique name referenced by events                     |
-| `type`                  | `line`, `triangle`, `circle`, `ellipse` or `tetragon` |
+| `type`                  | `line`, `line_points`, `triangle`, `circle`, `ellipse` or `tetragon` |
 | `npoints`               | number of points interpolated along the outline      |
 | `red`, `green`, `blue`  | color, each `0–255` (default `255`)                  |
 | `blank`                 | optional; blank every n-th point (dashed outlines)   |
@@ -98,6 +98,7 @@ The remaining attributes are the geometry coordinates:
 | Type        | Attributes                             |
 |-------------|----------------------------------------|
 | `line`      | `x0 y0 x1 y1`                          |
+| `line_points` | `x0 y0 spacing` (`(x0, y0)` = middle of a horizontal row of points, `spacing` = distance between the points) |
 | `triangle`  | `x0 y0 x1 y1 x2 y2`                    |
 | `circle`    | `cx cy r`                              |
 | `ellipse`   | `cx cy w h` (center, horizontal/vertical dimension) |
