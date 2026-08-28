@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: rotating pentagram — a five-pointed star rotating
+    around the frame center.
+
+    A pentagram is drawn by connecting every second vertex of a regular
+    pentagon (0→2→4→1→3→0). All 5 line segments share the same rotation
+    effect so the star spins as a single unit.
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <!-- 5 lines forming a pentagram, inscribed in a circle of radius 70 -->
+    <!-- Center: (128, 128), Outer vertices at 90°, 18°, -54°, -126°, -198° -->
+    <!-- Connections: P0→P2→P4→P1→P3→P0 -->
+    <shape name="p0" type="line" x0="128" y0="198" x1="169" y1="71"
+           npoints="24" red="255" green="0" blue="10"/>
+    <shape name="p1" type="line" x0="169" y0="71"  x1="61"  y1="150"
+           npoints="24" red="255" green="0" blue="10"/>
+    <shape name="p2" type="line" x0="61"  y0="150" x1="195" y1="150"
+           npoints="24" red="255" green="0" blue="10"/>
+    <shape name="p3" type="line" x0="195" y0="150" x1="87"  y1="71"
+           npoints="24" red="255" green="0" blue="10"/>
+    <shape name="p4" type="line" x0="87"  y0="71"  x1="128" y1="198"
+           npoints="24" red="255" green="0" blue="10"/>
+
+    <!-- circumscribing circle passing through all 5 pentagram vertices -->
+    <shape name="circ" type="circle" cx="128" cy="128" r="70"
+           npoints="48" red="255" green="0" blue="10"/>
+
+    <!-- 5 glyph runes at the pentagram tips (each glyph = multiple shapes) -->
+    <!-- Glyph 0: S-shape at top vertex (128, 198) - moved outward to ~225 -->
+    <shape name="r0a" type="line" x0="122" y0="225" x1="134" y1="225" npoints="8" red="255" green="0" blue="10"/>
+    <shape name="r0b" type="line" x0="122" y0="225" x1="122" y1="217" npoints="8" red="255" green="0" blue="10"/>
+    <shape name="r0c" type="line" x0="122" y0="217" x1="134" y1="217" npoints="8" red="255" green="0" blue="10"/>
+    <shape name="r0d" type="line" x0="134" y0="217" x1="134" y1="209" npoints="8" red="255" green="0" blue="10"/>
+    <shape name="r0e" type="line" x0="122" y0="209" x1="134" y1="209" npoints="8" red="255" green="0" blue="10"/>
+
+    <!-- Glyph 1: Tau (T) at upper-right vertex (195, 150) - moved outward along 18° to ~212, 155 -->
+    <shape name="r1a" type="line" x0="204" y0="155" x1="220" y1="155" npoints="10" red="255" green="0" blue="10"/>
+    <shape name="r1b" type="line" x0="212" y0="155" x1="212" y1="139" npoints="10" red="255" green="0" blue="10"/>
+
+    <!-- Glyph 2: C-shape at lower-right vertex (169, 71) - moved outward along -54° to ~185, 55 -->
+    <shape name="r2a" type="line" x0="191" y0="61" x1="179" y1="61" npoints="8" red="255" green="0" blue="10"/>
+    <shape name="r2b" type="line" x0="179" y0="61" x1="179" y1="45" npoints="8" red="255" green="0" blue="10"/>
+    <shape name="r2c" type="line" x0="179" y0="45" x1="191" y1="45" npoints="8" red="255" green="0" blue="10"/>
+
+    <!-- Glyph 3: J-shape at lower-left vertex (87, 71) - moved outward along -126° to ~71, 55 -->
+    <shape name="r3a" type="line" x0="65" y0="61" x1="77" y1="61" npoints="8" red="255" green="0" blue="10"/>
+    <shape name="r3b" type="line" x0="71" y0="61" x1="71" y1="45" npoints="8" red="255" green="0" blue="10"/>
+    <shape name="r3c" type="line" x0="65" y0="45" x1="71" y1="45" npoints="8" red="255" green="0" blue="10"/>
+
+    <!-- Glyph 4: O-shape at upper-left vertex (61, 150) - moved outward along 162° to ~44, 155 -->
+    <shape name="r4a" type="circle" cx="44" cy="155" r="8" npoints="24" red="255" green="0" blue="10"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="p0"/>
+        <create shape="p1"/>
+        <create shape="p2"/>
+        <create shape="p3"/>
+        <create shape="p4"/>
+        <create shape="circ"/>
+        <create shape="r0a"/>
+        <create shape="r0b"/>
+        <create shape="r0c"/>
+        <create shape="r0d"/>
+        <create shape="r0e"/>
+        <create shape="r1a"/>
+        <create shape="r1b"/>
+        <create shape="r2a"/>
+        <create shape="r2b"/>
+        <create shape="r2c"/>
+        <create shape="r3a"/>
+        <create shape="r3b"/>
+        <create shape="r3c"/>
+        <create shape="r4a"/>
+        <!-- smooth rotation around frame center (128, 128) -->
+        <effect shape="p0" type="rotation" speed="60"/>
+        <effect shape="p1" type="rotation" speed="60"/>
+        <effect shape="p2" type="rotation" speed="60"/>
+        <effect shape="p3" type="rotation" speed="60"/>
+        <effect shape="p4" type="rotation" speed="60"/>
+        <effect shape="circ" type="rotation" speed="60"/>
+        <effect shape="r0a" type="rotation" speed="60"/>
+        <effect shape="r0b" type="rotation" speed="60"/>
+        <effect shape="r0c" type="rotation" speed="60"/>
+        <effect shape="r0d" type="rotation" speed="60"/>
+        <effect shape="r0e" type="rotation" speed="60"/>
+        <effect shape="r1a" type="rotation" speed="60"/>
+        <effect shape="r1b" type="rotation" speed="60"/>
+        <effect shape="r2a" type="rotation" speed="60"/>
+        <effect shape="r2b" type="rotation" speed="60"/>
+        <effect shape="r2c" type="rotation" speed="60"/>
+        <effect shape="r3a" type="rotation" speed="60"/>
+        <effect shape="r3b" type="rotation" speed="60"/>
+        <effect shape="r3c" type="rotation" speed="60"/>
+        <effect shape="r4a" type="rotation" speed="60"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="p0"/>
+        <destroy shape="p1"/>
+        <destroy shape="p2"/>
+        <destroy shape="p3"/>
+        <destroy shape="p4"/>
+        <destroy shape="circ"/>
+        <destroy shape="r0a"/>
+        <destroy shape="r0b"/>
+        <destroy shape="r0c"/>
+        <destroy shape="r0d"/>
+        <destroy shape="r0e"/>
+        <destroy shape="r1a"/>
+        <destroy shape="r1b"/>
+        <destroy shape="r2a"/>
+        <destroy shape="r2b"/>
+        <destroy shape="r2c"/>
+        <destroy shape="r3a"/>
+        <destroy shape="r3b"/>
+        <destroy shape="r3c"/>
+        <destroy shape="r4a"/>
+    </event>
+</animation>
