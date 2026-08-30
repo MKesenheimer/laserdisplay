@@ -93,6 +93,10 @@
     <!-- ==================== referenced files ============================ -->
     <!-- the translate_by_path demo, slowed down for the bridge -->
     <sequence name="tbpath" file="../effects/translate_by_path.xml"/>
+    <!-- the two dotted lines converging, turning and splitting (bridge) -->
+    <sequence name="movinglines" file="../effects/moving_lines.xml"/>
+    <!-- two spinning dot rows riding the ring (chorus 1) -->
+    <sequence name="twolp" file="../effects/two_line_points.xml"/>
 
     <!-- ====================================================================
          TIMELINE
@@ -293,11 +297,10 @@
         <destroy shape="accC"/>
         <destroy shape="ring_rw1"/>
         <destroy shape="ch_t"/>
-        <!-- theme F: counter-rotating chasers on the big ring -->
-        <create shape="ch_c"/>
-        <effect shape="ch_c" type="translate_by_path" path="p_ring" velocity="135"/>
-        <create shape="ch_t"/>
-        <effect shape="ch_t" type="translate_by_path" path="p_ring" velocity="-135"/>
+        <!-- theme F: two spinning dot rows ride the ring, heated from
+             green toward coral -->
+        <create sequence="twolp"/>
+        <effect sequence="twolp" type="color_shift" dr="45" dg="-25" db="10"/>
     </event>
 
     <event at="58.8626">
@@ -307,6 +310,7 @@
     </event>
 
     <event at="62.0205">
+        <destroy sequence="twolp"/>
         <destroy shape="accT"/>
         <destroy shape="ch_g"/>
         <destroy shape="ch_t"/>
@@ -430,9 +434,10 @@
     <event at="97.8257">
         <destroy shape="ch_t"/>
         <destroy shape="ch_w"/>
-        <create shape="dia_b"/>
-        <effect shape="dia_b" type="rotation" speed="10"/>
-        <effect shape="dia_b" type="scale" min="0.92" max="1.08" frequency="0.3"/>
+        <!-- the two dotted lines converge, turn and split, tinted toward
+             the lagoon turquoise -->
+        <create sequence="movinglines"/>
+        <effect sequence="movinglines" type="color_shift" dr="6" dg="-4" db="18"/>
     </event>
 
     <event at="100.2405">

@@ -1,810 +1,1197 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Laser show: Shed My Skin - Within Temptation
-    Duration: 269s | BPM: 184.57
+    Shed My Skin - Laser Show
+    Song: Shed My Skin by Within Temptation
+    Duration: 269.166s | BPM: 92.29 (~0.650s per beat)
+    JSON: lasershows/shed-my-skin/shed-my-skin.json
 
-    Color scheme: Gothic metal — Deep Crimson (#FF1020), Icy Cyan (#00D0FF),
-    Pure White (#FFFFFF), Rose (#FF6090)
+    Heavy guitars + loud drums, melodic clear vocal.
 
-    Structure:
-      0-3.44s       Intro (very quiet, slow fade-in)
-      3.44-13.79s   Build-up 1
-      13.79-24.08   Instrumental
-      24.08-44.56   Verse 1
-      44.56-65.15   Bridge 1
-      65.15-85.61   Instrumental / Crescendo
-      85.61-106.22  Chorus 1
-      106.22-116.35 Instrumental
-      116.35-136.95 Verse 2
-      136.95-157.47 Bridge 2
-      157.47-162.56 Instrumental
-      162.56-183.19 Chorus 2
-      183.19-203.62 Drop
-      203.62-224.18 Instrumental
-      224.18-244.76 Chorus 3
-      244.76-265.27 Instrumental / Crescendo
-      265.27-269.00 Outro (fade to black)
+    Color scheme (fixed for the whole show):
+      Ice blue      (110,205,255) - verses, cool-downs, intro chorus
+      Deep ice      ( 45,125,225) - secondary cool tone
+      Orange        (255,145, 45) - warm partner of the ice theme
+      Warm gold     (255,200, 90) - bright accents
+      Red           (235, 45, 50) - chorus 2 drive, "evil" part
+      Green         ( 70,235,130) - bridge build-up
+      Magenta       (255, 65,205) - bridge build-up
+      White         (245,245,255) - flashes, "evil" part, outro
+
+    Structure (exact segment boundaries from the prompt):
+      0.00  - 13.26  Chorus   intro: ice+orange, wavy + circles (violin)
+      13.26 - 23.54  Middle 1 : red+orange, sharp objects moving
+      23.54 - 33.79  Verse 1  : ice+orange, quieter, round
+      33.79 - 44.10  Verse 2  : ice+orange, quieter, round
+      44.10 - 54.26  Bridge 1 : green+magenta, build-up, more shapes
+      54.26 - 64.70  Bridge 2 : green+magenta, build-up, more shapes
+      64.70 - 85.10  Middle 2 : ice+orange, cool-down
+      85.10 - 95.42  Chorus 2 : red+orange, crescendo, sharp
+      95.42 - 105.66 Chorus 2 : red+orange, sharp
+      105.66- 115.94 Middle 3 : ice+orange, cool-down
+      115.94- 126.30 Verse 3  : ice+orange, round
+      126.30- 136.54 Verse 4  : ice+orange, round
+      136.54- 146.70 Bridge 3 : green+magenta, build-up, more shapes
+      146.70- 157.10 Bridge 4 : green+magenta, build-up, more shapes
+      157.10- 162.10 Middle 4 : ice+orange, cool-down
+      162.10- 172.42 Chorus 2 : red+orange, crescendo, sharp
+      172.42- 182.70 Chorus 2 : red+orange, sharp
+      182.70- 203.22 Loud     : red+white, heavy "evil", flickering
+      203.22- 223.70 Middle 5 : ice+orange, cool-down
+      223.70- 234.06 Chorus 2 : red+orange, crescendo, sharp
+      234.06- 244.62 Chorus 2 : red+orange, sharp
+      244.62- 269.166 Outro   : red+white, heavy, fade-out
+
+    Pattern rules:
+      - Max four shapes on screen at once, never a blank frame
+      - Every segment transition fires at the exact boundary timestamp
+      - Sub-patterns rotate every ~4-8 beats (2.6-5.2s)
+      - Accents mirrored left/right; every-beat blink (0.65s) in the loud
+        parts, every-second-beat blink (1.30s) in the quiet parts
+      - translate_by_path drives the chasers; translate_to and rotate_by
+        carry the sharp sections; faster velocities where it gets louder
+      - Fades (negative color_shift) on every transition into a quiet part
+      - The chorus-2 / verse / bridge themes repeat with variation later on
 -->
-<animation fps="25" duration="269">
+<animation fps="25" duration="269.166">
 
     <!-- ==================== paths (never shown) ========================= -->
-    <!-- Circular orbit path -->
-    <shape name="p_ring" type="circle" cx="128" cy="128" r="85"
+    <shape name="p_ring"   type="circle" cx="128" cy="128" r="85" npoints="96" red="0" green="0" blue="0"/>
+    <shape name="p_ring2"  type="circle" cx="128" cy="128" r="60" npoints="72" red="0" green="0" blue="0"/>
+    <shape name="p_ring3"  type="circle" cx="128" cy="128" r="36" npoints="48" red="0" green="0" blue="0"/>
+    <shape name="p_rect"   type="tetragon" x0="28" y0="38" x1="228" y1="38" x2="228" y2="218" x3="28" y3="218"
            npoints="96" red="0" green="0" blue="0"/>
-    <!-- Figure-eight path -->
-    <shape name="p_eight" type="tetragon" x0="43" y0="43" x1="213" y1="213"
-           x2="43" y2="213" x3="213" y3="43"
+    <shape name="p_rect_s" type="tetragon" x0="58" y0="62" x1="198" y1="62" x2="198" y2="194" x3="58" y3="194"
            npoints="96" red="0" green="0" blue="0"/>
-    <!-- Rectangular path -->
-    <shape name="p_rect" type="tetragon" x0="28" y0="38" x1="228" y1="38"
-           x2="228" y2="218" x3="28" y3="218"
-           npoints="96" red="0" green="0" blue="0"/>
-    <!-- Diagonal path -->
-    <shape name="p_diagonal" type="line" x0="20" y0="220" x1="236" y1="36"
-           npoints="96" red="0" green="0" blue="0"/>
+    <shape name="p_orbit"  type="ellipse" cx="128" cy="128" w="170" h="96" npoints="96" red="0" green="0" blue="0"/>
+    <shape name="p_diag1"  type="line" x0="20" y0="220" x1="236" y1="36" npoints="2" red="0" green="0" blue="0"/>
+    <shape name="p_diag2"  type="line" x0="236" y0="220" x1="20" y1="36" npoints="2" red="0" green="0" blue="0"/>
 
-    <!-- ==================== main shapes ================================= -->
-    <!-- Orb — cyan, for intro/verses -->
-    <shape name="orb" type="circle" cx="50" cy="50" r="22"
-           npoints="40" red="0" green="208" blue="255"/>
-    <!-- Line — crimson -->
-    <shape name="line" type="line" x0="190" y0="30" x1="230" y1="70"
-           npoints="40" red="255" green="16" blue="32"/>
-    <!-- Triangle — white -->
-    <shape name="tri" type="triangle" x0="40" y0="200" x1="10" y1="148" x2="72" y2="148"
-           npoints="24" red="255" green="255" blue="255"/>
-    <!-- Diamond — white -->
-    <shape name="diamond" type="tetragon" x0="200" y0="140" x1="216" y1="124"
-           x2="232" y2="140" x3="216" y3="156"
-           npoints="16" red="255" green="255" blue="255"/>
-    <!-- Wide ellipse — cyan -->
-    <shape name="ellipse" type="ellipse" cx="200" cy="190" w="80" h="45"
-           npoints="40" red="0" green="208" blue="255"/>
-    <!-- Continuous sweep line — white -->
-    <shape name="cont" type="line" x0="50" y0="0" x1="200" y1="0"
-           npoints="36" red="255" green="255" blue="255"/>
-    <!-- Persistent chorus layer — cyan orb -->
-    <shape name="c_orb" type="circle" cx="200" cy="60" r="24"
-           npoints="36" red="0" green="208" blue="255"/>
-    <!-- Persistent chorus layer — rose triangle -->
-    <shape name="c_tri" type="triangle" x0="40" y0="190" x1="10" y1="140" x2="70" y2="140"
-           npoints="24" red="255" green="96" blue="144"/>
-    <!-- Persistent chorus layer — white dashed square -->
-    <shape name="c_frame" type="tetragon" x0="50" y0="50" x1="206" y1="50"
-           x2="206" y2="206" x3="50" y3="206"
-           npoints="48" red="255" green="255" blue="255" blank="6"/>
-    <!-- Large screen-filling cyan square (verse 1 background) -->
-    <shape name="bg1" type="tetragon" x0="20" y0="20" x1="236" y1="20"
-           x2="236" y2="236" x3="20" y3="236"
-           npoints="48" red="0" green="208" blue="255" blank="8"/>
-    <!-- Large screen-filling rose square (verse 2 background) -->
-    <shape name="bg2" type="tetragon" x0="20" y0="20" x1="236" y1="20"
-           x2="236" y2="236" x3="20" y3="236"
-           npoints="48" red="255" green="96" blue="144" blank="8"/>
-    <!-- Wide white ellipse (bridge background) -->
-    <shape name="bg3" type="ellipse" cx="128" cy="128" w="236" h="216"
-           npoints="80" red="255" green="255" blue="255" blank="6"/>
-    <!-- Large cyan circle (outro background) -->
-    <shape name="bg4" type="circle" cx="128" cy="128" r="110"
-           npoints="80" red="0" green="208" blue="255" blank="10"/>
-    <!-- Crimson dashed frame (crescendo / drop background) -->
-    <shape name="bg5" type="tetragon" x0="10" y0="10" x1="246" y1="10"
-           x2="246" y2="246" x3="10" y3="246"
-           npoints="64" red="255" green="16" blue="32" blank="12"/>
-    <!-- Drop shape — crimson diamond -->
-    <shape name="drop_dia" type="tetragon" x0="80" y0="80" x1="176" y1="80"
-           x2="176" y2="176" x3="80" y3="176"
-           npoints="20" red="255" green="16" blue="32"/>
+    <!-- ==================== chasers (small riders) ====================== -->
+    <shape name="ch_ice"  type="circle" cx="128" cy="128" r="10" npoints="20" red="110" green="205" blue="255"/>
+    <shape name="ch_ice2" type="circle" cx="128" cy="128" r="7"  npoints="16" red="45"  green="125" blue="225"/>
+    <shape name="ch_or"   type="circle" cx="128" cy="128" r="10" npoints="20" red="255" green="145" blue="45"/>
+    <shape name="ch_gold" type="circle" cx="128" cy="128" r="7"  npoints="16" red="255" green="200" blue="90"/>
+    <shape name="ch_red"  type="circle" cx="128" cy="128" r="10" npoints="20" red="235" green="45"  blue="50"/>
+    <shape name="ch_grn"  type="circle" cx="128" cy="128" r="10" npoints="20" red="70"  green="235" blue="130"/>
+    <shape name="ch_mag"  type="circle" cx="128" cy="128" r="10" npoints="20" red="255" green="65"  blue="205"/>
+    <shape name="ch_w"    type="circle" cx="128" cy="128" r="5"  npoints="12" red="245" green="245" blue="255"/>
 
-    <!-- ======================== references ============================== -->
-    <sequence name="verse1" file="verse1.xml"/>
-    <sequence name="verse2" file="verse2.xml"/>
-    <sequence name="chorus" file="chorus.xml"/>
-    <sequence name="bridge" file="bridge.xml"/>
-    <sequence name="crescendo" file="crescendo.xml"/>
+    <!-- ==================== large circles =============================== -->
+    <shape name="halo_ice"  type="circle" cx="128" cy="128" r="72" npoints="72" red="110" green="205" blue="255"/>
+    <shape name="halo_ice2" type="circle" cx="128" cy="128" r="55" npoints="64" red="45"  green="125" blue="225"/>
+    <shape name="ring_ice"  type="circle" cx="128" cy="128" r="55" npoints="48" red="110" green="205" blue="255"/>
+    <shape name="ring_red"  type="circle" cx="128" cy="128" r="55" npoints="48" red="235" green="45"  blue="50"/>
 
-    <!-- ======================== timeline ================================ -->
+    <!-- ==================== ellipses ==================================== -->
+    <shape name="ell_ice" type="ellipse" cx="128" cy="128" w="120" h="76" npoints="48" red="110" green="205" blue="255"/>
+    <shape name="ell_mag" type="ellipse" cx="128" cy="128" w="140" h="90" npoints="56" red="255" green="65"  blue="205"/>
 
-    <!-- ==================== INTRO (0-3.44s) ============================ -->
-    <!-- Very quiet start — orb fades in at top-left, drifting slowly -->
-    <event at="0.0">
-        <create shape="orb"/>
-        <effect shape="orb" type="color_shift" dr="-6" dg="0" db="8"/>
-        <effect shape="orb" type="translation" vx="5" vy="3" ax="10" fx="0.1"/>
-        <effect shape="orb" type="mirror" axis="vertical"/>
-    </event>
+    <!-- ==================== diamonds ==================================== -->
+    <shape name="dia_red" type="tetragon" x0="98" y0="98" x1="158" y1="98" x2="158" y2="158" x3="98" y3="158"
+           npoints="24" red="235" green="45"  blue="50"/>
+    <shape name="dia_grn" type="tetragon" x0="98" y0="98" x1="158" y1="98" x2="158" y2="158" x3="98" y3="158"
+           npoints="24" red="70"  green="235" blue="130"/>
+    <shape name="dia_mag" type="tetragon" x0="98" y0="98" x1="158" y1="98" x2="158" y2="158" x3="98" y3="158"
+           npoints="24" red="255" green="65"  blue="205"/>
+    <shape name="dia_w"   type="tetragon" x0="98" y0="98" x1="158" y1="98" x2="158" y2="158" x3="98" y3="158"
+           npoints="24" red="245" green="245" blue="255"/>
 
-    <!-- Large ellipse fades in at bottom-right, drifting slowly -->
-    <event at="2.0">
-        <create shape="ellipse"/>
-        <effect shape="ellipse" type="color_shift" dr="-5" dg="2" db="5"/>
-        <effect shape="ellipse" type="translation" vx="-6" vy="-4" ax="8" fx="0.1"/>
-        <effect shape="ellipse" type="mirror" axis="vertical"/>
-    </event>
+    <!-- ==================== triangles =================================== -->
+    <shape name="tri_red" type="triangle" x0="128" y0="170" x1="96" y1="106" x2="160" y2="106"
+           npoints="24" red="235" green="45"  blue="50"/>
+    <shape name="tri_or"  type="triangle" x0="128" y0="170" x1="96" y1="106" x2="160" y2="106"
+           npoints="24" red="255" green="145" blue="45"/>
+    <shape name="tri_mag" type="triangle" x0="128" y0="170" x1="96" y1="106" x2="160" y2="106"
+           npoints="24" red="255" green="65"  blue="205"/>
 
-    <!-- ==================== BUILD-UP 1 (3.44-13.79s) =================== -->
-    <!-- Orb drifts toward center -->
-    <event at="3.44">
-        <effect shape="orb" type="color_shift" dr="10" dg="-8" db="-5"/>
-    </event>
+    <!-- ==================== lines ======================================= -->
+    <shape name="wave_h_ice" type="line" x0="12" y0="128" x1="244" y1="128" npoints="96" red="110" green="205" blue="255"/>
+    <shape name="wave_h_or"  type="line" x0="12" y0="128" x1="244" y1="128" npoints="96" red="255" green="145" blue="45"/>
+    <shape name="wave_h_red" type="line" x0="12" y0="128" x1="244" y1="128" npoints="96" red="235" green="45"  blue="50"/>
+    <shape name="wave_h_grn" type="line" x0="12" y0="128" x1="244" y1="128" npoints="96" red="70"  green="235" blue="130"/>
+    <shape name="wave_h_mag" type="line" x0="12" y0="128" x1="244" y1="128" npoints="96" red="255" green="65"  blue="205"/>
+    <shape name="wave_v_ice" type="line" x0="128" y0="12" x1="128" y1="244" npoints="64" red="110" green="205" blue="255"/>
+    <shape name="flash_w"    type="line" x0="8"  y0="128" x1="248" y1="128" npoints="64" red="245" green="245" blue="255"/>
+    <shape name="spark_red"  type="line" x0="116" y0="128" x1="140" y1="128" npoints="10" red="235" green="45"  blue="50"/>
+    <shape name="spark_w"    type="line" x0="116" y0="128" x1="140" y1="128" npoints="10" red="245" green="245" blue="255"/>
+    <shape name="star1"      type="line" x0="128" y0="20"  x1="128" y1="238" npoints="36" red="245" green="245" blue="255"/>
+    <shape name="star2"      type="line" x0="20"  y0="128" x1="238" y1="128" npoints="36" red="245" green="245" blue="255"/>
+    <shape name="ray_red"    type="line" x0="128" y0="128" x1="46"  y1="46"  npoints="40" red="235" green="45"  blue="50"/>
+    <shape name="ray_red2"   type="line" x0="128" y0="128" x1="46"  y1="46"  npoints="40" red="235" green="45"  blue="50"/>
 
-    <!-- Line enters from top-right, sweeps downward -->
-    <event at="5.5">
-        <create shape="line"/>
-        <effect shape="line" type="translation" vx="-10" vy="20" ax="20" fx="0.4"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
+    <!-- ============ beat accents (left side, mirrored) ================== -->
+    <shape name="accIce" type="line" x0="36" y0="112" x1="56" y1="112" npoints="8" red="110" green="205" blue="255"/>
+    <shape name="accOr"  type="line" x0="36" y0="144" x1="56" y1="144" npoints="8" red="255" green="145" blue="45"/>
+    <shape name="accRed" type="line" x0="36" y0="112" x1="56" y1="112" npoints="8" red="235" green="45"  blue="50"/>
+    <shape name="accGrn" type="line" x0="30" y0="128" x1="52" y1="128" npoints="8" red="70"  green="235" blue="130"/>
+    <shape name="accMag" type="line" x0="36" y0="128" x1="56" y1="128" npoints="8" red="255" green="65"  blue="205"/>
+    <shape name="accW"   type="line" x0="28" y0="100" x1="50" y1="100" npoints="8" red="245" green="245" blue="255"/>
+
+    <!-- ==================== referenced files ============================ -->
+    <!-- the translate_by_path demo (ball, ball2, ship, spark) - cool-downs -->
+    <sequence name="tbpath" file="../effects/translate_by_path.xml"/>
+    <!-- two dotted lines converging, turning and splitting - verses -->
+    <sequence name="movinglines" file="../effects/moving_lines.xml"/>
+    <!-- two spinning dot rows on rect/triangle paths - chorus 2 -->
+    <sequence name="twolp" file="../effects/two_line_points.xml"/>
+    <!-- fast flickering triangle - the "evil" part -->
+    <sequence name="flick" file="../effects/flicker.xml"/>
+
+    <!-- ====================================================================
+         TIMELINE
+         ==================================================================== -->
+
+
+    <!-- ==================== CHORUS intro (0.00 - 13.26s) ================= -->
+    <!-- Violin + vocal. Ice blue + orange. Wavy patterns and circles,
+         slow and broad. -->
+
+    <event at="0.0929">
+        <create shape="halo_ice"/>
+        <effect shape="halo_ice" type="scale" min="0.8" max="1.1" frequency="0.12"/>
+        <effect shape="halo_ice" type="translation" vy="4"/>
+        <effect shape="halo_ice" type="color_shift" dr="4" dg="-6" db="-8"/>
+        <create shape="wave_h_ice"/>
+        <effect shape="wave_h_ice" type="warp" amplitude="14" wavelength="110" speed="0.18"/>
+        <effect shape="wave_h_ice" type="mirror" axis="horizontal"/>
     </event>
 
-    <!-- Diamond drops in from top-right corner, spinning -->
-    <event at="8.0">
-        <create shape="diamond"/>
-        <effect shape="diamond" type="rotation" speed="60"/>
-        <effect shape="diamond" type="translation" vx="-8" vy="12" ax="15" fx="0.3"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
+    <event at="2.6935">
+        <create shape="ch_ice"/>
+        <effect shape="ch_ice" type="translate_by_path" path="p_ring" velocity="40"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_ring" velocity="40" phase="0.5"/>
     </event>
 
-    <!-- Triangle slides in from bottom-left, spinning opposite -->
-    <event at="10.5">
-        <create shape="tri"/>
-        <effect shape="tri" type="rotation" speed="-80"/>
-        <effect shape="tri" type="translation" vx="12" vy="-15" ax="18" fx="0.35"/>
-        <effect shape="diamond" type="rotation" speed="90"/>
+    <event at="5.8979">
+        <effect shape="wave_h_ice" type="color_shift" dr="-90" dg="-90" db="-90"/>
     </event>
 
-    <!-- Speed everything up for chorus impact -->
-    <event at="13.0">
-        <effect shape="orb" type="speedup" factor="1.5"/>
-        <effect shape="line" type="speedup" factor="1.5"/>
-        <effect shape="diamond" type="speedup" factor="1.5"/>
-        <effect shape="tri" type="speedup" factor="1.5"/>
+    <event at="6.548">
+        <destroy shape="wave_h_ice"/>
+        <create shape="accIce"/>
+        <effect shape="accIce" type="mirror" axis="vertical"/>
+        <effect shape="accIce" type="blink" period="1.3" duty="0.18"/>
     </event>
 
-    <!-- ==================== INSTRUMENTAL 1 (13.79-24.08s) ============== -->
-    <!-- Shapes move along paths — calm but active, no vocals -->
-    <event at="13.79">
-        <effect shape="orb" type="translation" vx="0" vy="0" ax="20" fx="0.3"/>
-        <effect shape="orb" type="rotation" speed="50"/>
-        <effect shape="line" type="translation" vx="0" vy="0" ax="25" fx="0.35"/>
-        <effect shape="diamond" type="rotation" speed="80"/>
-        <effect shape="tri" type="rotation" speed="-100"/>
-        <effect shape="ellipse" type="translation" vx="0" vy="0" ax="18" fx="0.25"/>
-    </event>
-    <event at="18.0">
-        <effect shape="orb" type="color_shift" dr="-3" dg="5" db="-2"/>
-        <effect shape="ellipse" type="color_shift" dr="5" dg="-3" db="3"/>
-    </event>
-    <event at="22.0">
-        <effect shape="orb" type="scale" min="0.8" max="1.2" frequency="0.3"/>
+    <event at="9.7292">
+        <effect shape="halo_ice" type="color_shift" dr="-120" dg="-120" db="-120"/>
     </event>
 
-    <!-- ==================== VERSE 1 (24.08-44.56s) ===================== -->
-    <!-- Strip to calmer shapes, large cyan background fill -->
-    <event at="24.08">
-        <destroy shape="orb"/>
-        <destroy shape="ellipse"/>
-        <destroy shape="line"/>
-        <destroy shape="diamond"/>
-        <destroy shape="tri"/>
-        <create shape="bg1"/>
-        <effect shape="bg1" type="color_shift" dr="-5" dg="0" db="5"/>
-        <effect shape="bg1" type="rotation" speed="8"/>
-        <create sequence="verse1"/>
+    <event at="10.3793">
+        <destroy shape="accIce"/>
+        <destroy shape="halo_ice"/>
+        <create shape="ring_ice"/>
+        <effect shape="ring_ice" type="rotation" speed="18"/>
+        <effect shape="ring_ice" type="scale" min="0.9" max="1.1" frequency="0.25"/>
     </event>
 
-    <!-- Subtle color drift during verse -->
-    <event at="30.0">
-        <effect shape="v_orb" type="color_shift" dr="-3" dg="5" db="-2"/>
-    </event>
-    <event at="35.0">
-        <effect shape="v_line" type="color_shift" dr="4" dg="-3" db="1"/>
+    <event at="12.3066">
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="1.3" duty="0.2"/>
     </event>
 
-    <!-- ==================== BRIDGE 1 (44.56-65.15s) ==================== -->
-    <!-- Atmospheric — single large orb, slow rainbow, minimal motion -->
-    <event at="44.56">
-        <destroy sequence="verse1"/>
-        <destroy shape="bg1"/>
-        <create shape="bg3"/>
-        <effect shape="bg3" type="color_shift" dr="-5" dg="5" db="-3"/>
-        <effect shape="bg3" type="rotation" speed="4"/>
-        <create sequence="bridge"/>
+
+    <!-- ==================== MIDDLE 1 (13.26 - 23.54s) ==================== -->
+    <!-- Sharp objects moving around. Red + orange. Faster. -->
+
+    <event at="13.26">
+        <destroy shape="accOr"/>
+        <destroy shape="ring_ice"/>
+        <destroy shape="ch_ice"/>
+        <destroy shape="ch_or"/>
+        <create shape="ch_red"/>
+        <effect shape="ch_red" type="translate_by_path" path="p_rect" velocity="110"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_rect" velocity="110" phase="0.5"/>
+        <create shape="tri_red"/>
+        <effect shape="tri_red" type="rotation" speed="120"/>
     </event>
 
-    <!-- Slowly intensify the rainbow -->
-    <event at="50.0">
-        <effect shape="b_orb" type="rotation" speed="20"/>
-    </event>
-    <event at="56.0">
-        <effect shape="b_orb" type="scale" min="0.9" max="1.1" frequency="0.05"/>
+    <event at="13.5837">
+        <create shape="accRed"/>
+        <effect shape="accRed" type="mirror" axis="vertical"/>
+        <effect shape="accRed" type="blink" period="0.65" duty="0.22"/>
     </event>
 
-    <!-- ==================== INSTRUMENTAL / CRESCENDO (65.15-85.61s) === -->
-    <!-- Ramp up energy — crimson frame, fast red tetragons -->
-    <event at="65.15">
-        <destroy sequence="bridge"/>
-        <destroy shape="bg3"/>
-        <create shape="bg5"/>
-        <effect shape="bg5" type="rotation" speed="10"/>
-        <create shape="tri"/>
-        <create shape="diamond"/>
-        <create shape="line"/>
-        <effect shape="tri" type="rotation" speed="60"/>
-        <effect shape="tri" type="translation" vx="10" vy="-10" ax="20" fx="0.4"/>
-        <effect shape="diamond" type="rotation" speed="-70"/>
-        <effect shape="diamond" type="translation" vx="-8" vy="15" ax="22" fx="0.45"/>
-        <effect shape="line" type="translation" vx="0" vy="0" ax="25" fx="0.5"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="70.0">
-        <effect shape="tri" type="speedup" factor="1.3"/>
-        <effect shape="diamond" type="speedup" factor="1.3"/>
-        <effect shape="line" type="speedup" factor="1.3"/>
-    </event>
-    <event at="75.0">
-        <create shape="c_orb"/>
-        <effect shape="c_orb" type="rotation" speed="40"/>
-        <effect shape="c_orb" type="translation" vx="0" vy="0" ax="12" fx="0.2"/>
-        <effect shape="tri" type="speedup" factor="1.3"/>
-        <effect shape="diamond" type="speedup" factor="1.3"/>
-        <effect shape="line" type="speedup" factor="1.3"/>
-    </event>
-    <event at="80.0">
-        <create shape="c_tri"/>
-        <effect shape="c_tri" type="rotation" speed="-30"/>
-        <effect shape="c_tri" type="translation" vx="0" vy="0" ax="10" fx="0.15"/>
-        <effect shape="tri" type="rotation" speed="90"/>
-        <effect shape="diamond" type="rotation" speed="-100"/>
+    <event at="16.1611">
+        <destroy shape="accRed"/>
+        <destroy shape="tri_red"/>
+        <create shape="tri_or"/>
+        <effect shape="tri_or" type="rotation" speed="-120"/>
+        <create shape="spark_red"/>
+        <effect shape="spark_red" type="translate_by_path" path="p_diag1" velocity="170"/>
     </event>
 
-    <!-- ==================== CHORUS 1 (85.61-106.22s) =================== -->
-    <event at="85.61">
-        <destroy shape="bg5"/>
-        <destroy shape="tri"/>
-        <destroy shape="diamond"/>
-        <destroy shape="line"/>
-        <create sequence="chorus"/>
-        <create shape="c_frame"/>
-        <effect shape="c_frame" type="rotation" speed="20"/>
-        <create shape="cont"/>
-        <effect shape="cont" type="translation" vx="0" vy="15" ax="20" fx="0.4"/>
-        <effect shape="cont" type="mirror" axis="vertical"/>
+    <event at="19.9924">
+        <destroy shape="spark_red"/>
+        <destroy shape="tri_or"/>
+        <create shape="dia_red"/>
+        <effect shape="dia_red" type="rotate_by" angle="90" dt="1.3"/>
+        <effect shape="dia_red" type="translate_to" sx="128" sy="128" ex="88" ey="128" dt="3.0"/>
     </event>
 
-    <!-- Blink accents — every ~2s, with vertical mirrors -->
-    <event at="86.6">
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.25" duty="0.15"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="88.2">
-        <destroy shape="tri"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="89.8">
-        <destroy shape="line"/>
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.3" duty="0.2"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="91.4">
-        <destroy shape="diamond"/>
-    </event>
-    <event at="93.4">
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.22" duty="0.15"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="95.0">
-        <destroy shape="diamond"/>
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.18" duty="0.2"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="96.6">
-        <destroy shape="tri"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.25" duty="0.1"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="98.2">
-        <destroy shape="line"/>
-    </event>
-    <event at="100.2">
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="101.8">
-        <destroy shape="tri"/>
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.28" duty="0.2"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="103.4">
-        <destroy shape="diamond"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="105.0">
-        <destroy shape="line"/>
+    <event at="21.2927">
+        <effect shape="dia_red" type="rotate_by" angle="90" dt="1.3"/>
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="0.65" duty="0.25"/>
     </event>
 
-    <!-- ==================== INSTRUMENTAL 2 (106.22-116.35s) ============ -->
-    <!-- Post-chorus wind-down — multiple shapes, slowing rotation, color drift -->
-    <event at="106.22">
-        <destroy sequence="chorus"/>
-        <destroy shape="c_orb"/>
-        <destroy shape="c_tri"/>
-        <destroy shape="c_frame"/>
-        <create shape="orb"/>
-        <effect shape="orb" type="rotation" speed="40"/>
-        <effect shape="orb" type="translation" vx="0" vy="0" ax="15" fx="0.2"/>
-        <create shape="cont"/>
-        <effect shape="cont" type="translation" vx="0" vy="-10" ax="18" fx="0.3"/>
-        <effect shape="cont" type="mirror" axis="vertical"/>
-        <create shape="tri"/>
-        <effect shape="tri" type="rotation" speed="-30"/>
-        <effect shape="tri" type="translation" vx="8" vy="-6" ax="12" fx="0.18"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="108.5">
-        <create shape="diamond"/>
-        <effect shape="diamond" type="rotation" speed="50"/>
-        <effect shape="diamond" type="translate_by_path" path="p_ring" velocity="30"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-        <create shape="ellipse"/>
-        <effect shape="ellipse" type="scale" min="0.9" max="1.1" frequency="0.15"/>
-        <effect shape="ellipse" type="translation" vx="-5" vy="3" ax="10" fx="0.15"/>
-        <effect shape="ellipse" type="mirror" axis="vertical"/>
-    </event>
-    <event at="110.5">
-        <effect shape="orb" type="color_shift" dr="-4" dg="5" db="-3"/>
-        <effect shape="orb" type="rotation" speed="25"/>
-        <effect shape="tri" type="rotation" speed="-20"/>
-    </event>
-    <event at="112.5">
-        <create shape="line"/>
-        <effect shape="line" type="rotation" speed="35"/>
-        <effect shape="line" type="translation" vx="-6" vy="8" ax="14" fx="0.2"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="114.5">
-        <effect shape="diamond" type="rotation" speed="30"/>
-        <effect shape="ellipse" type="scale" min="0.85" max="1.15" frequency="0.2"/>
-        <effect shape="cont" type="translation" vx="0" vy="0" ax="12" fx="0.2"/>
+    <event at="23.22">
+        <destroy shape="accOr"/>
     </event>
 
-    <!-- ==================== VERSE 2 (116.35-136.95s) =================== -->
-    <!-- Rose triangle + tetragon, slower feel on rose background -->
-    <event at="116.35">
-        <destroy shape="orb"/>
-        <destroy shape="cont"/>
-        <destroy shape="tri"/>
-        <destroy shape="diamond"/>
-        <destroy shape="ellipse"/>
-        <destroy shape="line"/>
-        <create shape="bg2"/>
-        <effect shape="bg2" type="color_shift" dr="-5" dg="5" db="-3"/>
-        <effect shape="bg2" type="rotation" speed="-6"/>
-        <create sequence="verse2"/>
+
+    <!-- ==================== VERSE 1 (23.54 - 33.79s) ===================== -->
+    <!-- Quieter, round patterns. Ice blue + orange. Slow. -->
+
+    <event at="23.54">
+        <destroy shape="dia_red"/>
+        <destroy shape="ch_red"/>
+        <destroy shape="ch_or"/>
+        <create shape="ell_ice"/>
+        <effect shape="ell_ice" type="scale" min="0.9" max="1.1" frequency="0.2"/>
+        <effect shape="ell_ice" type="rotation" speed="6"/>
+        <create shape="ch_ice"/>
+        <effect shape="ch_ice" type="translate_by_path" path="p_ring2" velocity="30"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_ring2" velocity="30" phase="0.5"/>
     </event>
 
-    <!-- Gradual color warmth shift -->
-    <event at="124.0">
-        <effect shape="v2_tri" type="color_shift" dr="-2" dg="5" db="-3"/>
-    </event>
-    <event at="132.0">
-        <effect shape="v2_tet" type="color_shift" dr="3" dg="-4" db="2"/>
+    <event at="23.8469">
+        <create shape="accIce"/>
+        <effect shape="accIce" type="mirror" axis="vertical"/>
+        <effect shape="accIce" type="blink" period="1.3" duty="0.18"/>
     </event>
 
-    <!-- ==================== BRIDGE 2 (136.95-157.47s) ================== -->
-    <!-- Faster, flashing symmetrical accents — no slow rainbow orb -->
-    <event at="136.95">
-        <destroy sequence="verse2"/>
-        <destroy shape="bg2"/>
-        <create shape="bg3"/>
-        <effect shape="bg3" type="color_shift" dr="-3" dg="3" db="-2"/>
-        <effect shape="bg3" type="rotation" speed="3"/>
-        <create shape="ellipse"/>
-        <effect shape="ellipse" type="scale" min="0.85" max="1.15" frequency="0.08"/>
-        <effect shape="ellipse" type="rotation" speed="10"/>
-        <effect shape="ellipse" type="mirror" axis="vertical"/>
-        <!-- Symmetrical accent pair — left and right -->
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="tri" type="translation" vx="6" vy="4" ax="15" fx="0.25"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.25" duty="0.15"/>
-        <effect shape="line" type="translation" vx="-6" vy="4" ax="12" fx="0.2"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <!-- Blink accents — symmetrical pair every ~2s -->
-    <event at="139.0">
-        <destroy shape="tri"/>
-        <destroy shape="line"/>
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.22" duty="0.15"/>
-        <effect shape="diamond" type="rotation" speed="40"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="141.0">
-        <destroy shape="diamond"/>
-    </event>
-    <event at="143.0">
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.18" duty="0.12"/>
-        <effect shape="tri" type="translation" vx="0" vy="0" ax="20" fx="0.3"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="145.0">
-        <destroy shape="tri"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="line" type="rotation" speed="50"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="147.0">
-        <destroy shape="line"/>
-    </event>
-    <event at="149.0">
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.18" duty="0.12"/>
-        <effect shape="diamond" type="rotation" speed="60"/>
-        <effect shape="diamond" type="translate_by_path" path="p_ring" velocity="25"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="151.0">
-        <destroy shape="diamond"/>
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.15" duty="0.1"/>
-        <effect shape="tri" type="rotation" speed="-50"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="153.0">
-        <destroy shape="tri"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="line" type="translate_by_path" path="p_eight" velocity="20"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="155.0">
-        <destroy shape="line"/>
+    <event at="27.0745">
+        <destroy shape="accIce"/>
+        <create shape="wave_h_ice"/>
+        <effect shape="wave_h_ice" type="warp" amplitude="10" wavelength="110" speed="0.15"/>
     </event>
 
-    <!-- ==================== INSTRUMENTAL 3 (157.47-162.56s) ============ -->
-    <!-- Quick transition — shapes build energy for final chorus -->
-    <event at="157.47">
-        <destroy shape="bg3"/>
-        <destroy shape="ellipse"/>
-        <create shape="orb"/>
-        <effect shape="orb" type="rotation" speed="40"/>
-        <effect shape="orb" type="translation" vx="0" vy="0" ax="18" fx="0.3"/>
-        <effect shape="orb" type="color_shift" dr="10" dg="-5" db="-5"/>
-    </event>
-    <event at="160.0">
-        <create shape="line"/>
-        <effect shape="line" type="rotation" speed="60"/>
-        <effect shape="line" type="translation" vx="0" vy="0" ax="25" fx="0.5"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
+    <event at="30.2788">
+        <effect shape="wave_h_ice" type="color_shift" dr="-90" dg="-90" db="-90"/>
     </event>
 
-    <!-- ==================== CHORUS 2 (162.56-183.19s) ================== -->
-    <event at="162.56">
-        <destroy shape="orb"/>
-        <destroy shape="ellipse"/>
-        <destroy shape="line"/>
-        <create sequence="chorus"/>
-        <create shape="c_orb"/>
-        <effect shape="c_orb" type="rotation" speed="50"/>
-        <effect shape="c_orb" type="translation" vx="0" vy="0" ax="15" fx="0.2"/>
-        <create shape="c_tri"/>
-        <effect shape="c_tri" type="rotation" speed="-40"/>
-        <effect shape="c_tri" type="translation" vx="0" vy="0" ax="12" fx="0.15"/>
-        <create shape="c_frame"/>
-        <effect shape="c_frame" type="rotation" speed="20"/>
-        <create shape="cont"/>
-        <effect shape="cont" type="translation" vx="0" vy="18" ax="20" fx="0.4"/>
-        <effect shape="cont" type="mirror" axis="vertical"/>
+    <event at="30.9058">
+        <destroy shape="wave_h_ice"/>
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="1.3" duty="0.2"/>
     </event>
 
-    <!-- Blink accents — every ~2s, with vertical mirrors -->
-    <event at="163.6">
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.25" duty="0.15"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="165.2">
-        <destroy shape="tri"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="166.8">
-        <destroy shape="line"/>
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.3" duty="0.2"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="168.4">
-        <destroy shape="diamond"/>
-    </event>
-    <event at="170.4">
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.22" duty="0.15"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="172.0">
-        <destroy shape="diamond"/>
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.18" duty="0.2"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="173.6">
-        <destroy shape="tri"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.25" duty="0.1"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="175.2">
-        <destroy shape="line"/>
-    </event>
-    <event at="177.2">
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="178.8">
-        <destroy shape="tri"/>
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.28" duty="0.2"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="180.4">
-        <destroy shape="diamond"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="182.0">
-        <destroy shape="line"/>
+    <event at="33.4832">
+        <destroy shape="accOr"/>
     </event>
 
-    <!-- ==================== DROP (183.19-203.62s) ====================== -->
-    <!-- Heavy, driving — crimson shapes, intense blink, screen-filling -->
-    <event at="183.19">
-        <destroy sequence="chorus"/>
-        <destroy shape="c_orb"/>
-        <destroy shape="c_tri"/>
-        <destroy shape="c_frame"/>
-        <destroy shape="cont"/>
-        <destroy shape="tri"/>
-        <destroy shape="line"/>
-        <destroy shape="diamond"/>
-        <create shape="bg5"/>
-        <effect shape="bg5" type="rotation" speed="8"/>
-        <create shape="drop_dia"/>
-        <effect shape="drop_dia" type="rotation" speed="60"/>
-        <effect shape="drop_dia" type="scale" min="0.85" max="1.15" frequency="0.5"/>
-        <effect shape="drop_dia" type="mirror" axis="vertical"/>
-    </event>
-    <event at="186.0">
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.15" duty="0.12"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.18" duty="0.1"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="188.0">
-        <destroy shape="tri"/>
-        <destroy shape="diamond"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.12" duty="0.1"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="190.0">
-        <destroy shape="line"/>
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.14" duty="0.1"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.16" duty="0.1"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="192.0">
-        <destroy shape="tri"/>
-        <destroy shape="diamond"/>
-        <create shape="cont"/>
-        <effect shape="cont" type="translation" vx="0" vy="-15" ax="20" fx="0.3"/>
-        <effect shape="cont" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="cont" type="mirror" axis="vertical"/>
-    </event>
-    <event at="195.0">
-        <effect shape="drop_dia" type="scale" min="0.8" max="1.2" frequency="0.7"/>
-    </event>
-    <event at="198.0">
-        <destroy shape="cont"/>
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.1" duty="0.08"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.12" duty="0.08"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.08" duty="0.06"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
+
+    <!-- ==================== VERSE 2 (33.79 - 44.10s) ===================== -->
+    <!-- Same, varied: deep-ice halo, small ring, vertical wave. -->
+
+    <event at="33.79">
+        <destroy shape="ell_ice"/>
+        <destroy shape="ch_ice"/>
+        <destroy shape="ch_or"/>
+        <create shape="halo_ice2"/>
+        <effect shape="halo_ice2" type="scale" min="0.85" max="1.12" frequency="0.15"/>
+        <effect shape="halo_ice2" type="translation" vy="3"/>
+        <create shape="ch_ice2"/>
+        <effect shape="ch_ice2" type="translate_by_path" path="p_ring3" velocity="35"/>
+        <create shape="ch_gold"/>
+        <effect shape="ch_gold" type="translate_by_path" path="p_ring3" velocity="35" phase="0.5"/>
     </event>
 
-    <!-- ==================== INSTRUMENTAL 4 (203.62-224.18s) ============ -->
-    <!-- Post-drop calm — shapes return to path-based motion -->
-    <event at="203.62">
-        <destroy shape="bg5"/>
-        <destroy shape="drop_dia"/>
-        <destroy shape="tri"/>
-        <destroy shape="diamond"/>
-        <destroy shape="line"/>
-        <create shape="bg4"/>
-        <effect shape="bg4" type="color_shift" dr="-3" dg="3" db="-2"/>
-        <effect shape="bg4" type="rotation" speed="5"/>
-        <create shape="orb"/>
-        <effect shape="orb" type="translate_by_path" path="p_ring" velocity="40"/>
-        <create shape="ellipse"/>
-        <effect shape="ellipse" type="translate_by_path" path="p_eight" velocity="-35"/>
-        <effect shape="ellipse" type="color_shift" dr="-4" dg="2" db="3"/>
-        <effect shape="ellipse" type="mirror" axis="vertical"/>
-        <create shape="cont"/>
-        <effect shape="cont" type="translation" vx="0" vy="8" ax="15" fx="0.3"/>
-        <effect shape="cont" type="mirror" axis="vertical"/>
-    </event>
-    <event at="212.0">
-        <effect shape="orb" type="speedup" factor="1.3"/>
-        <effect shape="ellipse" type="speedup" factor="1.3"/>
-    </event>
-    <event at="220.0">
-        <effect shape="orb" type="speedup" factor="1.3"/>
-        <effect shape="ellipse" type="speedup" factor="1.3"/>
-        <effect shape="cont" type="translation" vx="0" vy="0" ax="25" fx="0.4"/>
+    <event at="34.1101">
+        <create shape="accIce"/>
+        <effect shape="accIce" type="mirror" axis="vertical"/>
+        <effect shape="accIce" type="blink" period="1.3" duty="0.18"/>
     </event>
 
-    <!-- ==================== CHORUS 3 (224.18-244.76s) ================== -->
-    <event at="224.18">
-        <destroy shape="bg4"/>
-        <destroy shape="orb"/>
-        <destroy shape="ellipse"/>
-        <destroy shape="cont"/>
-        <create sequence="chorus"/>
-        <create shape="c_orb"/>
-        <effect shape="c_orb" type="rotation" speed="50"/>
-        <effect shape="c_orb" type="translation" vx="0" vy="0" ax="15" fx="0.2"/>
-        <create shape="c_tri"/>
-        <effect shape="c_tri" type="rotation" speed="-40"/>
-        <effect shape="c_tri" type="translation" vx="0" vy="0" ax="12" fx="0.15"/>
-        <create shape="c_frame"/>
-        <effect shape="c_frame" type="rotation" speed="20"/>
-        <create shape="cont"/>
-        <effect shape="cont" type="translation" vx="0" vy="18" ax="20" fx="0.4"/>
-        <effect shape="cont" type="mirror" axis="vertical"/>
+    <event at="37.2912">
+        <destroy shape="accIce"/>
+        <create shape="wave_v_ice"/>
+        <effect shape="wave_v_ice" type="warp" horizontal="0" amplitude="12" wavelength="90" speed="0.18"/>
+        <effect shape="wave_v_ice" type="mirror" axis="vertical"/>
     </event>
 
-    <!-- Blink accents — every ~2s, with vertical mirrors -->
-    <event at="225.2">
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.25" duty="0.15"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="226.8">
-        <destroy shape="tri"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="228.4">
-        <destroy shape="line"/>
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.3" duty="0.2"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="230.0">
-        <destroy shape="diamond"/>
-    </event>
-    <event at="232.0">
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.22" duty="0.15"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="233.6">
-        <destroy shape="diamond"/>
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.18" duty="0.2"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="235.2">
-        <destroy shape="tri"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.25" duty="0.1"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="236.8">
-        <destroy shape="line"/>
-    </event>
-    <event at="238.8">
-        <create shape="tri"/>
-        <effect shape="tri" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="tri" type="mirror" axis="vertical"/>
-    </event>
-    <event at="240.4">
-        <destroy shape="tri"/>
-        <create shape="diamond"/>
-        <effect shape="diamond" type="blink" period="0.28" duty="0.2"/>
-        <effect shape="diamond" type="mirror" axis="vertical"/>
-    </event>
-    <event at="242.0">
-        <destroy shape="diamond"/>
-        <create shape="line"/>
-        <effect shape="line" type="blink" period="0.2" duty="0.15"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="243.6">
-        <destroy shape="line"/>
+    <event at="40.542">
+        <effect shape="wave_v_ice" type="color_shift" dr="-100" dg="-100" db="-100"/>
     </event>
 
-    <!-- ==================== INSTRUMENTAL / CRESCENDO (244.76-265.27s) == -->
-    <!-- Ramp up for final outro — crescendo shapes + blinks -->
-    <event at="244.76">
-        <destroy sequence="chorus"/>
-        <destroy shape="c_orb"/>
-        <destroy shape="c_tri"/>
-        <destroy shape="c_frame"/>
-        <create shape="bg5"/>
-        <effect shape="bg5" type="rotation" speed="12"/>
-        <create shape="tri"/>
-        <create shape="diamond"/>
-        <create shape="line"/>
-        <effect shape="tri" type="rotation" speed="80"/>
-        <effect shape="tri" type="translation" vx="12" vy="-12" ax="25" fx="0.45"/>
-        <effect shape="diamond" type="rotation" speed="-90"/>
-        <effect shape="diamond" type="translation" vx="-10" vy="18" ax="28" fx="0.5"/>
-        <effect shape="line" type="translation" vx="0" vy="0" ax="30" fx="0.55"/>
-        <effect shape="line" type="mirror" axis="vertical"/>
-    </event>
-    <event at="250.0">
-        <effect shape="tri" type="speedup" factor="1.4"/>
-        <effect shape="diamond" type="speedup" factor="1.4"/>
-        <effect shape="line" type="speedup" factor="1.4"/>
-        <create shape="cont"/>
-        <effect shape="cont" type="translation" vx="0" vy="-12" ax="20" fx="0.35"/>
-        <effect shape="cont" type="mirror" axis="vertical"/>
-    </event>
-    <event at="256.0">
-        <effect shape="tri" type="speedup" factor="1.4"/>
-        <effect shape="diamond" type="speedup" factor="1.4"/>
-        <effect shape="line" type="speedup" factor="1.4"/>
+    <event at="41.169">
+        <destroy shape="wave_v_ice"/>
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="1.3" duty="0.2"/>
     </event>
 
-    <!-- ==================== OUTRO (265.27-269.00s) ====================== -->
-    <!-- Fade to black — strip everything, single fading orb -->
-    <event at="265.27">
-        <destroy shape="bg5"/>
-        <destroy shape="tri"/>
-        <destroy shape="diamond"/>
-        <destroy shape="line"/>
-        <destroy shape="cont"/>
-        <create shape="bg4"/>
-        <effect shape="bg4" type="color_shift" dr="-8" dg="-8" db="-8"/>
-        <effect shape="bg4" type="rotation" speed="3"/>
-        <create shape="orb"/>
-        <effect shape="orb" type="color_shift" dr="-10" dg="-10" db="-10"/>
+    <event at="43.7464">
+        <destroy shape="accOr"/>
     </event>
-    <event at="267.0">
-        <effect shape="orb" type="color_shift" dr="-8" dg="-8" db="-8"/>
+
+
+    <!-- ==================== BRIDGE 1 (44.10 - 54.26s) ==================== -->
+    <!-- Builds up. Green + magenta. More shapes, rising speed. -->
+
+    <event at="44.10">
+        <destroy shape="halo_ice2"/>
+        <destroy shape="ch_ice2"/>
+        <destroy shape="ch_gold"/>
+        <create shape="ch_grn"/>
+        <effect shape="ch_grn" type="translate_by_path" path="p_rect_s" velocity="60"/>
+        <create shape="ch_mag"/>
+        <effect shape="ch_mag" type="translate_by_path" path="p_rect_s" velocity="60" phase="0.5"/>
+        <create shape="dia_mag"/>
+        <effect shape="dia_mag" type="rotation" speed="35"/>
     </event>
-    <event at="269.0">
-        <destroy shape="bg4"/>
-        <destroy shape="orb"/>
+
+    <event at="44.3966">
+        <create shape="accGrn"/>
+        <effect shape="accGrn" type="mirror" axis="vertical"/>
+        <effect shape="accGrn" type="blink" period="1.3" duty="0.2"/>
     </event>
+
+    <event at="47.5312">
+        <destroy shape="accGrn"/>
+        <create shape="wave_h_grn"/>
+        <effect shape="wave_h_grn" type="warp" amplitude="14" wavelength="100" speed="0.35"/>
+    </event>
+
+    <event at="50.1551">
+        <destroy shape="wave_h_grn"/>
+        <effect shape="ch_grn" type="speedup" factor="1.8"/>
+        <effect shape="ch_mag" type="speedup" factor="1.8"/>
+        <create shape="accMag"/>
+        <effect shape="accMag" type="mirror" axis="vertical"/>
+        <effect shape="accMag" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="52.7325">
+        <destroy shape="accMag"/>
+        <effect shape="dia_mag" type="color_shift" dr="-80" dg="-80" db="-80"/>
+    </event>
+
+
+    <!-- ==================== BRIDGE 2 (54.26 - 64.70s) ==================== -->
+    <!-- Continues the build. Green + magenta. -->
+
+    <event at="54.26">
+        <destroy shape="dia_mag"/>
+        <destroy shape="ch_grn"/>
+        <destroy shape="ch_mag"/>
+        <create shape="ch_mag"/>
+        <effect shape="ch_mag" type="translate_by_path" path="p_ring" velocity="80"/>
+        <create shape="ch_grn"/>
+        <effect shape="ch_grn" type="translate_by_path" path="p_ring" velocity="80" phase="0.5"/>
+        <create shape="tri_mag"/>
+        <effect shape="tri_mag" type="rotation" speed="90"/>
+    </event>
+
+    <event at="54.6598">
+        <create shape="accMag"/>
+        <effect shape="accMag" type="mirror" axis="vertical"/>
+        <effect shape="accMag" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="57.8873">
+        <destroy shape="accMag"/>
+        <destroy shape="tri_mag"/>
+        <create shape="dia_grn"/>
+        <effect shape="dia_grn" type="rotate_by" angle="120" dt="1.3"/>
+    </event>
+
+    <event at="60.4415">
+        <destroy shape="dia_grn"/>
+        <create shape="wave_h_mag"/>
+        <effect shape="wave_h_mag" type="warp" amplitude="18" wavelength="90" speed="0.5"/>
+        <effect shape="wave_h_mag" type="mirror" axis="horizontal"/>
+    </event>
+
+    <event at="61.7186">
+        <create shape="accGrn"/>
+        <effect shape="accGrn" type="mirror" axis="vertical"/>
+        <effect shape="accGrn" type="blink" period="0.65" duty="0.2"/>
+    </event>
+
+    <event at="64.2728">
+        <destroy shape="accGrn"/>
+        <effect shape="wave_h_mag" type="color_shift" dr="-100" dg="-100" db="-100"/>
+    </event>
+
+
+    <!-- ==================== MIDDLE 2 (64.70 - 85.10s) ==================== -->
+    <!-- Cool-down. Ice blue + orange. Slow, broad. Longest rest. -->
+
+    <event at="64.70">
+        <destroy shape="wave_h_mag"/>
+        <destroy shape="ch_mag"/>
+        <destroy shape="ch_grn"/>
+        <create shape="halo_ice"/>
+        <effect shape="halo_ice" type="scale" min="0.8" max="1.1" frequency="0.12"/>
+        <effect shape="halo_ice" type="translation" vy="3"/>
+        <create shape="wave_h_ice"/>
+        <effect shape="wave_h_ice" type="warp" amplitude="10" wavelength="120" speed="0.15"/>
+    </event>
+
+    <event at="64.923">
+        <create shape="ch_ice"/>
+        <effect shape="ch_ice" type="translate_by_path" path="p_orbit" velocity="35"/>
+    </event>
+
+    <event at="67.5004">
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_orbit" velocity="35" phase="0.5"/>
+    </event>
+
+    <event at="71.8425">
+        <destroy shape="ch_ice"/>
+        <destroy shape="ch_or"/>
+        <destroy shape="wave_h_ice"/>
+        <create shape="accIce"/>
+        <effect shape="accIce" type="mirror" axis="vertical"/>
+        <effect shape="accIce" type="blink" period="1.3" duty="0.18"/>
+        <create shape="ring_ice"/>
+        <effect shape="ring_ice" type="rotation" speed="12"/>
+    </event>
+
+    <event at="75.1862">
+        <destroy shape="accIce"/>
+        <destroy shape="ring_ice"/>
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="1.3" duty="0.2"/>
+    </event>
+
+    <event at="78.4138">
+        <destroy shape="accOr"/>
+        <create shape="wave_v_ice"/>
+        <effect shape="wave_v_ice" type="warp" horizontal="0" amplitude="10" wavelength="100" speed="0.15"/>
+        <effect shape="wave_v_ice" type="mirror" axis="vertical"/>
+    </event>
+
+    <event at="82.2451">
+        <effect shape="wave_v_ice" type="color_shift" dr="-100" dg="-100" db="-100"/>
+        <effect shape="halo_ice" type="color_shift" dr="-90" dg="-90" db="-90"/>
+    </event>
+
+    <event at="84.1723">
+        <destroy shape="wave_v_ice"/>
+        <destroy shape="halo_ice"/>
+        <!-- launch the chorus-2 build: fast red chasers + white flash -->
+        <create shape="ch_red"/>
+        <effect shape="ch_red" type="translate_by_path" path="p_ring" velocity="90"/>
+        <create shape="flash_w"/>
+        <effect shape="flash_w" type="blink" period="0.65" duty="0.2"/>
+    </event>
+
+
+    <!-- ==================== CHORUS 2a (85.10 - 95.42s) =================== -->
+    <!-- Crescendo. Sharp objects moving. Red + orange. -->
+
+    <event at="85.10">
+        <destroy shape="flash_w"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_ring" velocity="115" phase="0.5"/>
+        <effect shape="ch_red" type="speedup" factor="1.5"/>
+        <create shape="dia_red"/>
+        <effect shape="dia_red" type="rotate_by" angle="120" dt="2.0"/>
+        <effect shape="dia_red" type="translate_to" sx="128" sy="128" ex="196" ey="96" dt="4.0"/>
+        <effect shape="dia_red" type="scale" min="0.75" max="1.25" frequency="0.8"/>
+    </event>
+
+    <event at="85.4494">
+        <create shape="accRed"/>
+        <effect shape="accRed" type="mirror" axis="vertical"/>
+        <effect shape="accRed" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="89.3039">
+        <destroy shape="accRed"/>
+        <destroy shape="dia_red"/>
+        <create shape="wave_h_red"/>
+        <effect shape="wave_h_red" type="warp" amplitude="18" wavelength="90" speed="0.5"/>
+        <effect shape="wave_h_red" type="mirror" axis="horizontal"/>
+    </event>
+
+    <event at="91.208">
+        <create shape="spark_red"/>
+        <effect shape="spark_red" type="translate_by_path" path="p_diag1" velocity="170"/>
+    </event>
+
+    <event at="93.7854">
+        <destroy shape="spark_red"/>
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="0.65" duty="0.25"/>
+    </event>
+
+    <event at="95.0857">
+        <destroy shape="accOr"/>
+    </event>
+
+
+    <!-- ==================== CHORUS 2b (95.42 - 105.66s) ================== -->
+    <!-- Same drive. Sharp, fast. -->
+
+    <event at="95.42">
+        <destroy shape="wave_h_red"/>
+        <destroy shape="ch_or"/>
+        <!-- two spinning dot rows ride the rect/triangle paths -->
+        <create sequence="twolp"/>
+        <effect sequence="twolp" type="color_shift" dr="255" dg="-255" db="-150"/>
+    </event>
+
+    <event at="95.7359">
+        <create shape="accRed"/>
+        <effect shape="accRed" type="mirror" axis="vertical"/>
+        <effect shape="accRed" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="98.917">
+        <destroy shape="accRed"/>
+        <destroy sequence="twolp"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_rect" velocity="120" phase="0.5"/>
+        <create shape="spark_red"/>
+        <effect shape="spark_red" type="translate_by_path" path="p_diag2" velocity="170"/>
+    </event>
+
+    <event at="101.4944">
+        <destroy shape="spark_red"/>
+        <create shape="accRed"/>
+        <effect shape="accRed" type="mirror" axis="vertical"/>
+        <effect shape="accRed" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="104.0718">
+        <destroy shape="accRed"/>
+        <effect shape="ch_red" type="speedup" factor="0.6"/>
+        <effect shape="ch_or" type="speedup" factor="0.6"/>
+    </event>
+
+    <event at="105.3489">
+        <destroy shape="ch_red"/>
+        <destroy shape="ch_or"/>
+        <!-- cool down into middle 3 -->
+        <create shape="halo_ice"/>
+        <effect shape="halo_ice" type="scale" min="0.8" max="1.1" frequency="0.12"/>
+        <effect shape="halo_ice" type="translation" vy="3"/>
+    </event>
+
+
+    <!-- ==================== MIDDLE 3 (105.66 - 115.94s) ================== -->
+    <!-- Cool-down. Ice blue + orange. -->
+
+    <event at="105.66">
+        <create shape="ch_ice"/>
+        <effect shape="ch_ice" type="translate_by_path" path="p_orbit" velocity="35"/>
+    </event>
+
+    <event at="107.9263">
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_orbit" velocity="35" phase="0.5"/>
+        <create shape="accIce"/>
+        <effect shape="accIce" type="mirror" axis="vertical"/>
+        <effect shape="accIce" type="blink" period="1.3" duty="0.18"/>
+    </event>
+
+    <event at="111.1307">
+        <destroy shape="accIce"/>
+        <create shape="wave_h_ice"/>
+        <effect shape="wave_h_ice" type="warp" amplitude="10" wavelength="110" speed="0.15"/>
+    </event>
+
+    <event at="114.3351">
+        <destroy shape="wave_h_ice"/>
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="1.3" duty="0.2"/>
+    </event>
+
+    <event at="115.6122">
+        <destroy shape="accOr"/>
+    </event>
+
+
+    <!-- ==================== VERSE 3 (115.94 - 126.30s) =================== -->
+    <!-- Round patterns. Ice blue + orange. Quiet. -->
+
+    <event at="115.94">
+        <destroy shape="halo_ice"/>
+        <destroy shape="ch_ice"/>
+        <destroy shape="ch_or"/>
+        <create shape="ell_ice"/>
+        <effect shape="ell_ice" type="scale" min="0.9" max="1.1" frequency="0.2"/>
+        <effect shape="ell_ice" type="rotation" speed="6"/>
+        <create shape="ch_ice2"/>
+        <effect shape="ch_ice2" type="translate_by_path" path="p_ring3" velocity="30"/>
+        <create shape="ch_gold"/>
+        <effect shape="ch_gold" type="translate_by_path" path="p_ring3" velocity="30" phase="0.5"/>
+    </event>
+
+    <event at="116.2623">
+        <create shape="accIce"/>
+        <effect shape="accIce" type="mirror" axis="vertical"/>
+        <effect shape="accIce" type="blink" period="1.3" duty="0.18"/>
+    </event>
+
+    <event at="119.4667">
+        <destroy shape="accIce"/>
+        <destroy shape="ch_gold"/>
+        <!-- the two dotted lines converge, turn and split, tinted ice -->
+        <create sequence="movinglines"/>
+        <effect sequence="movinglines" type="color_shift" dr="40" dg="20" db="110"/>
+    </event>
+
+    <event at="123.3212">
+        <destroy sequence="movinglines"/>
+        <create shape="ch_gold"/>
+        <effect shape="ch_gold" type="translate_by_path" path="p_ring3" velocity="30" phase="0.5"/>
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="1.3" duty="0.2"/>
+    </event>
+
+    <event at="125.8754">
+        <destroy shape="accOr"/>
+    </event>
+
+
+    <!-- ==================== VERSE 4 (126.30 - 136.54s) =================== -->
+    <!-- Same, varied: ring + slow chasers + gentle wave. -->
+
+    <event at="126.30">
+        <destroy shape="ell_ice"/>
+        <destroy shape="ch_ice2"/>
+        <destroy shape="ch_gold"/>
+        <create shape="ring_ice"/>
+        <effect shape="ring_ice" type="rotation" speed="15"/>
+        <effect shape="ring_ice" type="scale" min="0.9" max="1.1" frequency="0.2"/>
+        <create shape="ch_ice"/>
+        <effect shape="ch_ice" type="translate_by_path" path="p_ring2" velocity="30"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_ring2" velocity="30" phase="0.5"/>
+    </event>
+
+    <event at="126.5255">
+        <create shape="accIce"/>
+        <effect shape="accIce" type="mirror" axis="vertical"/>
+        <effect shape="accIce" type="blink" period="1.3" duty="0.18"/>
+    </event>
+
+    <event at="129.6834">
+        <destroy shape="accIce"/>
+        <create shape="wave_h_or"/>
+        <effect shape="wave_h_or" type="warp" amplitude="10" wavelength="110" speed="0.18"/>
+    </event>
+
+    <event at="132.9342">
+        <destroy shape="wave_h_or"/>
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="1.3" duty="0.2"/>
+    </event>
+
+    <event at="136.1386">
+        <destroy shape="accOr"/>
+    </event>
+
+
+    <!-- ==================== BRIDGE 3 (136.54 - 146.70s) ================== -->
+    <!-- Builds up again. Green + magenta. More shapes. -->
+
+    <event at="136.54">
+        <destroy shape="ring_ice"/>
+        <destroy shape="ch_ice"/>
+        <destroy shape="ch_or"/>
+        <create shape="ch_grn"/>
+        <effect shape="ch_grn" type="translate_by_path" path="p_rect" velocity="60"/>
+        <create shape="ch_mag"/>
+        <effect shape="ch_mag" type="translate_by_path" path="p_rect" velocity="60" phase="0.5"/>
+        <create shape="dia_grn"/>
+        <effect shape="dia_grn" type="rotation" speed="30"/>
+    </event>
+
+    <event at="136.7888">
+        <create shape="accGrn"/>
+        <effect shape="accGrn" type="mirror" axis="vertical"/>
+        <effect shape="accGrn" type="blink" period="1.3" duty="0.2"/>
+    </event>
+
+    <event at="139.9699">
+        <destroy shape="accGrn"/>
+        <create shape="wave_h_mag"/>
+        <effect shape="wave_h_mag" type="warp" amplitude="14" wavelength="100" speed="0.4"/>
+    </event>
+
+    <event at="143.2207">
+        <destroy shape="wave_h_mag"/>
+        <effect shape="ch_grn" type="speedup" factor="1.8"/>
+        <effect shape="ch_mag" type="speedup" factor="1.8"/>
+        <create shape="accMag"/>
+        <effect shape="accMag" type="mirror" axis="vertical"/>
+        <effect shape="accMag" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="145.7749">
+        <destroy shape="accMag"/>
+    </event>
+
+
+    <!-- ==================== BRIDGE 4 (146.70 - 157.10s) ================== -->
+    <!-- Continues the build. Green + magenta. -->
+
+    <event at="146.70">
+        <destroy shape="dia_grn"/>
+        <destroy shape="ch_grn"/>
+        <destroy shape="ch_mag"/>
+        <create shape="ch_mag"/>
+        <effect shape="ch_mag" type="translate_by_path" path="p_ring" velocity="85"/>
+        <create shape="ch_grn"/>
+        <effect shape="ch_grn" type="translate_by_path" path="p_ring" velocity="85" phase="0.5"/>
+        <create shape="tri_mag"/>
+        <effect shape="tri_mag" type="rotation" speed="100"/>
+    </event>
+
+    <event at="147.052">
+        <create shape="accMag"/>
+        <effect shape="accMag" type="mirror" axis="vertical"/>
+        <effect shape="accMag" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="150.2795">
+        <destroy shape="accMag"/>
+        <destroy shape="tri_mag"/>
+        <create shape="ell_mag"/>
+        <effect shape="ell_mag" type="scale" min="0.85" max="1.15" frequency="0.5"/>
+        <effect shape="ell_mag" type="rotation" speed="15"/>
+    </event>
+
+    <event at="153.4839">
+        <destroy shape="ell_mag"/>
+        <create shape="wave_h_grn"/>
+        <effect shape="wave_h_grn" type="warp" amplitude="18" wavelength="90" speed="0.55"/>
+        <effect shape="wave_h_grn" type="mirror" axis="horizontal"/>
+    </event>
+
+    <event at="156.0381">
+        <create shape="accGrn"/>
+        <effect shape="accGrn" type="mirror" axis="vertical"/>
+        <effect shape="accGrn" type="blink" period="0.65" duty="0.2"/>
+    </event>
+
+    <event at="156.6883">
+        <destroy shape="accGrn"/>
+        <effect shape="wave_h_grn" type="color_shift" dr="-100" dg="-100" db="-100"/>
+    </event>
+
+
+    <!-- ==================== MIDDLE 4 (157.10 - 162.10s) ================== -->
+    <!-- Short cool-down. Ice blue + orange. -->
+
+    <event at="157.10">
+        <destroy shape="wave_h_grn"/>
+        <destroy shape="ch_mag"/>
+        <destroy shape="ch_grn"/>
+        <create shape="halo_ice"/>
+        <effect shape="halo_ice" type="scale" min="0.8" max="1.1" frequency="0.15"/>
+        <effect shape="halo_ice" type="translation" vy="3"/>
+        <create shape="ch_ice"/>
+        <effect shape="ch_ice" type="translate_by_path" path="p_orbit" velocity="40"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_orbit" velocity="40" phase="0.5"/>
+    </event>
+
+    <event at="159.9158">
+        <create shape="accIce"/>
+        <effect shape="accIce" type="mirror" axis="vertical"/>
+        <effect shape="accIce" type="blink" period="1.3" duty="0.18"/>
+    </event>
+
+    <event at="161.8199">
+        <destroy shape="accIce"/>
+    </event>
+
+
+    <!-- ==================== CHORUS 2a (162.10 - 172.42s) ================ -->
+    <!-- Crescendo again. Sharp. Red + orange. Varied: rect paths. -->
+
+    <event at="162.10">
+        <destroy shape="halo_ice"/>
+        <destroy shape="ch_ice"/>
+        <destroy shape="ch_or"/>
+        <create shape="ch_red"/>
+        <effect shape="ch_red" type="translate_by_path" path="p_rect" velocity="115"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_rect" velocity="115" phase="0.5"/>
+        <create shape="dia_red"/>
+        <effect shape="dia_red" type="rotate_by" angle="-120" dt="1.95"/>
+        <effect shape="dia_red" type="translate_to" sx="128" sy="128" ex="60" ey="160" dt="3.5"/>
+        <effect shape="dia_red" type="scale" min="0.75" max="1.25" frequency="0.83"/>
+    </event>
+
+    <event at="162.47">
+        <create shape="accRed"/>
+        <effect shape="accRed" type="mirror" axis="vertical"/>
+        <effect shape="accRed" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="165.6512">
+        <destroy shape="accRed"/>
+        <destroy shape="dia_red"/>
+        <create shape="wave_h_red"/>
+        <effect shape="wave_h_red" type="warp" amplitude="20" wavelength="85" speed="0.55"/>
+        <effect shape="wave_h_red" type="mirror" axis="horizontal"/>
+    </event>
+
+    <event at="168.8787">
+        <create shape="spark_red"/>
+        <effect shape="spark_red" type="translate_by_path" path="p_diag1" velocity="180"/>
+    </event>
+
+    <event at="171.4561">
+        <destroy shape="spark_red"/>
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="0.65" duty="0.25"/>
+    </event>
+
+    <event at="172.0831">
+        <destroy shape="accOr"/>
+    </event>
+
+
+    <!-- ==================== CHORUS 2b (172.42 - 182.70s) ================ -->
+    <!-- Same drive, varied: counter-rotating chasers + dot rows. -->
+
+    <event at="172.42">
+        <destroy shape="wave_h_red"/>
+        <destroy shape="ch_or"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_ring" velocity="-120" phase="0.5"/>
+        <effect shape="ch_red" type="speedup" factor="1.1"/>
+        <create shape="dia_w"/>
+        <effect shape="dia_w" type="rotate_by" angle="90" dt="1.75"/>
+        <effect shape="dia_w" type="translate_to" sx="128" sy="128" ex="188" ey="168" dt="3.5"/>
+        <effect shape="dia_w" type="scale" min="0.8" max="1.2" frequency="0.8"/>
+    </event>
+
+    <event at="172.7332">
+        <create shape="accRed"/>
+        <effect shape="accRed" type="mirror" axis="vertical"/>
+        <effect shape="accRed" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="175.9376">
+        <destroy shape="accRed"/>
+        <destroy shape="dia_w"/>
+        <!-- two spinning dot rows, tinted red -->
+        <create sequence="twolp"/>
+        <effect sequence="twolp" type="color_shift" dr="255" dg="-255" db="-150"/>
+    </event>
+
+    <event at="179.142">
+        <destroy sequence="twolp"/>
+        <create shape="accRed"/>
+        <effect shape="accRed" type="mirror" axis="vertical"/>
+        <effect shape="accRed" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="181.7194">
+        <destroy shape="accRed"/>
+        <effect shape="ch_red" type="speedup" factor="1.3"/>
+        <effect shape="ch_or" type="speedup" factor="1.3"/>
+    </event>
+
+
+    <!-- ==================== LOUD "EVIL" (182.70 - 203.22s) ============== -->
+    <!-- Very heavy, flickering. Red + white. Aggressive, fast. -->
+
+    <event at="182.70">
+        <destroy shape="ch_red"/>
+        <destroy shape="ch_or"/>
+        <!-- the fast flickering triangle, tinted red -->
+        <create sequence="flick"/>
+        <effect sequence="flick" type="color_shift" dr="30" dg="-140" db="-120"/>
+        <create shape="ch_red"/>
+        <effect shape="ch_red" type="translate_by_path" path="p_ring" velocity="150"/>
+        <create shape="ch_w"/>
+        <effect shape="ch_w" type="translate_by_path" path="p_ring" velocity="150" phase="0.5"/>
+    </event>
+
+    <event at="183.0197">
+        <create shape="accW"/>
+        <effect shape="accW" type="mirror" axis="vertical"/>
+        <effect shape="accW" type="blink" period="0.3" duty="0.2"/>
+    </event>
+
+    <event at="186.2008">
+        <destroy shape="accW"/>
+        <create shape="flash_w"/>
+        <effect shape="flash_w" type="blink" period="0.35" duty="0.15"/>
+    </event>
+
+    <event at="189.4284">
+        <destroy shape="flash_w"/>
+        <create shape="spark_w"/>
+        <effect shape="spark_w" type="translate_by_path" path="p_diag1" velocity="200"/>
+    </event>
+
+    <event at="193.2597">
+        <!-- the flick triangle auto-stopped at 192.70 -->
+        <create shape="tri_red"/>
+        <effect shape="tri_red" type="rotation" speed="120"/>
+        <effect shape="tri_red" type="blink" period="0.25" duty="0.3"/>
+    </event>
+
+    <event at="196.4873">
+        <destroy shape="tri_red"/>
+        <destroy shape="spark_w"/>
+        <!-- mirrored red rays sweeping around the centre -->
+        <create shape="ray_red"/>
+        <effect shape="ray_red" type="rotation" speed="90"/>
+        <create shape="ray_red2"/>
+        <effect shape="ray_red2" type="rotation" speed="90"/>
+        <effect shape="ray_red2" type="flip" axis="vertical"/>
+    </event>
+
+    <event at="199.6684">
+        <destroy shape="ray_red"/>
+        <destroy shape="ray_red2"/>
+        <create shape="flash_w"/>
+        <effect shape="flash_w" type="blink" period="0.3" duty="0.2"/>
+    </event>
+
+    <event at="200.9687">
+        <create shape="accW"/>
+        <effect shape="accW" type="mirror" axis="vertical"/>
+        <effect shape="accW" type="blink" period="0.3" duty="0.2"/>
+    </event>
+
+    <event at="202.896">
+        <destroy shape="accW"/>
+        <destroy shape="flash_w"/>
+        <effect shape="ch_red" type="speedup" factor="0.6"/>
+        <effect shape="ch_w" type="speedup" factor="0.6"/>
+    </event>
+
+
+    <!-- ==================== MIDDLE 5 (203.22 - 223.70s) ================== -->
+    <!-- Cool-down. Ice blue + orange. Long. -->
+
+    <event at="203.22">
+        <destroy shape="ch_red"/>
+        <destroy shape="ch_w"/>
+        <create shape="halo_ice"/>
+        <effect shape="halo_ice" type="scale" min="0.8" max="1.1" frequency="0.12"/>
+        <effect shape="halo_ice" type="translation" vy="3"/>
+        <create shape="wave_h_ice"/>
+        <effect shape="wave_h_ice" type="warp" amplitude="10" wavelength="120" speed="0.15"/>
+    </event>
+
+    <event at="203.5693">
+        <create shape="ch_ice"/>
+        <effect shape="ch_ice" type="translate_by_path" path="p_orbit" velocity="35"/>
+    </event>
+
+    <event at="207.4006">
+        <destroy shape="ch_ice"/>
+        <destroy shape="wave_h_ice"/>
+        <destroy shape="halo_ice"/>
+        <!-- the translate_by_path demo, slowed to cool-down tempo -->
+        <create sequence="tbpath"/>
+        <effect sequence="tbpath" type="speedup" factor="0.5"/>
+        <effect sequence="tbpath" type="color_shift" dr="-40" dg="20" db="40"/>
+    </event>
+
+    <event at="212.5555">
+        <destroy sequence="tbpath"/>
+        <create shape="halo_ice"/>
+        <effect shape="halo_ice" type="scale" min="0.8" max="1.1" frequency="0.12"/>
+        <effect shape="halo_ice" type="translation" vy="3"/>
+        <create shape="accIce"/>
+        <effect shape="accIce" type="mirror" axis="vertical"/>
+        <effect shape="accIce" type="blink" period="1.3" duty="0.18"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_orbit" velocity="35" phase="0.5"/>
+    </event>
+
+    <event at="215.7366">
+        <destroy shape="accIce"/>
+        <create shape="ring_ice"/>
+        <effect shape="ring_ice" type="rotation" speed="12"/>
+    </event>
+
+    <event at="218.941">
+        <destroy shape="ring_ice"/>
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="1.3" duty="0.2"/>
+    </event>
+
+    <event at="222.1453">
+        <destroy shape="accOr"/>
+        <destroy shape="ch_or"/>
+        <!-- launch the final chorus build -->
+        <create shape="ch_red"/>
+        <effect shape="ch_red" type="translate_by_path" path="p_ring" velocity="95"/>
+        <create shape="flash_w"/>
+        <effect shape="flash_w" type="blink" period="0.65" duty="0.2"/>
+    </event>
+
+
+    <!-- ==================== CHORUS 2a (223.70 - 234.06s) ================ -->
+    <!-- Final crescendo. Sharp. Red + orange. Fastest yet. -->
+
+    <event at="223.70">
+        <destroy shape="flash_w"/>
+        <destroy shape="halo_ice"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_ring" velocity="130" phase="0.5"/>
+        <effect shape="ch_red" type="speedup" factor="1.4"/>
+        <create shape="dia_red"/>
+        <effect shape="dia_red" type="rotate_by" angle="180" dt="1.45"/>
+        <effect shape="dia_red" type="translate_to" sx="128" sy="128" ex="200" ey="128" dt="2.9"/>
+        <effect shape="dia_red" type="scale" min="0.7" max="1.3" frequency="0.83"/>
+    </event>
+
+    <event at="224.0726">
+        <create shape="accRed"/>
+        <effect shape="accRed" type="mirror" axis="vertical"/>
+        <effect shape="accRed" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="226.6268">
+        <destroy shape="accRed"/>
+        <destroy shape="dia_red"/>
+        <create shape="wave_h_red"/>
+        <effect shape="wave_h_red" type="warp" amplitude="22" wavelength="80" speed="0.6"/>
+        <effect shape="wave_h_red" type="mirror" axis="horizontal"/>
+    </event>
+
+    <event at="229.2042">
+        <create shape="spark_red"/>
+        <effect shape="spark_red" type="translate_by_path" path="p_diag1" velocity="190"/>
+    </event>
+
+    <event at="231.7584">
+        <destroy shape="spark_red"/>
+        <create shape="accOr"/>
+        <effect shape="accOr" type="mirror" axis="vertical"/>
+        <effect shape="accOr" type="blink" period="0.65" duty="0.25"/>
+    </event>
+
+    <event at="233.6856">
+        <destroy shape="accOr"/>
+    </event>
+
+
+    <!-- ==================== CHORUS 2b (234.06 - 244.62s) ================ -->
+    <!-- Same drive, final variation: orbit chasers + dot rows. -->
+
+    <event at="234.06">
+        <destroy shape="wave_h_red"/>
+        <destroy shape="ch_or"/>
+        <effect shape="ch_red" type="speedup" factor="1.1"/>
+        <create sequence="twolp"/>
+        <effect sequence="twolp" type="color_shift" dr="255" dg="-255" db="-150"/>
+    </event>
+
+    <event at="234.3358">
+        <create shape="accRed"/>
+        <effect shape="accRed" type="mirror" axis="vertical"/>
+        <effect shape="accRed" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="237.5401">
+        <destroy shape="accRed"/>
+        <destroy sequence="twolp"/>
+        <create shape="ch_or"/>
+        <effect shape="ch_or" type="translate_by_path" path="p_orbit" velocity="-130" phase="0.5"/>
+        <create shape="spark_red"/>
+        <effect shape="spark_red" type="translate_by_path" path="p_diag2" velocity="190"/>
+    </event>
+
+    <event at="240.7445">
+        <destroy shape="spark_red"/>
+        <create shape="accRed"/>
+        <effect shape="accRed" type="mirror" axis="vertical"/>
+        <effect shape="accRed" type="blink" period="0.65" duty="0.22"/>
+    </event>
+
+    <event at="243.3219">
+        <destroy shape="accRed"/>
+    </event>
+
+
+    <!-- ==================== OUTRO (244.62 - 269.166s) =================== -->
+    <!-- Heavy. Red + white. Builds to a climax, then fades out to black. -->
+
+    <event at="244.62">
+        <destroy shape="ch_red"/>
+        <destroy shape="ch_or"/>
+        <create shape="ring_red"/>
+        <effect shape="ring_red" type="rotation" speed="25"/>
+        <effect shape="ring_red" type="scale" min="0.9" max="1.1" frequency="0.4"/>
+        <create shape="ch_red"/>
+        <effect shape="ch_red" type="translate_by_path" path="p_ring" velocity="120"/>
+        <create shape="ch_w"/>
+        <effect shape="ch_w" type="translate_by_path" path="p_ring" velocity="120" phase="0.5"/>
+    </event>
+
+    <event at="245.2492">
+        <create shape="accW"/>
+        <effect shape="accW" type="mirror" axis="vertical"/>
+        <effect shape="accW" type="blink" period="0.65" duty="0.2"/>
+    </event>
+
+    <event at="248.4535">
+        <destroy shape="accW"/>
+        <destroy shape="ch_w"/>
+        <create shape="wave_h_red"/>
+        <effect shape="wave_h_red" type="warp" amplitude="20" wavelength="80" speed="0.5"/>
+        <effect shape="wave_h_red" type="mirror" axis="horizontal"/>
+    </event>
+
+    <event at="252.308">
+        <destroy shape="wave_h_red"/>
+        <create shape="star1"/>
+        <effect shape="star1" type="rotation" speed="120"/>
+        <create shape="star2"/>
+        <effect shape="star2" type="rotation" speed="120"/>
+    </event>
+
+    <event at="255.5124">
+        <destroy shape="star1"/>
+        <destroy shape="star2"/>
+        <create shape="accW"/>
+        <effect shape="accW" type="mirror" axis="vertical"/>
+        <effect shape="accW" type="blink" period="0.65" duty="0.25"/>
+        <create shape="spark_w"/>
+        <effect shape="spark_w" type="translate_by_path" path="p_diag1" velocity="160"/>
+    </event>
+
+    <event at="258.7167">
+        <destroy shape="spark_w"/>
+        <destroy shape="accW"/>
+        <!-- climax: the white flash over the red ring -->
+        <create shape="flash_w"/>
+        <effect shape="flash_w" type="blink" period="0.65" duty="0.3"/>
+        <create shape="ch_w"/>
+        <effect shape="ch_w" type="translate_by_path" path="p_ring3" velocity="120"/>
+    </event>
+
+    <event at="261.2941">
+        <!-- final beat: the whole show fades out -->
+        <effect shape="ring_red" type="color_shift" dr="-45" dg="-45" db="-45"/>
+        <effect shape="flash_w" type="color_shift" dr="-45" dg="-45" db="-45"/>
+        <effect shape="ch_red" type="color_shift" dr="-45" dg="-45" db="-45"/>
+        <effect shape="ch_w" type="color_shift" dr="-45" dg="-45" db="-45"/>
+    </event>
+
+    <!-- the climax shapes fade to black and the show ends on the fade -->
 
 </animation>

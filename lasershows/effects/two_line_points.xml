@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect: two rows of dots spinning in place while following two
+    different, seemingly random trajectories around the frame
+
+    Two line_points shapes with 10 dots each, 12 units apart -> each row
+    spans 108 units (54 around its center), so the paths are sized such
+    that the rows stay inside the 0-255 frame at all times. Both rows are
+    defined at the frame center, so the default rotation pivot (the frame
+    center) is their own center.
+    - dots_rect: follows a rectangle (velocity 85 u/s, counter-clockwise)
+    - dots_tri:  follows an equilateral triangle (velocity -55 u/s, i.e.
+                 clockwise) that rotates by itself around the frame center
+                 (36 deg/s): the rotation effect is attached *after* the
+                 translate_by_path, so it spins the row together with the
+                 triangle it rides on
+    Both rows spin around their own center (in opposite directions) while
+    their center travels along the path; the different path lengths and
+    speeds make the combined motion hard to predict.
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ==================== -->
+    <!-- paths (defined black, never shown) -->
+    <shape name="p_rect_tlp" type="tetragon" x0="58" y0="62" x1="198" y1="62"
+           x2="198" y2="194" x3="58" y3="194"
+           npoints="96" red="0" green="0" blue="0"/>
+    <shape name="p_tri_tlp" type="triangle" x0="128" y0="198" x1="67" y1="93"
+           x2="189" y2="93"
+           npoints="96" red="0" green="0" blue="0"/>
+
+    <!-- riders (defined at the frame center = their own spin pivot) -->
+    <shape name="dots_rect" type="line_points" x0="128" y0="128"
+           npoints="10" spacing="12" red="0" green="255" blue="0"/>
+    <shape name="dots_tri" type="line_points" x0="128" y0="128"
+           npoints="10" spacing="12" red="0" green="255" blue="0"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="dots_rect"/>
+        <effect shape="dots_rect" type="rotation" speed="90"/>
+        <effect shape="dots_rect" type="translate_by_path" path="p_rect_tlp" velocity="85" phase="0.25"/>
+        <create shape="dots_tri"/>
+        <effect shape="dots_tri" type="rotation" speed="-70"/>
+        <effect shape="dots_tri" type="translate_by_path" path="p_tri_tlp" velocity="-55" phase="0.1"/>
+        <!-- attached after the path: rotates the row and the triangle it
+             rides around the frame center, so the triangle appears to
+             rotate by itself -->
+        <effect shape="dots_tri" type="rotation" speed="36"/>
+    </event>
+
+    <event at="20.0">
+        <destroy shape="dots_rect"/>
+        <destroy shape="dots_tri"/>
+    </event>
+</animation>

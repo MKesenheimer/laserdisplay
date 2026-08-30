@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: rotate_by
+
+    <effect shape="NAME" type="rotate_by" angle [px py] dt/>
+    rotates the shape by angle degrees over dt seconds (default 1.0) and
+    leaves it in the final orientation, easing in and out (negative
+    angles rotate the other way).  The rotation happens around the pivot
+    point (px, py); without a pivot the shape rotates around its own
+    center.  As with translate_to the effect starts at the moment it is
+    attached, so chained rotations continue from the current orientation.
+
+    Riders: a triangle doing three chained turns around its own center
+    (a full circle), a ball swinging half a circle around the frame
+    center to and fro, and a diamond doing a full turn followed by a
+    backwards half turn.
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <shape name="tri" type="triangle" x0="128" y0="110" x1="110" y1="78" x2="146" y2="78"
+           npoints="12" red="255" green="200" blue="80"/>
+    <shape name="ball" type="circle" cx="178" cy="128" r="9"
+           npoints="20" red="255" green="80" blue="120"/>
+    <shape name="diamond" type="tetragon" x0="128" y0="198" x1="143" y1="178"
+           x2="128" y2="158" x3="113" y3="178"
+           npoints="16" red="80" green="220" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="tri"/>
+        <!-- no pivot: a quarter turn around the triangle's own center -->
+        <effect shape="tri" type="rotate_by" angle="90" dt="2"/>
+        <create shape="ball"/>
+        <!-- pivot at the frame center: half a circle to the left side -->
+        <effect shape="ball" type="rotate_by" angle="180" px="128" py="128" dt="3"/>
+        <create shape="diamond"/>
+        <effect shape="diamond" type="rotate_by" angle="360" dt="6"/>
+    </event>
+
+    <event at="3.0">
+        <!-- chained turn: another 90° from the orientation at t=2 -->
+        <effect shape="tri" type="rotate_by" angle="90" dt="2"/>
+    </event>
+
+    <event at="4.0">
+        <!-- the ball swings back to the right side -->
+        <effect shape="ball" type="rotate_by" angle="180" px="128" py="128" dt="3"/>
+    </event>
+
+    <event at="6.0">
+        <!-- the final turn: 180° more, back to the start orientation -->
+        <effect shape="tri" type="rotate_by" angle="180" dt="4"/>
+    </event>
+
+    <event at="7.0">
+        <!-- the diamond does a backwards half turn -->
+        <effect shape="diamond" type="rotate_by" angle="-180" dt="5"/>
+    </event>
+
+    <event at="8.0">
+        <!-- one more swing: the ball ends on the left side -->
+        <effect shape="ball" type="rotate_by" angle="180" px="128" py="128" dt="3"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="tri"/>
+        <destroy shape="ball"/>
+        <destroy shape="diamond"/>
+    </event>
+</animation>

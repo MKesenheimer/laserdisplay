@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect: two dotted green lines converging, turning and splitting
+
+    Two line_points shapes (10 dots, 12 units apart -> each line is
+    108 units long).  line_points draws a *horizontal* row of dots, so
+    at t=0 two instant effects (dt="0") set the starting pose of the
+    choreography: a rotate_by turns each row into a vertical dotted
+    line, and a translate_to moves it to the left (x=10) or the right
+    (x=245) edge of the screen.  The rows are defined at the frame
+    center, because a 108-unit row does not fit at the edge.
+    The choreography, in 0.5s steps:
+      1. both lines translate_to the center of the screen (they merge)
+      2. both lines rotate_by -90 deg (clockwise) -> horizontal
+      3. the left line translates_to up (y=188), the right one down
+         (y=68) -> the merged line splits in two
+      4. a brief hold, then the whole sequence plays in reverse:
+         the lines merge again, rotate back (counter-clockwise) and
+         translate_to their edges, ending where they started
+-->
+<animation fps="25" duration="5">
+    <!-- ==================== shape definitions ============================ -->
+    <!-- horizontal dot rows at the frame center (they do not fit at the
+         edges); the t=0 instant effects bring them to their starting pose -->
+    <shape name="line_left" type="line_points" x0="128" y0="128"
+           npoints="10" spacing="12" red="0" green="255" blue="128"/>
+    <shape name="line_right" type="line_points" x0="128" y0="128"
+           npoints="10" spacing="12" red="0" green="255" blue="128"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="line_left"/>
+        <!-- dt="0": both effects apply straight away, so on the first
+             frame the lines are already vertical dotted lines at the
+             left and right edge of the screen -->
+        <effect shape="line_left" type="rotate_by" angle="90" dt="0"/>
+        <effect shape="line_left" type="translate_to" sx="128" sy="128" ex="10" ey="128" dt="0"/>
+        <create shape="line_right"/>
+        <effect shape="line_right" type="rotate_by" angle="90" dt="0"/>
+        <effect shape="line_right" type="translate_to" sx="128" sy="128" ex="245" ey="128" dt="0"/>
+    </event>
+
+    <!-- 1. converge: both lines move to the center of the screen -->
+    <event at="0.5">
+        <effect shape="line_left" type="translate_to" sx="10" sy="128" ex="128" ey="128" dt="0.5"/>
+        <effect shape="line_right" type="translate_to" sx="245" sy="128" ex="128" ey="128" dt="0.5"/>
+    </event>
+
+    <!-- 2. turn: both lines rotate clockwise by 90 deg (negative angle)
+         around their own center -> they are horizontal now and overlap -->
+    <event at="1.0">
+        <effect shape="line_left" type="rotate_by" angle="-90" dt="0.5"/>
+        <effect shape="line_right" type="rotate_by" angle="-90" dt="0.5"/>
+    </event>
+
+    <!-- 3. split: one line moves up, the other down; the offset (60) is
+         larger than half the line length (54), so the two rows no longer
+         overlap -->
+    <event at="1.5">
+        <effect shape="line_left" type="translate_to" sx="128" sy="128" ex="128" ey="188" dt="0.5"/>
+        <effect shape="line_right" type="translate_to" sx="128" sy="128" ex="128" ey="68" dt="0.5"/>
+    </event>
+
+    <!-- 4. reverse: hold the split state for half a second, then play the
+         sequence back (merge, rotate back, return to the edges) -->
+    <event at="2.5">
+        <effect shape="line_left" type="translate_to" sx="128" sy="188" ex="128" ey="128" dt="0.5"/>
+        <effect shape="line_right" type="translate_to" sx="128" sy="68" ex="128" ey="128" dt="0.5"/>
+    </event>
+
+    <event at="3.0">
+        <effect shape="line_left" type="rotate_by" angle="90" dt="0.5"/>
+        <effect shape="line_right" type="rotate_by" angle="90" dt="0.5"/>
+    </event>
+
+    <event at="3.5">
+        <effect shape="line_left" type="translate_to" sx="128" sy="128" ex="10" ey="128" dt="0.5"/>
+        <effect shape="line_right" type="translate_to" sx="128" sy="128" ex="245" ey="128" dt="0.5"/>
+    </event>
+
+    <event at="5.0">
+        <destroy shape="line_left"/>
+        <destroy shape="line_right"/>
+    </event>
+</animation>

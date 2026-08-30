@@ -339,6 +339,8 @@ degrees or units per second, frequencies in hertz.
 | `move_points`  | required `points` selection (`"3:7"`, `"-10:"`, `"0,5,9"`); moved by `dx`/`dy` or towards `tx`/`ty`; animated with `duration` |
 | `morph`        | required `target` (name of another defined shape) to blend into; `duration`, `bounce`, `smooth`        |
 | `translate_by_path` | required `path` (name of another defined shape); the shape's center follows the path outline with `velocity` (units/s, default 50); `closed` (`1` = loop, default, `0` = stop at the end) |
+| `translate_to` | moves the shape's center from `sx`/`sy` to `ex`/`ey` (both required) in `dt` seconds (default 1.0) and leaves it there; or required `path` (name of another defined shape): the center follows the path from its first to its last point in `dt` seconds |
+| `rotate_by` | required `angle` (degrees); rotates the shape by that angle in `dt` seconds (default 1.0) and leaves it in the final orientation; around `px`/`py` if given, otherwise the shape's own center |
 | `flip` | mirrors the shape and its already applied effects in place at the middle vertical (default, left/right) or horizontal (top/bottom) frame axis: `axis` (`vertical`/`horizontal`), `period` (s, default 0 = fixed flip, >0 = flip between mirrored and original), `phase` (s) |
 | `mirror` | adds an exactly mirrored copy of the shape (original untouched; a blanked point between both halves keeps the travel line invisible): `axis` (`vertical` default / `horizontal`) |
 | `speedup` | changes the speed of all animations of the shape (every effect attached before or after it; via `<effect sequence=.../>`: every shape of the sequence): `factor` (default 1.0) — >1 faster, <1 slower, negative = reverse |

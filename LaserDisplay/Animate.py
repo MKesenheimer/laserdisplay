@@ -44,6 +44,37 @@ class Rotation:
         return out
 
 
+class RotateBy:
+    """rotates the shape by a given angle (degrees) over `dt` seconds and
+    leaves it in the final orientation (dt <= 0 applies the angle straight
+    away).  When the effect is attached the shape is still in its original
+    orientation; it then eases through the rotation (smoothstep), like the
+    other animated effects.  The rotation happens around the pivot point;
+    without a pivot the shape rotates around its own center."""
+
+    def __init__(self, angle, pivot=None, dt=1.0):
+        self.angle = float(angle)        # degrees
+        self.pivot = None if pivot is None \
+            else numpy.array([float(pivot[0]), float(pivot[1])])
+        self.duration = float(dt)
+
+    def transform(self, pts, dt):
+        out = pts.copy()
+        if len(out) == 0:
+            return out
+        p = 1.0 if self.duration <= 0 \
+            else _ease(min(max(dt / self.duration, 0.0), 1.0))
+        pivot = out[:, :2].mean(axis=0) if self.pivot is None else self.pivot
+        angle = math.radians(self.angle * p)
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+        x = out[:, 0] - pivot[0]
+        y = out[:, 1] - pivot[1]
+        out[:, 0] = cos_a * x - sin_a * y + pivot[0]
+        out[:, 1] = sin_a * x + cos_a * y + pivot[1]
+        return out
+
+
 class Translation:
     """moves the shape with constant velocity plus optional sinusoidal wobble.
     By default the shape wraps around the screen: when its center leaves the
@@ -360,6 +391,58 @@ class TranslateByPath:
         center = out[:, :2].mean(axis=0)
         out[:, 0] += x - center[0]
         out[:, 1] += y - center[1]
+        return out
+
+
+class TranslateTo:
+    """moves the shape's center from a start point to an end point over
+    `dt` seconds and leaves it there (dt <= 0 jumps straight to the end
+    point).  When the effect is attached the center is at the start point;
+    it then eases towards the end point (smoothstep), like the other
+    animated effects.  Alternatively, the movement can be defined along a
+    path (a Shape object or an (n, 5) point array): the center then
+    follows the path from its first to its last point in `dt` seconds, so
+    a closed path (e.g. a rectangle) leads to a full lap."""
+
+    def __init__(self, start=None, end=None, dt=1.0, path=None):
+        self.duration = float(dt)
+        if path is not None:
+            if start is not None or end is not None:
+                raise ValueError("TranslateTo takes a start and an end "
+                                 "point or a path, not both")
+            if hasattr(path, 'get_points'):
+                path = path.get_points()
+            path = numpy.asarray(path, dtype='float64')
+            if len(path) < 2:
+                raise ValueError("the path needs at least two points")
+            verts = path[:, :2]
+            seg = numpy.sqrt(((verts[1:] - verts[:-1]) ** 2).sum(axis=1))
+            self._s = numpy.concatenate([[0.0], numpy.cumsum(seg)])
+            self._verts = verts
+            self._total = self._s[-1]
+        else:
+            if start is None or end is None:
+                raise ValueError("TranslateTo needs a start and an end "
+                                 "point, or a path")
+            self._start = numpy.array([float(start[0]), float(start[1])])
+            self._end = numpy.array([float(end[0]), float(end[1])])
+            self._verts = None
+
+    def transform(self, pts, dt):
+        out = pts.copy()
+        if len(out) == 0 or (self._verts is not None and self._total <= 0):
+            return out
+        p = 1.0 if self.duration <= 0 \
+            else _ease(min(max(dt / self.duration, 0.0), 1.0))
+        if self._verts is not None:
+            s = p * self._total
+            target = numpy.array([numpy.interp(s, self._s, self._verts[:, 0]),
+                                  numpy.interp(s, self._s, self._verts[:, 1])])
+        else:
+            target = self._start + (self._end - self._start) * p
+        offset = target - out[:, :2].mean(axis=0)
+        out[:, 0] += offset[0]
+        out[:, 1] += offset[1]
         return out
 
 

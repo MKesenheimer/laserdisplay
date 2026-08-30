@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect example: translate_to
+
+    <effect shape="NAME" type="translate_to" sx sy ex ey dt/> or
+    <effect shape="NAME" type="translate_to" path=SHAPE dt/>
+    moves the shape's center from the start point (sx, sy) to the end
+    point (ex, ey) in dt seconds (default 1.0) and leaves it there,
+    easing in and out.  The center is at the start point when the effect
+    is attached, so chained moves start exactly where the previous one
+    ended.  Alternatively, with path=SHAPE the center follows the outline
+    of another *defined but never created* shape (the path) from its
+    first to its last point in dt seconds (a closed path like a
+    rectangle leads to a full lap).
+
+    Riders: a ball gliding corner to corner (two chained start/end
+    moves), a ship making one full lap around a rectangle, and a spark
+    racing up a diagonal and back.
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ============================ -->
+    <!-- paths (never shown) -->
+    <shape name="p_rect" type="tetragon" x0="28" y0="38" x1="228" y1="38"
+           x2="228" y2="218" x3="28" y3="218"
+           npoints="96" red="0" green="0" blue="0"/>
+    <shape name="p_diagonal" type="line" x0="20" y0="220" x1="236" y1="36"
+           npoints="2" red="0" green="0" blue="0"/>
+
+    <!-- riders -->
+    <shape name="ball" type="circle" cx="28" cy="28" r="9"
+           npoints="20" red="255" green="200" blue="80"/>
+    <shape name="ship" type="triangle" x0="28" y0="55" x1="12" y1="28" x2="44" y2="28"
+           npoints="12" red="255" green="255" blue="255"/>
+    <shape name="spark" type="line" x0="8" y0="228" x1="32" y1="212"
+           npoints="8" red="255" green="120" blue="200"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="ball"/>
+        <effect shape="ball" type="translate_to" sx="28" sy="28" ex="128" ey="128" dt="2"/>
+        <create shape="ship"/>
+        <!-- closed path: one full lap around the rectangle in 8 seconds -->
+        <effect shape="ship" type="translate_to" path="p_rect" dt="8"/>
+        <create shape="spark"/>
+        <effect shape="spark" type="translate_to" path="p_diagonal" dt="8"/>
+    </event>
+
+    <event at="3.0">
+        <!-- chained move: starts where the ball ended up at t=2 -->
+        <effect shape="ball" type="translate_to" sx="128" sy="128" ex="228" ey="228" dt="3"/>
+    </event>
+
+    <event at="8.0">
+        <!-- the spark reached the top of the diagonal: glide back down it -->
+        <effect shape="spark" type="translate_to" sx="236" sy="36" ex="20" ey="220" dt="4"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="ball"/>
+        <destroy shape="ship"/>
+        <destroy shape="spark"/>
+    </event>
+</animation>

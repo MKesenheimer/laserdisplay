@@ -52,6 +52,12 @@ warp, multi_color (colors="r,g,b;r,g,b;..."), move_points
 translate_by_path (moves the shape along the outline of the path given
 with path=<shape name> at velocity units/second, starting at the fraction
 phase of the path's length; the path shape is defined but never created),
+translate_to (moves the shape's center from the start point sx/sy to the
+end point ex/ey in dt seconds, or, with path=<shape name>, along the
+outline of that path from its first to its last point in dt seconds; the
+path shape is defined but never created),
+rotate_by (rotates the shape by angle degrees in dt seconds, around the
+pivot point px/py if given, otherwise around the shape's own center),
 flip (mirrors the shape and its already applied effects in place at the
 middle vertical (axis="vertical", the default) or horizontal
 (axis="horizontal") frame axis; with period > 0 it flips between mirrored
@@ -71,9 +77,9 @@ import xml.etree.ElementTree as ElementTree
 
 import numpy
 
-from .Animate import (apply, Rotation, Translation, Scale, ColorShift, Blink,
-                      Morph, MultiColor, Rainbow, Warp, MovePoints,
-                      TranslateByPath, Flip, Mirror, SpeedUp)
+from .Animate import (apply, Rotation, RotateBy, Translation, Scale, ColorShift,
+                      Blink, Morph, MultiColor, Rainbow, Warp, MovePoints,
+                      TranslateByPath, TranslateTo, Flip, Mirror, SpeedUp)
 from .Geometry import Geometry
 from .Shape import Shape
 
@@ -99,8 +105,9 @@ _GEOMETRY_PARAMS = {
 # effects understood by the XML format:
 #   parameter -> (default, kind); kind 'coord'/'color' are given in 0..255 and
 #   scaled to the internal 16 bit range, kind 'raw' is used as-is.
-#   'morph', 'multi_color', 'move_points' and 'translate_by_path' need
-#   list/reference parameters and are parsed separately in __effect_builder()
+#   'morph', 'multi_color', 'move_points', 'translate_by_path' and
+#   'translate_to' need list/reference parameters and are parsed
+#   separately in __effect_builder()
 _EFFECT_PARAMS = {
     'rotation':    {'pivot_x': (None, 'coord'), 'pivot_y': (None, 'coord'),
                     'speed': (45.0, 'raw'), 'phase': (0.0, 'raw')},
@@ -424,6 +431,10 @@ class Scheduler:
             return self.__move_points_factory(params, context)
         if type == 'translate_by_path':
             return self.__translate_by_path_factory(params, context)
+        if type == 'translate_to':
+            return self.__translate_to_factory(params, context)
+        if type == 'rotate_by':
+            return self.__rotate_by_factory(params, context)
         if type == 'flip':
             return self.__flip_factory(params, context)
         if type == 'mirror':
@@ -540,6 +551,55 @@ class Scheduler:
             return TranslateByPath(builder(), velocity=velocity, closed=closed,
                                    phase=phase)
         return factory
+
+    def __translate_to_factory(self, params, context):
+        path_name = params.pop('path', None)
+        raw = {key: params.pop(key, None) for key in ('sx', 'sy', 'ex', 'ey', 'dt')}
+        if params:
+            raise ValueError("%s: unknown parameter(s) %s" % (context, sorted(params)))
+        try:
+            dt = float(raw['dt']) if raw['dt'] is not None else 1.0
+            if path_name is None:
+                if None in (raw['sx'], raw['sy'], raw['ex'], raw['ey']):
+                    raise ValueError("needs sx/sy, ex/ey or path="
+                                     "<shape name>")
+                start = (float(raw['sx']) * SCALE, float(raw['sy']) * SCALE)
+                end = (float(raw['ex']) * SCALE, float(raw['ey']) * SCALE)
+            else:
+                if None not in (raw['sx'], raw['sy'], raw['ex'], raw['ey']):
+                    raise ValueError("path cannot be combined with sx/sy, "
+                                     "ex/ey")
+                start = end = None
+        except ValueError as e:
+            raise ValueError("%s: invalid translate_to parameter (%s)"
+                             % (context, e))
+        if path_name is None:
+            return lambda: TranslateTo(start, end, dt=dt)
+
+        def factory():
+            with self._lock:
+                if path_name not in self._definitions:
+                    raise KeyError("no shape defined with name '%s'" % path_name)
+                builder, _ = self._definitions[path_name]
+            return TranslateTo(path=builder(), dt=dt)
+        return factory
+
+    def __rotate_by_factory(self, params, context):
+        raw = {key: params.pop(key, None) for key in ('angle', 'px', 'py', 'dt')}
+        if params:
+            raise ValueError("%s: unknown parameter(s) %s" % (context, sorted(params)))
+        try:
+            if raw['angle'] is None:
+                raise ValueError("needs an angle=<degrees> parameter")
+            angle = float(raw['angle'])
+            dt = float(raw['dt']) if raw['dt'] is not None else 1.0
+            if (raw['px'] is None) != (raw['py'] is None):
+                raise ValueError("px and py must be given together")
+            pivot = None if raw['px'] is None \
+                else (float(raw['px']) * SCALE, float(raw['py']) * SCALE)
+        except ValueError as e:
+            raise ValueError("%s: invalid rotate_by parameter (%s)" % (context, e))
+        return lambda: RotateBy(angle, pivot=pivot, dt=dt)
 
     def __flip_factory(self, params, context):
         axis = params.pop('axis', 'vertical')
