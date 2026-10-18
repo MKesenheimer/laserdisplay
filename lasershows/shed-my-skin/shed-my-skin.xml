@@ -49,7 +49,7 @@
         parts, every-second-beat blink (1.30s) in the quiet parts
       - translate_by_path drives the chasers; translate_to and rotate_by
         carry the sharp sections; faster velocities where it gets louder
-      - Fades (negative color_shift) on every transition into a quiet part
+      - Fades (fade_out) on every transition into a quiet part
       - The chorus-2 / verse / bridge themes repeat with variation later on
 -->
 <animation fps="25" duration="269.166">
@@ -164,7 +164,7 @@
     </event>
 
     <event at="5.8979">
-        <effect shape="wave_h_ice" type="color_shift" dr="-90" dg="-90" db="-90"/>
+        <effect shape="wave_h_ice" type="fade_out" dt="0.65"/>
     </event>
 
     <event at="6.548">
@@ -175,7 +175,7 @@
     </event>
 
     <event at="9.7292">
-        <effect shape="halo_ice" type="color_shift" dr="-120" dg="-120" db="-120"/>
+        <effect shape="halo_ice" type="fade_out" dt="0.65"/>
     </event>
 
     <event at="10.3793">
@@ -273,7 +273,7 @@
     </event>
 
     <event at="30.2788">
-        <effect shape="wave_h_ice" type="color_shift" dr="-90" dg="-90" db="-90"/>
+        <effect shape="wave_h_ice" type="fade_out" dt="0.63"/>
     </event>
 
     <event at="30.9058">
@@ -318,7 +318,7 @@
     </event>
 
     <event at="40.542">
-        <effect shape="wave_v_ice" type="color_shift" dr="-100" dg="-100" db="-100"/>
+        <effect shape="wave_v_ice" type="fade_out" dt="0.63"/>
     </event>
 
     <event at="41.169">
@@ -371,7 +371,7 @@
 
     <event at="52.7325">
         <destroy shape="accMag"/>
-        <effect shape="dia_mag" type="color_shift" dr="-80" dg="-80" db="-80"/>
+        <effect shape="dia_mag" type="fade_out" dt="1.53"/>
     </event>
 
 
@@ -418,7 +418,7 @@
 
     <event at="64.2728">
         <destroy shape="accGrn"/>
-        <effect shape="wave_h_mag" type="color_shift" dr="-100" dg="-100" db="-100"/>
+        <effect shape="wave_h_mag" type="fade_out" dt="0.43"/>
     </event>
 
 
@@ -473,8 +473,8 @@
     </event>
 
     <event at="82.2451">
-        <effect shape="wave_v_ice" type="color_shift" dr="-100" dg="-100" db="-100"/>
-        <effect shape="halo_ice" type="color_shift" dr="-90" dg="-90" db="-90"/>
+        <effect shape="wave_v_ice" type="fade_out" dt="1.93"/>
+        <effect shape="halo_ice" type="fade_out" dt="1.93"/>
     </event>
 
     <event at="84.1723">
@@ -785,7 +785,7 @@
 
     <event at="156.6883">
         <destroy shape="accGrn"/>
-        <effect shape="wave_h_grn" type="color_shift" dr="-100" dg="-100" db="-100"/>
+        <effect shape="wave_h_grn" type="fade_out" dt="0.41"/>
     </event>
 
 
@@ -1185,11 +1185,11 @@
     </event>
 
     <event at="261.2941">
-        <!-- final beat: the whole show fades out -->
-        <effect shape="ring_red" type="color_shift" dr="-45" dg="-45" db="-45"/>
-        <effect shape="flash_w" type="color_shift" dr="-45" dg="-45" db="-45"/>
-        <effect shape="ch_red" type="color_shift" dr="-45" dg="-45" db="-45"/>
-        <effect shape="ch_w" type="color_shift" dr="-45" dg="-45" db="-45"/>
+        <!-- final beat: the whole show fades out to black at the end -->
+        <effect shape="ring_red" type="fade_out" dt="7.87"/>
+        <effect shape="flash_w" type="fade_out" dt="7.87"/>
+        <effect shape="ch_red" type="fade_out" dt="7.87"/>
+        <effect shape="ch_w" type="fade_out" dt="7.87"/>
     </event>
 
     <!-- the climax shapes fade to black and the show ends on the fade -->

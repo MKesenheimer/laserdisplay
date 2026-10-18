@@ -148,6 +148,50 @@ class ColorShift:
         return out
 
 
+class FadeIn:
+    """raises the brightness of the shape from zero to its full brightness
+    over `duration` seconds: at the moment the effect is attached the
+    shape is dark, its brightness then rises, and from `duration` seconds
+    on the shape keeps its full brightness. The factor multiplies the
+    colors the effects attached before it have produced, so it fades in
+    whatever appearance the shape has at that point"""
+
+    def __init__(self, duration=1.0):
+        self.duration = float(duration)
+
+    def transform(self, pts, dt):
+        out = pts.copy()
+        if len(out) == 0:
+            return out
+        p = 1.0 if self.duration <= 0 \
+            else min(max(dt / self.duration, 0.0), 1.0)
+        out[:, 2:5] *= p
+        return out
+
+
+class FadeOut:
+    """fades the brightness of the shape down from the level it has when
+    the effect is attached to zero over `duration` seconds and keeps the
+    shape dark from then on. Like FadeIn, the factor multiplies the colors
+    the effects attached before it have produced, so the fade always ends
+    in full black no matter what the other effects are doing (unlike a
+    negative color_shift, whose rate has to be tuned to the time left and
+    whose brightness can come back up when another effect keeps shifting
+    the color)"""
+
+    def __init__(self, duration=1.0):
+        self.duration = float(duration)
+
+    def transform(self, pts, dt):
+        out = pts.copy()
+        if len(out) == 0:
+            return out
+        p = 1.0 if self.duration <= 0 \
+            else min(max(dt / self.duration, 0.0), 1.0)
+        out[:, 2:5] *= (1.0 - p)
+        return out
+
+
 class Blink:
     """switches the shape on/off periodically and optionally blanks every n-th point"""
 

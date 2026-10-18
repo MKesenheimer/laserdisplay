@@ -45,7 +45,10 @@ sequence is created.  A running sequence is stopped with
 (including those of nested sequences) are removed and its remaining
 timeline events no longer fire.
 
-Effect types: rotation, translation, scale, color_shift, blink, rainbow,
+Effect types: rotation, translation, scale, color_shift, fade_in (raises
+the brightness from zero to full in dt seconds), fade_out (fades the
+brightness from the current level to zero in dt seconds and keeps the
+shape dark), blink, rainbow,
 warp, multi_color (colors="r,g,b;r,g,b;..."), move_points
 (points="3:7"/"-10:"/"0,5,9", moved by dx/dy or towards tx/ty), morph
 (blends the shape into the shape given with target=<shape name>),
@@ -78,8 +81,9 @@ import xml.etree.ElementTree as ElementTree
 import numpy
 
 from .Animate import (apply, Rotation, RotateBy, Translation, Scale, ColorShift,
-                      Blink, Morph, MultiColor, Rainbow, Warp, MovePoints,
-                      TranslateByPath, TranslateTo, Flip, Mirror, SpeedUp)
+                      FadeIn, FadeOut, Blink, Morph, MultiColor, Rainbow, Warp,
+                      MovePoints, TranslateByPath, TranslateTo, Flip, Mirror,
+                      SpeedUp)
 from .Geometry import Geometry
 from .Shape import Shape
 
@@ -119,6 +123,8 @@ _EFFECT_PARAMS = {
                     'frequency': (0.0, 'raw'),
                     'center_x': (None, 'coord'), 'center_y': (None, 'coord')},
     'color_shift': {'dr': (0.0, 'color'), 'dg': (0.0, 'color'), 'db': (0.0, 'color')},
+    'fade_in':     {'dt': (1.0, 'raw')},
+    'fade_out':    {'dt': (1.0, 'raw')},
     'blink':       {'period': (1.0, 'raw'), 'duty': (0.5, 'raw'), 'every': (0, 'raw')},
     'rainbow':     {'cycles': (1.0, 'raw'), 'speed': (0.1, 'raw'), 'phase': (0.0, 'raw'),
                     'saturation': (1.0, 'raw'), 'brightness': (1.0, 'raw')},
@@ -454,11 +460,11 @@ class Scheduler:
         if params:
             raise ValueError("%s: unknown parameter(s) %s" % (context, sorted(params)))
         # XML attribute names that differ from the effect constructor arguments
-        aliases = {'min': 'min_factor', 'max': 'max_factor'}
+        aliases = {'min': 'min_factor', 'max': 'max_factor', 'dt': 'duration'}
         kwargs = {aliases.get(k, k): v for k, v in kwargs.items()}
         classes = {'rotation': Rotation, 'translation': Translation, 'scale': Scale,
-                   'color_shift': ColorShift, 'blink': Blink,
-                   'rainbow': Rainbow, 'warp': Warp, 'speedup': SpeedUp}
+                   'color_shift': ColorShift, 'fade_in': FadeIn, 'fade_out': FadeOut,
+                   'blink': Blink, 'rainbow': Rainbow, 'warp': Warp, 'speedup': SpeedUp}
         return lambda: classes[type](**kwargs)
 
     def __morph_factory(self, params, context):

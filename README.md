@@ -162,8 +162,11 @@ LD.show_frame()
 ```
 
 Shapes use a 16 bit coordinate/color space (`0 .. 255*255`, y pointing up).
-The effects `Rotation`, `Translation`, `Scale`, `ColorShift`, `Blink`
-(periodic on/off or beam off at every n-th point), `DeletePoints`,
+The effects `Rotation`, `Translation`, `Scale`, `ColorShift`,
+`FadeIn` (raise the brightness from zero to full over a duration),
+`FadeOut` (fade the brightness down to zero over a duration and keep the
+shape dark), `Blink` (periodic on/off or beam off at every n-th point),
+`DeletePoints`,
 `AddPoints`, `Morph` (blend into another shape), `MultiColor` (different
 colors per part), `Rainbow`, `Warp` (travelling sine wave), `MovePoints`
 (move selected points to another position), `TranslateByPath` (move the
@@ -332,6 +335,8 @@ degrees or units per second, frequencies in hertz.
 | `translation`  | `vx`, `vy` (units/s) plus optional wobble `ax`, `ay` (amplitude) and `fx`, `fy` (Hz), `phase` (radians) |
 | `scale`        | static `factor`, or pulsing with `min`, `max`, `frequency`; `center_x`, `center_y` (default: center)   |
 | `color_shift`  | `dr`, `dg`, `db` — color change per second (negative values fade a channel out)                        |
+| `fade_in`      | `dt` (s, default 1.0) — the shape starts dark and rises to its full brightness over `dt` seconds, keeping it from then on |
+| `fade_out`     | `dt` (s, default 1.0) — the shape fades from its current brightness to zero over `dt` seconds and stays dark afterwards; unlike a negative `color_shift` it always ends in full black and the brightness never comes back up |
 | `blink`        | `period` (s), `duty` (on-fraction 0–1), `every` (blank every n-th point while on)                      |
 | `rainbow`      | `cycles`, `speed`, `phase`, `saturation`, `brightness` — rainbow gradient along the shape               |
 | `warp`         | travelling sine wave: `amplitude`, `wavelength`, `speed`, `phase`, `horizontal` (`1`/`0`)              |

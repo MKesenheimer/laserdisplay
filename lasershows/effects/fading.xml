@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Effect: fade_in and fade_out
+
+    Two circles orbiting the middle of the frame in opposite directions:
+    - fade_in_circle (orange): starts dark, rises to full brightness over
+      1.5 s (fade_in), orbits for a while, then fades to black over 2 s
+      (fade_out) and stays dark until it is removed
+    - fade_out_circle (ice blue): starts at full brightness and fades to
+      black over 3 s right away
+
+    A fade multiplies the brightness the effects attached before it have
+    produced, so fade_out always ends in full black - no matter what the
+    other effects are doing (a blink keeps pulsing dimmer, a color_shift
+    drift is overruled) - and the brightness never comes back up.  To make
+    a faded shape bright again it has to be destroyed and re-created.
+-->
+<animation fps="25" duration="12">
+    <!-- ==================== shape definitions ==================== -->
+    <shape name="fade_in_circle" type="circle" cx="96" cy="128" r="36"
+           npoints="48" red="255" green="145" blue="45"/>
+    <shape name="fade_out_circle" type="circle" cx="160" cy="128" r="36"
+           npoints="48" red="110" green="205" blue="255"/>
+
+    <!-- ======================== timeline ========================= -->
+    <event at="0.0">
+        <create shape="fade_in_circle"/>
+        <effect shape="fade_in_circle" type="fade_in" dt="1.5"/>
+        <effect shape="fade_in_circle" type="rotation" speed="40"/>
+        <create shape="fade_out_circle"/>
+        <effect shape="fade_out_circle" type="fade_out" dt="3.0"/>
+        <effect shape="fade_out_circle" type="rotation" speed="-40"/>
+    </event>
+
+    <event at="7.0">
+        <effect shape="fade_in_circle" type="fade_out" dt="2.0"/>
+    </event>
+
+    <event at="12.0">
+        <destroy shape="fade_in_circle"/>
+        <destroy shape="fade_out_circle"/>
+    </event>
+</animation>
