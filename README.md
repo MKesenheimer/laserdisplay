@@ -33,7 +33,7 @@ the factory method `LaserDisplay.create()`:
 |------------------------------|----------------------------------------------------|
 | *(unset)*                    | pygame simulator window (default)                  |
 | `lumax`                      | lumax device over USB                              |
-| `local`                      | local USB laser device (vendor id `0x3333`)        |
+| `local`                      | local USB laser device (USB `0x9999:0x5555`)       |
 | `remote:host`                | remote LaserDisplay server, default port `31337`   |
 | `remote:host:port`           | remote LaserDisplay server on a custom port        |
 
@@ -84,7 +84,6 @@ All examples live in `examples/` and select their backend through `LASER`.
 | `cube.py`                  | rotating wireframe cube                                            |
 | `clock.py`                 | analog clock                                                       |
 | `shapes.py`                | shape pipeline demo: Geometry shapes transformed with effects      |
-| `scheduler.py`             | plays the XML animation timeline `files/shapes.xml` (see below)          |
 | `pong.py`                  | playable pong — controls: player 1 `q`/`a`, player 2 `o`/`l`, `esc` quits (opens a control window when not running in the simulator) |
 | `bezier-screensaver.py`    | flying quadratic bezier curves                                     |
 | `spaceship.py`             | transformed bezier spaceship                                       |
@@ -199,9 +198,18 @@ scheduler.load_xml('./examples/files/shapes.xml')
 scheduler.run()                     # or run_in_background() for injection
 ```
 
-A ready-made timeline plus runner can be found in
-`examples/files/shapes.xml` and `examples/scheduler.py`. The complete XML format
-reference is in [lasershows/XML_FORMAT.md](lasershows/XML_FORMAT.md).
+A ready-made timeline is in `examples/files/shapes.xml`. The top-level script
+`lasershow-player.py` plays any such timeline (it is how the shows in
+`lasershows/` are run):
+
+```
+python lasershow-player.py [--fast] [--start-at TIME] TIMELINE.xml [MUSIC.file]
+```
+
+`--fast` runs through the whole timeline as fast as possible (no audio, no
+real-time pacing) to validate it; `--start-at TIME` (seconds or `M:SS[.d]`)
+seeks into the show and the music together. The complete XML format reference
+is in [lasershows/XML_FORMAT.md](lasershows/XML_FORMAT.md).
 
 ### XML file format
 

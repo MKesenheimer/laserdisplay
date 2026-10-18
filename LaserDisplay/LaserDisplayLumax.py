@@ -178,9 +178,9 @@ class LaserDisplayLumax(LaserDisplay):
         self.draw_point(cx+rx*math.cos(2*math.pi/steps*i),cy+ry*math.sin(2*math.pi/steps*i),0x02)
 
     def draw_polyline(self, points):
-        self.draw_point( points[0][0], points[0][1], 0x03)
+        self.draw_point(points[0][0], points[0][1], 0x03)
         for i in range(len(points)-2):
-            self.draw_point( points[i][0], points[i][1], 0x00)
+            self.draw_point(points[i][0], points[i][1], 0x00)
         i = len(points)-1
         self.draw_point( points[i][0], points[i][1], 0x02)
 
