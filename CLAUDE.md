@@ -28,7 +28,7 @@ pip install -e .
 
 ```
 # play a show (backend chosen via $LASER, default = pygame simulator window)
-python lasershow-player.py [--fast] [--start-at TIME] lasershows/<show>/<show>.xml [MUSIC.m4a|mp3|...]
+python lasershow-player.py [--fast] [--start-at TIME] [--settings FILE] lasershows/<show>/<show>.xml [MUSIC.m4a|mp3|...]
 
 # validate a show XML without real-time pacing or audio (runs as fast as possible)
 python lasershow-player.py --fast lasershows/<show>/<show>.xml
@@ -48,6 +48,14 @@ venv/bin/python tools/beat-detector.py SONG.m4a
 
 `--start-at` accepts seconds or `M:SS[.d]` (e.g. `1:30.5`) and seeks the show and
 music together.
+
+The laser system settings (zoom, mirroring, x-y swap, scan rate, blanking
+delay — globally and per device in `[device N]` sections) live in
+`settings.toml` at the repo root; `--settings FILE` overrides them, a missing
+file falls back to the player's built-in defaults. The device sections only
+take effect with `LASER=lumax` (one renderer per card); the driver's blanking
+delay is system-wide, so per-device values are applied in device order and the
+last one wins.
 
 ## Architecture
 

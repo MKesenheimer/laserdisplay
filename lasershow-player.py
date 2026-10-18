@@ -2,7 +2,8 @@
 
 # Plays the animation timeline from shapes.xml with the Scheduler class.
 #
-# usage: python lasershow-player.py [--fast] [--start-at TIME] TIMELINE.xml [MUSIC.wav|mp3|ogg|flac]
+# usage: python lasershow-player.py [--fast] [--start-at TIME] [--settings FILE]
+#                                     TIMELINE.xml [MUSIC.wav|mp3|ogg|flac]
 #
 # --fast   Run in validation mode: no real-time pacing, no audio.
 #          Runs through the full timeline as fast as possible to check
@@ -14,6 +15,12 @@
 #          screen with their effects already progressed, and the music (if
 #          given) is seeked to the same position.  TIME is seconds or
 #          M:SS[.d] (e.g. 90 or 1:30.5).
+#
+# --settings FILE
+#          Read the laser system settings (per-device zoom, mirroring,
+#          x-y swap, scan rate, blanking delay) from FILE instead of the
+#          default settings.toml in the script's directory; see that file
+#          for the format.
 #
 # If a music file is given (without --fast), its playback is started at the
 # same moment as the animation, so all events in the timeline stay in sync
@@ -27,6 +34,7 @@
 
 import os
 import sys
+import tomllib
 
 import gi
 gi.require_version('Gst', '1.0')
@@ -64,8 +72,76 @@ def parse_time(spec):
     except ValueError:
         raise ValueError("'%s' is not a valid time (use seconds or M:SS[.d])" % spec)
 
+def usage():
+    print('Usage: lasershow-player.py [--fast] [--start-at TIME] [--settings FILE] TIMELINE.xml [MUSIC.file]')
 
-USAGE = 'Usage: lasershow-player.py [--fast] [--start-at TIME] TIMELINE.xml [MUSIC.file]'
+# Built-in laser system settings, used when no settings file is found;
+# same structure and values as the shipped settings.toml.
+DEFAULT_SETTINGS = {
+    'global': {'zoom': 0.1, 'mirror_x': 0, 'mirror_y': 0,
+               'scan_rate': 7000, 'blanking_delay': 1},
+    'device 2': {'zoom': 0.05, 'mirror_x': 1, 'swap_xy': 1,
+                 'blanking_delay': 10},
+}
+
+
+def load_settings(path):
+    """reads the laser system settings from a TOML file; a missing file
+    falls back to DEFAULT_SETTINGS, a malformed file aborts the player"""
+    try:
+        with open(path, 'rb') as f:
+            return tomllib.load(f)
+    except FileNotFoundError:
+        print('No settings file at %s, using the built-in defaults' % path)
+        return DEFAULT_SETTINGS
+    except tomllib.TOMLDecodeError as e:
+        print('Could not parse the settings file %s: %s' % (path, e))
+        sys.exit(1)
+
+
+def apply_settings(LD, settings):
+    """applies the laser system settings: [global] to the display as a
+    whole, then each [device N] section to device N (1 = first device) —
+    only backends that expose one renderer per device (LaserDisplayLumax)
+    support the per-device sections"""
+    g = settings.get('global', {})
+    if 'zoom' in g:
+        LD.set_zoom(g['zoom'])
+    if 'mirror_x' in g or 'mirror_y' in g:
+        LD.set_mirror(g.get('mirror_x', 0), g.get('mirror_y', 0))
+    if 'scan_rate' in g:
+        LD.set_scan_rate(g['scan_rate'])
+    if 'blanking_delay' in g:
+        LD.set_blanking_delay(g['blanking_delay'])
+
+    renderers = getattr(LD, 'renderers', None)
+    if not renderers:
+        if any(name.startswith('device ') for name in settings):
+            print('Warning: the backend has no per-device renderers, '
+                  'ignoring the [device N] settings')
+        return
+    # in device order, so the last per-device blanking delay wins (the
+    # lumax driver only supports one system-wide delay)
+    for name in sorted(n for n in settings if n.startswith('device ')):
+        dev = int(name.split()[1])
+        if not 1 <= dev <= len(renderers):
+            print('Warning: %s does not exist (%d device(s)), ignoring'
+                  % (name, len(renderers)))
+            continue
+        d = settings[name]
+        r = renderers[dev - 1]
+        if 'zoom' in d:
+            r.zoom = d['zoom']
+        if 'mirror_x' in d:
+            r.mirrorx = d['mirror_x']
+        if 'mirror_y' in d:
+            r.mirrory = d['mirror_y']
+        if 'swap_xy' in d:
+            r.swapxy = d['swap_xy']
+        if 'scan_rate' in d:
+            r.scan_rate = d['scan_rate']
+        if 'blanking_delay' in d:
+            r.lmx.set_blanking_delay(d['blanking_delay'])
 
 
 def main():
@@ -77,7 +153,7 @@ def main():
     if '--start-at' in sys.argv:
         index = sys.argv.index('--start-at')
         if index + 1 >= len(sys.argv):
-            print(USAGE)
+            usage()
             sys.exit(1)
         try:
             start = parse_time(sys.argv[index + 1])
@@ -90,14 +166,24 @@ def main():
         del sys.argv[index:index + 2]
 
     if len(sys.argv) < 2:
-        print(USAGE)
+        usage()
         sys.exit(1)
+
+    # laser system settings: default settings.toml next to this script,
+    # overridable with --settings FILE
+    settings_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 'settings.toml')
+    if '--settings' in sys.argv:
+        index = sys.argv.index('--settings')
+        if index + 1 >= len(sys.argv):
+            usage()
+            sys.exit(1)
+        settings_file = sys.argv[index + 1]
+        del sys.argv[index:index + 2]
 
     LD = LaserDisplay.create()
     LD.set_time_offset(start)
-    LD.set_zoom(0.3)
-    LD.set_scan_rate(7000)
-    LD.set_blanking_delay(1)
+    apply_settings(LD, load_settings(settings_file))
 
     scheduler = Scheduler(LD, fps=25)
     scheduler.load_xml(sys.argv[1])

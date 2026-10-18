@@ -3,7 +3,7 @@ import math
 from random import random
 import numpy
 from .LaserDisplay import LaserDisplay
-from .lumax import lumax_renderer
+from .lumax import lumax, lumax_renderer
 
 class LaserDisplayLumax(LaserDisplay):
     # lumaxlib uses a 0..255 coordinate/color space scaled by 255 (16 bit)
@@ -16,8 +16,11 @@ class LaserDisplayLumax(LaserDisplay):
     MAX_INTERP = 128
 
     # Mirror output
-    MIRROR_X = 1
-    MIRROR_Y = 1
+    MIRROR_X = 0
+    MIRROR_Y = 0
+
+    # Transpose output (swap the x- and y-axes)
+    SWAP_XY = 0
 
     def __init__(self):
         LaserDisplay.__init__(self)
@@ -26,15 +29,22 @@ class LaserDisplayLumax(LaserDisplay):
         cwd = os.getcwd()
         # lumaxlib resolves its native library relative to the current working
         # directory ('./libs/liblumax_<platform>.so'); chdir to the driver
-        # directory while constructing the renderer so the library is found
+        # directory while constructing the renderers so the library is found
         # regardless of where the script was started.
         os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lumax'))
         try:
-            self.renderer = lumax_renderer(mirrorx=self.MIRROR_X, mirrory=self.MIRROR_Y)
+            self.renderers = [lumax_renderer(mirrorx=self.MIRROR_X, mirrory=self.MIRROR_Y, swapxy=self.SWAP_XY)]
+            # if a second card is connected, drive it as well, showing the
+            # same output mirrored in x (see lumax/python/demo_multi.py)
+            if lumax().get_physical_devices() >= 2:
+                try:
+                    self.renderers.append(lumax_renderer(2, mirrorx=self.MIRROR_X ^ 1, mirrory=self.MIRROR_Y, swapxy=self.SWAP_XY))
+                except RuntimeError as e:
+                    print('Warning: found a second lumax card, but could not open it: %s' % e)
         finally:
             os.chdir(cwd)
 
-        if not self.renderer.lhandle:
+        if not self.renderers[0].lhandle:
             raise IOError('Could not find lumax device ...')
 
 # private functions
@@ -49,13 +59,13 @@ class LaserDisplayLumax(LaserDisplay):
         # translate the buffered points (flags protocol of the local backend)
         # into lumax points: the device renders discrete points only, so
         # segments are interpolated and blanked points are inserted for the
-        # beam travel between shapes
+        # beam travel between shapes; zoom and mirroring are applied per
+        # device by the renderer
         points = []
         prev = None
-        center = self.SIZE / 2.0
         for (x, y, flags, r, g, b) in self.__buffer:
-            zx = min(max(center + (x - center) * self.zoom, 0), self.SIZE - 1)
-            zy = min(max(center + (y - center) * self.zoom, 0), self.SIZE - 1)
+            zx = min(max(x, 0), self.SIZE - 1)
+            zy = min(max(y, 0), self.SIZE - 1)
             lx = int(zx * self.SCALE)
             ly = int((self.SIZE - 1 - zy) * self.SCALE)
             color = (r * self.SCALE, g * self.SCALE, b * self.SCALE)
@@ -86,28 +96,50 @@ class LaserDisplayLumax(LaserDisplay):
         return numpy.array(points, dtype='uint16')
 
     def __generate_shape_points(self, shape):
-        # translates the points of a shape into lumax points, applying the
-        # global zoom (about the center of the frame) and flipping the y axis;
-        # mirroring is done on the device side by the renderer
+        # translates the points of a shape into lumax points, flipping the
+        # y axis; zoom and mirroring are applied per device by the renderer
         pts = shape.get_points()
         x = pts[:, 0].astype('float64') / self.SCALE
         y = pts[:, 1].astype('float64') / self.SCALE
-        center = self.SIZE / 2.0
-        x = numpy.clip(center + (x - center) * self.zoom, 0, self.SIZE - 1)
-        y = numpy.clip(center + (y - center) * self.zoom, 0, self.SIZE - 1)
         points = numpy.empty((len(pts), 5), dtype='uint16')
-        points[:, 0] = numpy.rint(x * self.SCALE)
-        points[:, 1] = numpy.rint((self.SIZE - 1 - y) * self.SCALE)
+        points[:, 0] = numpy.rint(numpy.clip(x, 0, self.SIZE - 1) * self.SCALE)
+        points[:, 1] = numpy.rint((self.SIZE - 1 - numpy.clip(y, 0, self.SIZE - 1)) * self.SCALE)
         points[:, 2:5] = pts[:, 2:5]
         return points
 
 # public functions
 
+    def set_zoom(self, zoom):
+        LaserDisplay.set_zoom(self, zoom)
+        # zoom is applied per device by the renderer; set a common value here
+        # and then tune individual devices via self.renderers[i].zoom
+        for r in self.renderers:
+            r.zoom = zoom
+
     def set_mirror(self, mirror_x, mirror_y):
         LaserDisplay.set_mirror(self, mirror_x, mirror_y)
-        # the lumax renderer mirrors on the device side (1 = flipped axis)
-        self.renderer.mirrorx = self.mirror_x
-        self.renderer.mirrory = self.mirror_y
+        # the lumax renderer mirrors on the device side (1 = flipped axis);
+        # the second card always shows the horizontal mirror of the first;
+        # individual devices can be tuned via self.renderers[i].mirrorx/mirrory
+        for i, r in enumerate(self.renderers):
+            r.mirrorx = self.mirror_x ^ (1 if i else 0)
+            r.mirrory = self.mirror_y
+
+    def set_scan_rate(self, value):
+        LaserDisplay.set_scan_rate(self, value)
+        # the scan rate is passed to the device with every frame, per
+        # renderer; set a common value here and then tune individual
+        # devices via self.renderers[i].scan_rate
+        for r in self.renderers:
+            r.scan_rate = value
+
+    def set_xy_swap(self, swap):
+        # the lumax renderer transposes the pattern per device (device x
+        # from the shape's y and vice versa), e.g. for a scanner head
+        # mounted rotated by 90 degrees; set a common value here and then
+        # tune individual devices via self.renderers[i].swapxy
+        for r in self.renderers:
+            r.swapxy = 1 if swap else 0
 
     def set_blanking_delay(self, value):
         LaserDisplay.set_blanking_delay(self, value)
@@ -115,38 +147,50 @@ class LaserDisplayLumax(LaserDisplay):
         # the diode cannot react instantly, so the driver shifts the light
         # channels (colors + TTL) forward by value * scan rate / 1000 points
         # to keep the beam from trailing the galvo position
-        self.renderer.lmx.set_blanking_delay(value)
+        for r in self.renderers:
+            r.lmx.set_blanking_delay(value)
 
     def set_laser_configuration(self):
         # scan rate is passed to the device with every frame
         pass
 
     def close(self):
-        # stops the laser output and releases the device
-        self.renderer.close_device()
+        # stops the laser output and releases all devices
+        for r in self.renderers:
+            r.close_device()
 
     def show_frame(self):
-        # frames built from shapes are passed to the lumax renderer directly
+        # frames built from shapes are passed to the lumax renderer directly;
+        # every card gets the same points (mirroring happens per renderer)
         if self.frame_shapes:
             for s in self.frame_shapes:
                 if s.get_number_of_points() > 0:
-                    self.renderer.add_points_to_frame(self.__generate_shape_points(s))
+                    pts = self.__generate_shape_points(s)
+                    for r in self.renderers:
+                        r.add_points_to_frame(pts)
             self.frame_shapes = []
-            if self.renderer.totnpoints > 0:
-                # lumax accepts 250..70000 pps
-                speed = max(250, min(int(self.scan_rate), 70000))
-                self.renderer.send_frame(speed)
-                self.renderer.new_frame()
+            for r in self.renderers:
+                if r.totnpoints > 0:
+                    # lumax accepts 250..70000 pps; a per-renderer rate
+                    # (self.renderers[i].scan_rate) overrides the global one
+                    rate = getattr(r, 'scan_rate', None) or self.scan_rate
+                    speed = max(250, min(int(rate), 70000))
+                    r.send_frame(speed)
+                    r.new_frame()
         else:
             self.flush_frame()
 
     def flush_frame(self):
         if len(self.__buffer):
-            self.renderer.add_points_to_frame(self.__generate_buffer())
-            # lumax accepts 250..70000 pps
-            speed = max(250, min(int(self.scan_rate), 70000))
-            self.renderer.send_frame(speed)
-            self.renderer.new_frame()
+            pts = self.__generate_buffer()
+            for r in self.renderers:
+                r.add_points_to_frame(pts)
+                # lumax accepts 250..70000 pps; a per-renderer rate
+                # (self.renderers[i].scan_rate) overrides the global one
+                rate = getattr(r, 'scan_rate', None) or self.scan_rate
+                speed = max(250, min(int(rate), 70000))
+                r.send_frame(speed)
+                r.new_frame()
         self.__buffer = []
 
     def draw_point(self, x, y, flags = 0x01):

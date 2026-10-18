@@ -1,0 +1,36 @@
+# Laser system settings for lasershow-player.py
+#
+# The player reads this file (or the file given with --settings FILE) and
+# applies the settings before the show starts. All keys are optional; a
+# missing key keeps the built-in default (the values listed here).
+#
+# Keys (in any section):
+#   zoom            scale the output about the center (1.0 = full size)
+#   mirror_x        1 = flip left/right
+#   mirror_y        1 = flip top/bottom
+#   swap_xy         1 = transpose the pattern (swap x and y), e.g. for a
+#                   scanner head mounted rotated by 90 degrees
+#   scan_rate       points per second (250..70000)
+#   blanking_delay  beam delay compensation in milliseconds
+#
+# [global] applies to all devices. [device N] overrides the global settings
+# for device N (1 = first card). Device sections only take effect on
+# backends that expose one renderer per device (LASER=lumax); they are
+# ignored with a warning on other backends.
+#
+# Note: the lumax driver only supports ONE blanking delay for the whole
+# system, so per-device blanking_delay values are applied in device order
+# and the last one wins.
+
+[global]
+zoom = 0.1
+mirror_x = 0
+mirror_y = 0
+scan_rate = 7000
+blanking_delay = 1
+
+["device 2"]
+zoom = 0.05
+mirror_x = 1
+swap_xy = 1
+blanking_delay = 10
