@@ -159,3 +159,6 @@ symmetry, fast pattern changes). It expects `lasershows/example.xml` and
 recognition of the pygame window. Validate shows with
 `python lasershow-player.py --fast <show>.xml` (runs the full timeline and
 surfaces XML/parser errors), and by reading the XML against `XML_FORMAT.md`.
+
+## Next steps
+- make the blanking delay settings (`set_blanking_delay`) individual for every device. Update `lasershow-player.py` and `LaserDisplayLumax.py`.

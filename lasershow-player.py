@@ -141,7 +141,7 @@ def apply_settings(LD, settings):
         if 'scan_rate' in d:
             r.scan_rate = d['scan_rate']
         if 'blanking_delay' in d:
-            r.lmx.set_blanking_delay(d['blanking_delay'])
+            r.lmx.set_blanking_delay(d['blanking_delay']) # TODO: make this individual per device
 
 
 def main():

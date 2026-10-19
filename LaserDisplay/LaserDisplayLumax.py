@@ -38,7 +38,7 @@ class LaserDisplayLumax(LaserDisplay):
             # same output mirrored in x (see lumax/python/demo_multi.py)
             if lumax().get_physical_devices() >= 2:
                 try:
-                    self.renderers.append(lumax_renderer(2, mirrorx=self.MIRROR_X ^ 1, mirrory=self.MIRROR_Y, swapxy=self.SWAP_XY))
+                    self.renderers.append(lumax_renderer(2, mirrorx=self.MIRROR_X, mirrory=self.MIRROR_Y, swapxy=self.SWAP_XY))
                 except RuntimeError as e:
                     print('Warning: found a second lumax card, but could not open it: %s' % e)
         finally:
@@ -122,7 +122,7 @@ class LaserDisplayLumax(LaserDisplay):
         # the second card always shows the horizontal mirror of the first;
         # individual devices can be tuned via self.renderers[i].mirrorx/mirrory
         for i, r in enumerate(self.renderers):
-            r.mirrorx = self.mirror_x ^ (1 if i else 0)
+            r.mirrorx = self.mirror_x
             r.mirrory = self.mirror_y
 
     def set_scan_rate(self, value):
