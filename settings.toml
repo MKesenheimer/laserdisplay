@@ -34,4 +34,4 @@ zoom = 0.05
 mirror_x = 0
 mirror_y = 1
 swap_xy = 1
-blanking_delay = 10
+blanking_delay = 1

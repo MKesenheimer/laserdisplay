@@ -143,12 +143,11 @@ class LaserDisplayLumax(LaserDisplay):
 
     def set_blanking_delay(self, value):
         LaserDisplay.set_blanking_delay(self, value)
-        # forward the delay to the lumax driver (lumaxlib.set_blanking_delay):
         # the diode cannot react instantly, so the driver shifts the light
         # channels (colors + TTL) forward by value * scan rate / 1000 points
         # to keep the beam from trailing the galvo position
         for r in self.renderers:
-            r.lmx.set_blanking_delay(value)
+            r.blanking_delay_ms = value
 
     def set_laser_configuration(self):
         # scan rate is passed to the device with every frame
