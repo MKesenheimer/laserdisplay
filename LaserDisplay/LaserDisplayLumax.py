@@ -145,7 +145,11 @@ class LaserDisplayLumax(LaserDisplay):
         LaserDisplay.set_blanking_delay(self, value)
         # the diode cannot react instantly, so the driver shifts the light
         # channels (colors + TTL) forward by value * scan rate / 1000 points
-        # to keep the beam from trailing the galvo position
+        # to keep the beam from trailing the galvo position; the driver only
+        # knows one process-wide value, so it is stored per renderer and
+        # pushed right before each card's frame is encoded (see
+        # show_frame/flush_frame), and individual devices can be tuned via
+        # self.renderers[i].blanking_delay_ms
         for r in self.renderers:
             r.blanking_delay_ms = value
 
@@ -174,6 +178,10 @@ class LaserDisplayLumax(LaserDisplay):
                     # (self.renderers[i].scan_rate) overrides the global one
                     rate = getattr(r, 'scan_rate', None) or self.scan_rate
                     speed = max(250, min(int(rate), 70000))
+                    # the driver's blanking delay is process-wide, but it is
+                    # read when the frame is encoded: push this card's value
+                    # right before its frame so each card keeps its own
+                    r.lmx.set_blanking_delay(getattr(r, 'blanking_delay_ms', 0))
                     r.send_frame(speed)
                     r.new_frame()
         else:
@@ -188,6 +196,10 @@ class LaserDisplayLumax(LaserDisplay):
                 # (self.renderers[i].scan_rate) overrides the global one
                 rate = getattr(r, 'scan_rate', None) or self.scan_rate
                 speed = max(250, min(int(rate), 70000))
+                # the driver's blanking delay is process-wide, but it is
+                # read when the frame is encoded: push this card's value
+                # right before its frame so each card keeps its own
+                r.lmx.set_blanking_delay(getattr(r, 'blanking_delay_ms', 0))
                 r.send_frame(speed)
                 r.new_frame()
         self.__buffer = []

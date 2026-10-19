@@ -53,9 +53,9 @@ The laser system settings (zoom, mirroring, x-y swap, scan rate, blanking
 delay — globally and per device in `[device N]` sections) live in
 `settings.toml` at the repo root; `--settings FILE` overrides them, a missing
 file falls back to the player's built-in defaults. The device sections only
-take effect with `LASER=lumax` (one renderer per card); the driver's blanking
-delay is system-wide, so per-device values are applied in device order and the
-last one wins.
+take effect with `LASER=lumax` (one renderer per card). The driver's blanking
+delay is process-wide, but the backend pushes each card's value right before
+that card's frame is encoded, so per-device `blanking_delay` works.
 
 ## Architecture
 
@@ -159,6 +159,3 @@ symmetry, fast pattern changes). It expects `lasershows/example.xml` and
 recognition of the pygame window. Validate shows with
 `python lasershow-player.py --fast <show>.xml` (runs the full timeline and
 surfaces XML/parser errors), and by reading the XML against `XML_FORMAT.md`.
-
-## Next steps
-- make the blanking delay settings (`set_blanking_delay`) individual for every device. Update `lasershow-player.py` and `LaserDisplayLumax.py`.

@@ -18,16 +18,16 @@
 # backends that expose one renderer per device (LASER=lumax); they are
 # ignored with a warning on other backends.
 #
-# Note: the lumax driver only supports ONE blanking delay for the whole
-# system, so per-device blanking_delay values are applied in device order
-# and the last one wins.
+# Note: the lumax driver only knows one process-wide blanking delay; the
+# backend pushes each card's value right before that card's frame is
+# encoded, so the per-device values are genuinely independent.
 
 [global]
 zoom = 0.1
 mirror_x = 0
 mirror_y = 0
 scan_rate = 7000
-blanking_delay = 0
+blanking_delay = 1
 
 ["device 2"]
 zoom = 0.05

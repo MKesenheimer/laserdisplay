@@ -79,9 +79,9 @@ def usage():
 # same structure and values as the shipped settings.toml.
 DEFAULT_SETTINGS = {
     'global': {'zoom': 0.1, 'mirror_x': 0, 'mirror_y': 0,
-               'scan_rate': 7000, 'blanking_delay': 1},
-    'device 2': {'zoom': 0.05, 'mirror_x': 1, 'swap_xy': 1,
-                 'blanking_delay': 10},
+               'scan_rate': 7000, 'blanking_delay': 0},
+    'device 2': {'zoom': 0.05, 'mirror_x': 0, 'mirror_y': 1, 'swap_xy': 1,
+                 'blanking_delay': 1},
 }
 
 
@@ -120,8 +120,7 @@ def apply_settings(LD, settings):
             print('Warning: the backend has no per-device renderers, '
                   'ignoring the [device N] settings')
         return
-    # in device order, so the last per-device blanking delay wins (the
-    # lumax driver only supports one system-wide delay)
+    # in device order
     for name in sorted(n for n in settings if n.startswith('device ')):
         dev = int(name.split()[1])
         if not 1 <= dev <= len(renderers):
@@ -141,7 +140,9 @@ def apply_settings(LD, settings):
         if 'scan_rate' in d:
             r.scan_rate = d['scan_rate']
         if 'blanking_delay' in d:
-            r.lmx.set_blanking_delay(d['blanking_delay']) # TODO: make this individual per device
+            # stored per device; the backend pushes each card's value to the
+            # (process-wide) driver right before that card's frame is encoded
+            r.blanking_delay_ms = d['blanking_delay']
 
 
 def main():
