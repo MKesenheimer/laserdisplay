@@ -51,6 +51,19 @@ class LaserDisplaySimulator(LaserDisplay):
             self.surface.fill( (0,0,0) )
             pygame.display.set_caption('Laser Display Simulator')
             self._timestamp_font = pygame.font.Font(None, 20)
+            self._font_height = self._timestamp_font.get_height()
+            # the legend text is static: render its surfaces once here (they
+            # are blitted, not re-rendered, every frame)
+            self._legend = []
+            for i, line in enumerate(self.LEGEND):
+                stamp = self._timestamp_font.render(line, True, (128,128,128))
+                y = self.surface.get_height() - self._font_height*(len(self.LEGEND)-i) - 4
+                self._legend.append((stamp, y))
+            # the timestamp surfaces change at most every 10 ms: cache them
+            # and only re-render when the tick value changes
+            self._last_ticks = None
+            self._timestamp_text_stamp = None
+            self._timestamp_seconds_stamp = None
             self._timestamp_start = time.perf_counter()
             self._clock_start = 0.0
             self._marks = []
@@ -146,22 +159,22 @@ class LaserDisplaySimulator(LaserDisplay):
     def set_laser_configuration(self):
         pass
 
-    def __draw_legend(self):
-        # the key descriptions in the lower part of the window
-        height = self._timestamp_font.get_height()
-        for i, line in enumerate(self.LEGEND):
-            stamp = self._timestamp_font.render(line, True, (128,128,128))
-            y = self.surface.get_height() - height*(len(self.LEGEND)-i) - 4
-            self.surface.blit(stamp, (4, y))
-
     def flush_frame(self):
         self.__open_timeline()
         self.__process_events()
-        stamp = self._timestamp_font.render(self.__timestamp_text(), True, (128,128,128))
-        self.surface.blit(stamp, (4,4))
-        stamp = self._timestamp_font.render(self.__timestamp_seconds(), True, (128,128,128))
-        self.surface.blit(stamp, (4,4 + stamp.get_height()))
-        self.__draw_legend()
+        # re-render the timestamp surfaces only when the 10 ms tick changes,
+        # then blit the cached timestamp and legend surfaces
+        ticks = self.__timestamp_ticks()
+        if ticks != self._last_ticks:
+            self._last_ticks = ticks
+            self._timestamp_text_stamp = self._timestamp_font.render(
+                self.__timestamp_text(), True, (128,128,128))
+            self._timestamp_seconds_stamp = self._timestamp_font.render(
+                self.__timestamp_seconds(), True, (128,128,128))
+        self.surface.blit(self._timestamp_text_stamp, (4,4))
+        self.surface.blit(self._timestamp_seconds_stamp, (4, 4 + self._font_height))
+        for stamp, y in self._legend:
+            self.surface.blit(stamp, (4, y))
         pygame.display.flip()
         self.surface.fill( (0,0,0) )
 

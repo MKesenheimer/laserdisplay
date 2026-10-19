@@ -23,14 +23,14 @@
 # encoded, so the per-device values are genuinely independent.
 
 [global]
-zoom = 0.1
+zoom = 0.2
 mirror_x = 0
 mirror_y = 0
 scan_rate = 7000
 blanking_delay = 1
 
 ["device 2"]
-zoom = 0.05
+zoom = 0.09
 mirror_x = 0
 mirror_y = 1
 swap_xy = 1

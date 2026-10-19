@@ -141,6 +141,10 @@ class _ActiveShape:
     def __init__(self, shape):
         self.shape = shape
         self.base = shape.get_points().astype('float64')
+        # the shape's points for the current frame (after its effects),
+        # kept separate from shape.points so the shape object keeps holding
+        # its original uint16 points
+        self.display_points = None
         self.effects = []                # list of (start, anim_start, effect)
         # animation time of the shape: the time its effects are evaluated
         # with. Normally it equals the animation (wall) time; speedup
@@ -864,8 +868,10 @@ class Scheduler:
     def __update_shapes(self, now):
         # recomputes every active shape from its original points by piping it
         # through all of its attached effects; points that leave the screen
-        # keep their true coordinates in the shape (they are only filtered
-        # when the shape is added to the output buffer, see __render())
+        # keep their true coordinates (they are only filtered when the shape
+        # is added to the output buffer, see __render()). The result is kept
+        # in display_points; the shape object itself still holds its
+        # original (uint16) points.
         with self._lock:
             entries = list(self._active.values())
         for entry in entries:
@@ -873,12 +879,11 @@ class Scheduler:
             for (start, anim_start, effect) in entry.effects:
                 if now >= start:
                     pts = effect.transform(pts, entry.anim_time(now) - anim_start)
-            entry.shape.points = pts
-            entry.shape.npoints = len(pts)
+            entry.display_points = pts
 
     def __render(self):
         with self._lock:
-            shapes = [self.__visible_shape(entry.shape)
+            shapes = [self.__visible_points(entry.display_points)
                       for entry in self._active.values()]
         self.display.new_frame()
         for s in shapes:
@@ -887,15 +892,13 @@ class Scheduler:
         self.display.show_frame()
 
     @staticmethod
-    def __visible_shape(shape):
+    def __visible_points(pts):
         # returns a new shape holding only the points that lie on the screen
-        # (0 .. MAX), or None if the shape has no visible points; the given
-        # shape keeps all of its points
-        pts = shape.get_points()
+        # (0 .. MAX) for both coordinates, or None if there are no visible
+        # points; the given points keep all of their points
         if len(pts) == 0:
             return None
-        mask = (pts[:, 0] >= 0) & (pts[:, 0] <= MAX) & \
-               (pts[:, 1] >= 0) & (pts[:, 1] <= MAX)
+        mask = ((pts[:, 0:2] >= 0) & (pts[:, 0:2] <= MAX)).all(axis=1)
         if not mask.any():
             return None
         return Shape(numpy.rint(pts[mask]).astype('uint16'))

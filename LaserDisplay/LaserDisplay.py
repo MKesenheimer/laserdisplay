@@ -1,5 +1,6 @@
 import math
 from random import random
+import numpy
 from numpy import matrix
 
 class LaserDisplay():
@@ -155,29 +156,39 @@ class LaserDisplay():
     def _draw_shape(self, shape):
         # renders a shape using the classic drawing primitives; shapes use
         # the 16 bit coordinate/color space (0 .. 255*255) with y pointing up,
-        # the display uses 0 .. SIZE-1 with y pointing down
+        # the display uses 0 .. SIZE-1 with y pointing down. A shape is
+        # drawn as a sequence of same-color runs: a run is a maximal stretch
+        # of consecutive points sharing one non-zero color, so blank points
+        # (r=g=b=0) split the polyline (the beam is moved off) and a color
+        # change starts a new run.
         pts = shape.get_points()
         n = len(pts)
-        i = 0
-        while i < n:
-            r = int(pts[i, 2])
-            g = int(pts[i, 3])
-            b = int(pts[i, 4])
+        if n == 0:
+            return
+        color = pts[:, 2:5]                      # (n, 3) r, g, b
+        # a segment boundary is at index 0 and at every point whose color
+        # differs from the previous point's; each segment is a maximal
+        # constant-color stretch. A run is a segment whose color is not
+        # blank (r=g=b=0); blank segments draw nothing and split the
+        # polyline (the beam is moved off).
+        change = numpy.zeros(n, dtype=bool)
+        change[0] = True
+        change[1:] = (color[1:] != color[:-1]).any(axis=1)
+        starts = numpy.flatnonzero(change)
+        ends = numpy.append(starts[1:], n)
+        # display-space coordinates for every point (x right, y down),
+        # computed once and sliced per run
+        x = pts[:, 0].astype('float64') / 255.0
+        y = (self.SIZE - 1) - pts[:, 1].astype('float64') / 255.0
+        for s, e in zip(starts, ends):
+            r, g, b = color[s]
             if r == 0 and g == 0 and b == 0:
-                # blanked point: splits the polyline (beam is moved off)
-                i += 1
                 continue
-            # collect the run of consecutive points with identical color
-            j = i + 1
-            while j < n and int(pts[j, 2]) == r and int(pts[j, 3]) == g and int(pts[j, 4]) == b:
-                j += 1
-            self.set_color((min(r >> 8, 255), min(g >> 8, 255), min(b >> 8, 255)))
-            run = [(float(p[0]) / 255.0, (self.SIZE - 1) - float(p[1]) / 255.0) for p in pts[i:j]]
-            if len(run) == 1:
-                self.draw_point(run[0][0], run[0][1])
+            self.set_color((int(r) >> 8, int(g) >> 8, int(b) >> 8))
+            if e - s == 1:
+                self.draw_point(x[s], y[s])
             else:
-                self.draw_polyline(run)
-            i = j
+                self.draw_polyline(numpy.column_stack((x[s:e], y[s:e])))
 
     def draw_point(self, x, y, flags = 0):
         raise NotImplementedError

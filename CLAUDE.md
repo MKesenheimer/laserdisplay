@@ -159,3 +159,143 @@ symmetry, fast pattern changes). It expects `lasershows/example.xml` and
 recognition of the pygame window. Validate shows with
 `python lasershow-player.py --fast <show>.xml` (runs the full timeline and
 surfaces XML/parser errors), and by reading the XML against `XML_FORMAT.md`.
+
+## Next Steps
+
+Frame-generation pipeline review (2026-10-19) and the Python-side fixes that
+followed it. Per-frame numbers are measured with `tools/frame-bench.py`
+(added 2026-10-19) on the dev Mac (Apple silicon, venv Python 3.14):
+`python tools/frame-bench.py <show>.xml` benchmarks a real show, `--sweep` runs
+the 500/2k/8k/32k-point synthetic scaling, and `--points N` one size. It is
+pure CPU (no hardware, no audio, no window), so the numbers reproduce
+before/after a change.
+
+**Status:** items 2–6 are done. Item 1 (the lumax card-query latency) is the
+only remaining item and needs a hardware check before it is touched. Within
+item 5, the Rainbow arclength cache and the dead-code cleanups were
+deliberately **not** done (see that item).
+
+### 1. (open) Lumax: the 30 ms card-query is the dominant latency
+
+`lumaxlib.py send_frame()` calls `wait_for_buffer(handle, 17)` after every
+`Lumax_SendFrame`; that enters the timeout branch of `Lumax_WaitForBuffer`
+(`liblumax.c` ~line 739), which purges, writes the query, then does an
+**unconditional `usleep(30000)`** before the first read — so each call costs
+≥30 ms even when the card answers instantly, and the 17 ms deadline can never
+take effect. With two cards served sequentially that is ≥60 ms/frame, over the
+40 ms (25 fps) budget: on real hardware the show is paced by card queries, not
+by the scheduler. Verify on the cards first, then fix. Options, in increasing
+order of change: shorten the first poll to 2–5 ms (cards answer in ~5 ms) and
+poll until the deadline; or use the `TimeToWait`/`TimeUntilFree` value
+`Lumax_SendFrame` already reads from the frame-end reply and drop the second
+round-trip; or wait for buffer-free *before* sending (the reference VB flow
+does this) instead of after; and/or send to both cards first, wait once.
+This is the only remaining CPU→device gap; the encode and replay work below no
+longer competes with it.
+
+### 2. (done) Vectorize `lumaxlib.lumax_renderer.__generate_buffer()`
+
+Replaced the per-point Python loop (numpy scalar reads + scalar `xout`/`yout`
+helpers + 5 ctypes writes/point) with one vectorized build: the whole frame is
+assembled as a single C-contiguous `(total, 9)` uint16 array `[x, y, r, g, b,
+Ch6, Ch7, Ch8, TTL]` (leading center point, then per-shape
+`[blank@first, lit points, blank@last]`), zoom/clip/mirror applied with numpy,
+and mapped onto the ctypes struct array in one copy
+(`(_lpoint * total).from_buffer(arr)` — `_lpoint` is 9 contiguous uint16s, no
+padding, so the layout is byte-identical). `_lpoints` is now a thin wrapper
+(`length` + `struct_arr`) around that buffer; the old `_lpoints(n)` zero-fill
+loop is gone. Verified byte-identical to the old loop across
+zoom×mirrorx×mirrory×swapxy permutations and multi-shape frames with blanks.
+
+`__generate_buffer` ms/frame, `--sweep` (1 renderer):
+
+```
+points | before | after
+   500 |   1.68 |  0.05   (34×)
+  2000 |   6.59 |  0.06   (110×)
+  8000 |  27.76 |  0.10   (278×)
+ 32000 | 103.43 |  0.25   (414×)
+```
+
+~4 µs/point → ~0.01 µs/point; the encode is now sub-millisecond at every size
+that matters, so it no longer competes with the 40 ms budget (×2 cards).
+
+### 3. (done) Vectorize `LaserDisplay._draw_shape()` (simulator/remote/local replay)
+
+Replaced the per-point scalar while loop with numpy run detection: color-run
+boundaries are found with one comparison over the color columns
+(`change[0]=True; change[1:] = (color[1:] != color[:-1]).any(axis=1)`), each
+maximal constant-color stretch is a segment and a segment that is not blank
+(r=g=b=0) is a run; blank segments draw nothing and split the polyline. Display
+coordinates are computed once for all points and sliced per run; a 1-point run
+calls `draw_point`, a longer one calls `draw_polyline` with a numpy `(m, 2)`
+array. Semantics preserved exactly (blank points split runs, single lit points
+become points, equal-color adjacency is one polyline) — verified identical call
+sequences to the old loop on frames with blanks, single points and multi-run
+shapes.
+
+`LaserDisplayRemote` polylines/quadratic/cubic are built in one pass:
+`__write_points` applies the `_output_transform` math to the whole array and
+formats the message body with `numpy.savetxt` into a single `sendall` (byte-
+identical to the old per-point `'%f %f'`, including the empty case).
+
+Replay (`_draw_shape`) ms/frame, `--sweep` (random-color shapes, every point its
+own run — the worst case for the new run loop; real shows have a few long runs
+and do better):
+
+```
+points | before | after
+   500 |   0.75 |  0.59
+  2000 |   3.01 |  2.29
+  8000 |  12.36 |  8.93
+ 32000 |  47.76 | 35.52
+```
+
+Even in the adversarial isolated-run case the precompute makes the new path
+~1.3–1.4× faster; on realistic (few-long-run) shapes the win is larger, and
+`shed-my-skin` replay dropped 0.11 → 0.05 ms/frame (2.2×).
+
+### 4. (done) Lumax: plain list in `add_shape_to_frame()`
+
+`lumax_renderer.shapes` is now a plain Python list (`__init__` and `new_frame`
+reset to `[]`; `add_shape_to_frame` appends) instead of a `numpy.append`'d
+object array — `numpy.append` is O(n) per call (a k-shape frame cost O(k²)) and
+produced an object array that only masqueraded as a list. `len()`, iteration
+and `get_points()` all work unchanged; demos keep working.
+
+### 5. (done, with deliberate skips) Minor items
+
+Done:
+- `Scheduler.__update_shapes` stores the per-frame float64 result in a new
+  `entry.display_points` instead of overwriting `entry.shape.points` (a uint16
+  by contract); `__render` reads `display_points`. `entry.base` remains the
+  sole original-points source.
+- `Scheduler.__visible_shape` is now `__visible_points(pts)` (takes the array
+  directly) with a single chained mask
+  `((pts[:, 0:2] >= 0) & (pts[:, 0:2] <= MAX)).all(axis=1)` instead of four
+  separate comparisons.
+- The simulator renders the 3 legend strings once in `__init__` (cached
+  surfaces) and re-renders the two timestamp surfaces only when the 10 ms tick
+  changes, replacing 5 font renders/frame with blits.
+
+Deliberately skipped (by decision):
+- **Rainbow arclength cache** — caching `_arclength_fraction()` per point count
+  would freeze the gradient for any future show that puts a geometry-altering
+  effect (`warp`/`morph`) ahead of `rainbow` in the chain; the gain is a few µs,
+  not worth the latent correctness risk.
+- **Dead code** — `AddPoints`/`DeletePoints` (exported from
+  `LaserDisplay/__init__.py` but unused), the legacy `shape`/`geometry` classes
+  in `lumaxlib.py` (used only by the demos), and `LaserDisplay.noise_clamp()`
+  (shadows `min`/`max`, only the local backend uses it) all left in place.
+
+### 6. (done) Benchmark harness — `tools/frame-bench.py`
+
+Added. Given a show XML it runs the Scheduler (mock display, no audio, no
+real-time pacing) and reports ms/frame for the scheduler core (process events /
+update shapes / render, via phase timing), the lumax encode
+(`__generate_shape_points` + `__generate_buffer` on a device-less renderer), and
+the `_draw_shape` replay, plus average/peak points/frame. `--sweep` /
+`--points N` add the synthetic scaling. No hardware, no audio, no window.
+Rule of thumb now: a few hundred points/frame is free on the CPU side at every
+stage; the lumax encode is sub-millisecond, and the real-time bottleneck on
+hardware is item 1's card query, not the encode.

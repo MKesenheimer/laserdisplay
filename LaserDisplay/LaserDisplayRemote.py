@@ -1,4 +1,6 @@
+import io
 import socket
+import numpy
 from .LaserDisplay import LaserDisplay
 
 class LaserDisplayRemote(LaserDisplay):
@@ -12,6 +14,26 @@ class LaserDisplayRemote(LaserDisplay):
 
     def __write(self, msg):
         self.remote.sendall(msg.encode('ascii'))
+
+    def __write_points(self, cmd, points):
+        # builds and sends `cmd x1 y1 x2 y2 ...` in one pass: the
+        # _output_transform math is applied to the whole array, the message
+        # body is formatted with savetxt (C-speed) and sent as a single write
+        pts = numpy.asarray(points, dtype='float64')
+        if pts.size == 0:
+            self.__write(cmd + '\r\n')
+            return
+        center = self.SIZE / 2.0
+        x = center + (pts[:, 0] - center) * self.zoom
+        y = center + (pts[:, 1] - center) * self.zoom
+        if self.mirror_x:
+            x = (self.SIZE - 1) - x
+        if self.mirror_y:
+            y = (self.SIZE - 1) - y
+        sio = io.StringIO()
+        numpy.savetxt(sio, numpy.column_stack((x, y)), fmt='%.6f', delimiter=' ')
+        body = sio.getvalue().replace('\n', ' ').rstrip()
+        self.__write(cmd + (' ' + body if body else '') + '\r\n')
 
     def set_laser_configuration(self):
         self.__write('config %d %d\r\n' % (self.blanking_delay, self.scan_rate))
@@ -42,22 +64,10 @@ class LaserDisplayRemote(LaserDisplay):
         self.__write('ellipse %f %f %f %f\r\n' % (cx, cy, rx * self.zoom, ry * self.zoom))
 
     def draw_polyline(self, points):
-        msg = 'polyline'
-        for p in points:
-            px, py = self._output_transform(p[0], p[1])
-            msg += ' %f %f' % (px, py)
-        self.__write(msg + '\r\n')
+        self.__write_points('polyline', points)
 
     def draw_quadratic_bezier(self, points, steps):
-        msg = 'quadratic'
-        for p in points:
-            px, py = self._output_transform(p[0], p[1])
-            msg += ' %f %f' % (px, py)
-        self.__write(msg + '\r\n')
+        self.__write_points('quadratic', points)
 
     def draw_cubic_bezier(self, points, steps):
-        msg = 'cubic'
-        for p in points:
-            px, py = self._output_transform(p[0], p[1])
-            msg += ' %f %f' % (px, py)
-        self.__write(msg + '\r\n')
+        self.__write_points('cubic', points)
